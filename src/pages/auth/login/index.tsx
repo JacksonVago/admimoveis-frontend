@@ -14,10 +14,12 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { z } from 'zod'
+import { useGlobalParams } from '@/globals/GlobalParams'
 
 interface LoginData {
   login: string
   password: string
+  empresaId?: number
 }
 
 interface loginResponse {
@@ -52,6 +54,7 @@ const loginSchema = z.object({
   password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
   newpassword: z.string().optional(),
   newpasswordconf: z.string().optional(),
+  empresaId: z.number().optional()
 })
 
 export const putUpdateUser = (id: string, datapwd: {
@@ -67,6 +70,8 @@ type LoginSchema = z.infer<typeof loginSchema>
 
 export function Login() {
   const navigate = useNavigate()
+  //Globals
+  const glb_params = useGlobalParams();  
   
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -92,6 +97,7 @@ export function Login() {
 
   const onSubmit = (data: LoginSchema) => {
     if (!updPassword) {
+      data.empresaId = data.empresaId || loginUser?.empresaId || (glb_params.id_empresa ? parseInt(glb_params.id_empresa) : 0);
       login(data);
     } else {
       if (!data.newpassword || data.newpassword.length < 8) {
@@ -164,7 +170,7 @@ export function Login() {
 
   const handlerValidPwd = (pwd: string) => {
     if (loginUser) {
-      postLogin({ login: loginUser.login, password: pwd })
+      postLogin({ login: loginUser.login, password: pwd, empresaId: loginUser.empresaId })
         .then((response) => {
           if (response) {
             setError('password', {});

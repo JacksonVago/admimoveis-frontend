@@ -57,8 +57,8 @@ export const getTipos = async (empresaId:number) => {
 
 
 // API & Query Logic
-export const getImoveis = async ({ page, limit, search, type, rooms, price, tipo, exclude }: GetImoveisParams) => {
-    return await api.get<BasePaginationData<Imovel>>('imoveis/locacao', {
+export const getImoveis = async (empresaId:number, { page, limit, search, type, rooms, price, tipo, exclude }: GetImoveisParams) => {
+    return await api.get<BasePaginationData<Imovel>>(`imoveis/locacao/${empresaId}`, {
         params: {
             page,
             limit,
@@ -72,7 +72,7 @@ export const getImoveis = async ({ page, limit, search, type, rooms, price, tipo
     })
 }
 
-export const useGetImoveisQueryOptions = ({
+export const useGetImoveisQueryOptions = (empresaId:number, {
     search,
     type,
     rooms,
@@ -93,8 +93,8 @@ export const useGetImoveisQueryOptions = ({
     exclude?: string
 } = {}) => {
     return queryOptions({
-        queryKey: ['imoveis', { search, type, rooms, price, page, limit, tipo, exclude }, queryKeys],
-        queryFn: () => getImoveis({ search, type, rooms, price, page, limit, tipo, exclude })
+        queryKey: ['imoveis', empresaId, { search, type, rooms, price, page, limit, tipo, exclude }, queryKeys],
+        queryFn: () => getImoveis(empresaId, { search, type, rooms, price, page, limit, tipo, exclude })
     })
 }
 
@@ -142,7 +142,7 @@ export default function ListarImoveisLocacao({
     });
 
     const { data, isLoading } = useQuery(
-        useGetImoveisQueryOptions({
+        useGetImoveisQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,{
             page,
             limit,
             search,

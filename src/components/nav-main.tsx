@@ -43,7 +43,7 @@ export function NavMain({
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem onClick={useSidebar().toggleSidebar}>
-              <SidebarMenuButton className={isMobile ? "py-5" : "py-3"} asChild tooltip={item.title}>
+              <SidebarMenuButton className={isMobile ? "py-5" : "py-3"} asChild tooltip={item.title} onClick={()=>{glb_params.updPastaOrig(item.title)}}>
                 <Link to={item.url}>
                   <item.icon />
                   <span style={{ "fontSize": isMobile ? ".80rem" : "0.80rem" }}>{item.title}</span>

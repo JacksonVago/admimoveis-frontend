@@ -25,6 +25,7 @@ export const STORAGE_REFRESH_TOKEN_KEY = '@my_application_refresh_token'
 interface LoginData {
   login: string
   password: string
+  empresaId?: number
 }
 
 interface loginResponse {
@@ -119,7 +120,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const response = await postLogin({
         login: data.login,
-        password: data.password
+        password: data.password,
+        empresaId: data.empresaId
       })
       const { access_token } = response
 

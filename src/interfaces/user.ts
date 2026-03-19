@@ -70,6 +70,10 @@ export type Permission =
   | 'UPDATE_LANCAMENTO_CONDOMINIO'
   | 'DELETE_LANCAMENTO_CONDOMINIO'
   | 'VIEW_LANCAMENTOS_CONDOMINIOS'
+  | 'CREATE_MORADOR'
+  | 'UPDATE_MORADOR'
+  | 'DELETE_MORADOR'
+  | 'VIEW_MORADORES'
 
 
 export const userPermissions: {
@@ -130,6 +134,10 @@ export const userPermissions: {
   UPDATE_LANCAMENTO_CONDOMINIO: 'Atualizar lançamento condomínio',
   DELETE_LANCAMENTO_CONDOMINIO: 'Deletar lançamento condomínio',
   VIEW_LANCAMENTOS_CONDOMINIOS: 'Visualizar lançamentos condomínios',
+  CREATE_MORADOR: 'Criar morador',
+  UPDATE_MORADOR: 'Atualizar morador',
+  DELETE_MORADOR: 'Deletar morador',
+  VIEW_MORADORES: 'Visualizar moradores',
 
 }
 

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { CondominioForm } from './components/condominio-form'
 import { condominioSchema, CondominioSchema } from '@/schemas/condominio.schema'
 import { useGlobalParams } from '@/globals/GlobalParams'
+import api from '@/services/axios/api'
 
 
 //const CONDOMINIO_KNOWN_ERRORS = ['Condomínio já cadastrado']
@@ -90,6 +91,9 @@ export const CriarCondominio = () => {
       const jsonData = JSON.stringify(dataObject);
       console.log(jsonData);
 
+      await api.post('condominios', form, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       /*const response = await api.post('condominios', form, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })*/
@@ -102,7 +106,7 @@ export const CriarCondominio = () => {
 
       toast({ title: 'Condomínio criado com sucesso' })
       //navigate(`${ROUTE.IMOVEIS}/${response.data.id}`)
-      navigate(`${ROUTE.IMOVEIS}`)
+      navigate(`${ROUTE.CONDOMINIOS}`)
 
     } catch (error) {
       console.log(error);

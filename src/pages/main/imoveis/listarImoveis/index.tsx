@@ -55,13 +55,13 @@ export interface BasePaginationData<T> {
   currentPosition: number
 }
 
-export const getTipos = async (empresaId:number) => {
+export const getTipos = async (empresaId: number) => {
   return await api.get<TipoImovel[]>(`tipoimovel/${empresaId}`)
 }
 
 
 // API & Query Logic
-export const getImoveis = async (empresaId:number, { page, limit, search, type, rooms, price, tipo, exclude }: GetImoveisParams) => {
+export const getImoveis = async (empresaId: number, { page, limit, search, type, rooms, price, tipo, exclude }: GetImoveisParams) => {
   return await api.get<BasePaginationData<Imovel>>('imoveis/' + empresaId.toString(), {
     params: {
       page,
@@ -76,7 +76,7 @@ export const getImoveis = async (empresaId:number, { page, limit, search, type, 
   })
 }
 
-export const useGetImoveisQueryOptions = (empresaId:number, {
+export const useGetImoveisQueryOptions = (empresaId: number, {
   search,
   type,
   rooms,
@@ -138,7 +138,7 @@ export default function ListarImoveis({
 
   const [searchParams, setSearchTerm] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1
-  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : (isMobile && limitView > 2) ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
+  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? (showcard ? 6 : 9) : (isMobile && limitView > 2) ? 1 : limitView > 0 ? (showcard ? limitView : 9) : limitView || Number(searchParams.get('limit')) || (showcard ? 6 : 9));
   const search = searchParams.get('search') || ''
   const tipo = searchParams.get('tipo') || undefined
 
@@ -151,7 +151,7 @@ export default function ListarImoveis({
   });
 
   const { data, isLoading } = useQuery(
-    useGetImoveisQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,{
+    useGetImoveisQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {
       page,
       limit,
       search,
@@ -266,9 +266,11 @@ export default function ListarImoveis({
           user?.permissions.includes("ALL") ||
           user?.permissions.includes("CREATE_IMOVEL")
         ) && !onSelectImovel) && (
-            <Button size={"sm"} onClick={handleClickCreateImovel}>
-              <Plus className="mr-2 h-4 w-4" /> Criar imovel
-            </Button>
+            <div>
+              <Button size={"sm"} onClick={handleClickCreateImovel}>
+                <Plus className="mr-2 h-4 w-4" /> Criar imovel
+              </Button>
+            </div>
           )
         }
       </div>
@@ -314,7 +316,7 @@ export default function ListarImoveis({
             <Loader />
           </div>
         ) :
-        
+
           (
             showcard ?
               (
@@ -462,11 +464,11 @@ export default function ListarImoveis({
         <PaginationContent>
           {/* Previous & Next Buttons */}
           <PaginationItem>
-            <PaginationPrevious onClick={() => handlePageChange(page - 1)} />
+            <PaginationPrevious onClick={() => handlePageChange(page - 1)} className='hover:cursor-pointer hover:bg-gray-200 rounded' />
           </PaginationItem>
           {generatePaginationLinks(page, !totalPages ? 1 : totalPages, (limit === 1 ? limit : isBigScreen ? 10 : isPortrait ? 10 : isTablet ? 5 : 1), handlePageChange)}
           <PaginationItem>
-            <PaginationNext onClick={() => handlePageChange(page + 1)} />
+            <PaginationNext onClick={() => handlePageChange(page + 1)} className='hover:cursor-pointer hover:bg-gray-200 rounded' />
           </PaginationItem>
         </PaginationContent>
       </Pagination>

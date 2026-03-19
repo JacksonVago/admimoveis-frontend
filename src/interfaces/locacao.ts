@@ -5,6 +5,8 @@ import { Imovel } from './imovel'
 import { Locatario } from './locatario'
 import { LancamentoLocacao } from './lancamentos'
 import { Empresa } from './empresa'
+import { Morador } from './morador'
+import { Boleto } from './boleto'
 
 export enum BackendGarantiaLocacaoTypes {
   SEGURO_FIANCA = 'SEGURO_FIANCA',
@@ -58,7 +60,10 @@ export interface Locacao {
   updatedAt: string
 
   locatarios?:Locatario[]
+  boletos?: Boleto[]
+  //reajustes?: Reajuste[]
   lancamentos?: LancamentoLocacao[]
+  moradores?: Morador[]
 }
 
 export interface SeguroFianca {

@@ -443,12 +443,12 @@ export const DetalhesImovel = () => {
 
   //remove null values from object
   const parsedData = transformNullToUndefined(imovel || {})
-  console.log('parsedData', parsedData);
+  console.log('parsedData', imovel);
 
   //remove null values from object endereço
   const enderecoData = transformNullToUndefined(imovel?.endereco || {})
 
-  const defaultValues = {
+  const defaultValuesImovel = {
     ...parsedData,
     //tipoId: imovel?.tipo.name,
     empresaId: imovel?.empresaId,
@@ -462,7 +462,7 @@ export const DetalhesImovel = () => {
     images: imageFiles,
     condominioId: imovel?.condominioId,
     blocoId: imovel?.blocoId,
-    condominioBloco: imovel?.condominioId + ';' + imovel?.blocoId,
+    condominioBloco: imovel?.condominioId.toString() + ';' + imovel?.blocoId.toString(),
     imovelPhotos: imageFiles,
   }
 
@@ -470,9 +470,11 @@ export const DetalhesImovel = () => {
   const imovelMethods = useForm<ImovelSchema>({
     resolver: zodResolver(imovelSchema),
     mode: 'all',
-    defaultValues
+    defaultValues:defaultValuesImovel
   })
 
+  console.log(imovelMethods.getValues());
+  
   //Dados do proprietário schema de validação
   const imovelProp = useForm<PropImovelSchema>({
     resolver: zodResolver(propImoveSchema),
@@ -525,14 +527,15 @@ export const DetalhesImovel = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      imovelMethods.reset(defaultValues)
+      console.log('reset');
+      imovelMethods.reset(defaultValuesImovel)
     }
 
   }, [isSuccess, imageFiles])
 
   useEffect(() => {
-    console.log(glb_params.pastaOrig);
-  }, [glb_params])
+    imovelMethods.setValue("condominioBloco", imovel?.condominioId.toString() + ';' + imovel?.blocoId.toString())
+  }, [defaultValuesImovel])
 
   //Validade dados do imóvel no caso de alteração
   const onSubmitImovelData = (data: ImovelSchema) => {    

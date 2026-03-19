@@ -7,6 +7,7 @@ import {  useNavigate } from 'react-router-dom'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { blocoSchema, BlocoSchema } from '@/schemas/bloco.schema'
 import { BlocoForm } from './components/bloco-form'
+import api from '@/services/axios/api'
 
 
 //TODO: create a interface for created imovel
@@ -80,6 +81,9 @@ export const CriarBloco = () => {
       const jsonData = JSON.stringify(dataObject);
       console.log(jsonData);
 
+      await api.post('blocos', form, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       /*const response = await api.post('blocos', form, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })*/

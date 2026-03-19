@@ -16,10 +16,12 @@ export const generatePaginationLinks = (
   if (totalPages <= showPages) {
     for (let i = 1; i <= totalPages; i++) {
       pages.push(
-        <PaginationItem key={i}>
+        <PaginationItem key={i}                  
+        >
           <PaginationLink
             onClick={() => onPageChange(i)}
             isActive={i === currentPage}
+            className="hover:cursor-pointer hover:bg-gray-200 rounded"
           >
             {i}
           </PaginationLink>

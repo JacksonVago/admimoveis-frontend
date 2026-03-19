@@ -132,7 +132,7 @@ export const DetalhesLancamento = () => {
         description: `Lançamento excluído com sucesso`
       })
     }
-  })
+  });
 
   const onSubmitLancamentoData = async (data: LancamentoSchema) => {
     try {
@@ -268,12 +268,11 @@ export const DetalhesLancamento = () => {
   }, [defaultValues])
 
   //react hook form
-
   const lancamentoMethods = useForm<LancamentoSchema>({
     resolver: zodResolver(lancamentoSchema),
     defaultValues,
     mode: 'all'
-  })
+  });
 
   React.useEffect(() => {
     if (locacao) {
