@@ -300,7 +300,7 @@ export const DetalhesEmpresaForm = () => {
             variant="outline"
             size="sm"
             onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
-            className='bg-gray-100'
+            className='bg-gray-100 hover:cursor-pointer'
           >
             <Edit className="mr-2 h-4 w-4" />
             {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
@@ -319,6 +319,7 @@ export const DetalhesEmpresaForm = () => {
                 disabled={
                   !empresaMethods.formState.isDirty || !empresaMethods.formState.isValid
                 }
+                className='hover:cursor-pointer'
               >
                Salvar Alterações
               </Button>

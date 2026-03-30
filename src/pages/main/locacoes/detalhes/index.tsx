@@ -881,7 +881,13 @@ export default function DetalhesLocacao() {
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
       <div className="flex items-center justify-between">
-        <h1 className="text-1xl font-bold">{`${locacao?.imovel?.endereco.logradouro} ${locacao?.imovel?.endereco.numero} - ${locacao?.imovel?.description}`}</h1>
+                          <span className="text-wrap"
+                    style={
+                      {
+                        fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
+                      }}
+
+                  >{`${locacao?.imovel?.endereco.logradouro} ${locacao?.imovel?.endereco.numero} - ${locacao?.imovel?.description}`}</span>
         {activeTab === 'personal-info' && (
           <AlertDialog>
             <AlertDialogTrigger asChild>

@@ -224,7 +224,7 @@ export default function ListarTipos() {
           }}
         >
           <DialogTrigger asChild>
-            <Button size={"sm"}>
+            <Button size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'>
               <Plus className="mr-2 h-4 w-4" /> Criar Tipo de Imóvel
             </Button>
           </DialogTrigger>
@@ -249,7 +249,7 @@ export default function ListarTipos() {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleCreateTipo}>Criar Tipo</Button>
+              <Button onClick={handleCreateTipo} className='hover:cursor-pointer hover:bg-gray-600'>Criar Tipo</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -282,6 +282,7 @@ export default function ListarTipos() {
                           setSelectedTipo(tipo)
                           setIsEditDialogOpen(true)
                         }}
+                        className='hover:cursor-pointer hover:bg-gray-200'
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>

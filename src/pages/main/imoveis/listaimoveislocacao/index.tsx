@@ -131,7 +131,7 @@ export default function ListarImoveisLocacao({
     const page = Number(searchParams.get('page')) || 1
     const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : (isMobile && limitView > 2) ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
     const search = searchParams.get('search') || ''
-    const tipo = searchParams.get('tipo') || undefined
+    const tipo = searchParams.get('tipo') || '0'
 
     //Consulta Tipo imóvel
     const {
@@ -166,7 +166,7 @@ export default function ListarImoveisLocacao({
 
         if (totalPages && page > totalPages) {
             navigate({
-                search: `?page=1&limit=${limit}&search=${search}&tipo=${(tipo !== null ? tipo : '')}`
+                search: `?page=1&limit=${limit}&search=${search}&tipo=${tipo}`
             })
         }
     }, [totalPages, page, limit, search, tipo])
@@ -185,7 +185,7 @@ export default function ListarImoveisLocacao({
 
         if (!canChangePage) return
         navigate({
-            search: `?page=${newpage}&limit=${limit}&search=${search}&tipo=${(tipo !== null && tipo !== undefined ? tipo : '')}`
+            search: `?page=${newpage}&limit=${limit}&search=${search}&tipo=${tipo}`
         })
     }
 

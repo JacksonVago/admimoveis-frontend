@@ -313,7 +313,7 @@ export const DetalhesCondominio = () => {
                 user?.permissions.includes("ALL") ||
                 user?.permissions.includes("DELETE_CONDOMINIO")
               ) && (
-                  <Button variant="destructive">
+                  <Button variant="destructive" className='h-full hover:cursor-pointer hover:bg-red-400'>
                     <Trash2 className="mr-2 h-4 w-4" />
                     Excluir Condomínio
                   </Button>)}
@@ -343,9 +343,9 @@ export const DetalhesCondominio = () => {
 
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <TabsList>
-          <TabsTrigger value="cond-info">Dados do Condomínio</TabsTrigger>
-          <TabsTrigger value="blocos">Blocos</TabsTrigger>
-          <TabsTrigger value="imoveis">Imóveis</TabsTrigger>
+          <TabsTrigger value="cond-info" className=' hover:cursor-pointer hover:bg-gray-200'>Dados do Condomínio</TabsTrigger>
+          <TabsTrigger value="blocos" className=' hover:cursor-pointer hover:bg-gray-200'>Blocos</TabsTrigger>
+          <TabsTrigger value="imoveis" className=' hover:cursor-pointer hover:bg-gray-200'>Imóveis</TabsTrigger>
         </TabsList>
 
         <TabsContent value="cond-info" className="space-y-4 font-[Poppins-regular]">
@@ -362,6 +362,7 @@ export const DetalhesCondominio = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
+                      className=' hover:cursor-pointer hover:bg-gray-200'
                     >
                       <Edit className="mr-2 h-4 w-4" />
                       {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
@@ -385,6 +386,7 @@ export const DetalhesCondominio = () => {
                         !condominioMethods.formState.isDirty || !condominioMethods.formState.isValid
                       }
                       type="submit"
+                      className="mt-4 hover:cursor-pointer hover:bg-gray-600"
                     >
                       Salvar Alterações
                     </Button>
@@ -404,10 +406,11 @@ export const DetalhesCondominio = () => {
               user?.permissions.includes("UPDATE_PROPRIETARIO")
             ) && (
                 <Button
+                  className="hover:cursor-pointer hover:bg-gray-600"
                   size={"sm"}
                   onClick={handlerNewBloco}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Propriedade
+                  Bloco
                 </Button>
               )}
           </div>
@@ -457,7 +460,7 @@ export const DetalhesCondominio = () => {
                       ) && (
 
                           <Button
-                            className='mt-2'
+                            className="mt-2 hover:cursor-pointer hover:bg-gray-200"
                             variant="secondary"
                             size="sm"
                             onClick={() => { /*handlerDetailProp(proprietario.pessoaId)*/ }}
@@ -495,7 +498,7 @@ export const DetalhesCondominio = () => {
                 <Card key={imovel.id}>
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
-                      <span>{imovel.id}</span>
+                      <span>{imovel.description}</span>
                       <Badge variant={imovel.status == ImovelStatus.INDISPONIVEL ? "destructive" : "default"} >{imovel.status}</Badge>
                     </CardTitle>
                   </CardHeader>
@@ -537,7 +540,26 @@ export const DetalhesCondominio = () => {
 
                     <hr className="border-t border-gray-300 mt-3" />
                   </CardContent>
-                  <CardFooter className="flex justify-end space-x-2 font-[Poppins-regular]">                    
+                  <CardFooter className="flex justify-end space-x-2 font-[Poppins-regular]">    
+                                          {(isAdmin ||
+                        user?.permissions.includes("ALL") ||
+                        user?.permissions.includes("VIEW_BLOCOS")
+                      ) && (
+
+                          <Button
+                            className="mt-2 hover:cursor-pointer hover:bg-gray-200"
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => { /*handlerDetailProp(proprietario.pessoaId)*/ }}
+                            style={
+                              {
+                                fontSize: '0.8rem',
+                              }}
+                          >
+                            Ver detalhes
+                          </Button>
+                        )}
+                
                   </CardFooter>
                 </Card>
               ))}

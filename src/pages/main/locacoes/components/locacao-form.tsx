@@ -74,7 +74,7 @@ export const LocacaoFormContent = ({
       setSelGarantia(sel);
     }
   }, []);
-  
+
   //Lista de imóveis
   const locacaoImoveis = useFieldArray({
     control: createLocacaoMethods.control,
@@ -315,10 +315,11 @@ export const LocacaoFormContent = ({
         <div style={{ display: (!selFiador ? 'block' : 'none') }}>
           <div>
             {(!selLocatario && !selImovel && !selFiador) && (
-              <div>
-                <Label className='text-base' >Imóvel</Label>
+              <div>                
                 {(locacaoImoveis.fields.length > 0) ? (
+                  
                   <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
+                    <Label className='text-base' >Imóvel</Label>
                     {locacaoImoveis.fields.map((field, index) => (
                       <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
                         <Label >{field.nome}</Label>
@@ -337,7 +338,12 @@ export const LocacaoFormContent = ({
                   </div>
                 ) : (
                   <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
-                    <div className='flex justify-end items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                    <Button type='button'
+                      onClick={() => {
+                        handlerSelImovel('imoveis')
+                      }}
+                    >Adicionar imóvel</Button>
+                    {/*<div className='flex justify-end items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
                       <button disabled={disabled}
                         className='border bg-zinc-200 hover:bg-zinc-400'
                         type="button"
@@ -347,7 +353,7 @@ export const LocacaoFormContent = ({
                       >
                         <Search className='px-1'></Search>
                       </button>
-                    </div>
+                    </div>*/}
                   </div>
                 )}
                 {!!createLocacaoMethods?.formState?.errors?.imovelId?.message && (

@@ -68,11 +68,11 @@ export const MainLayout = () => {
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 bg-gray-100">
           <div className="flex w-full items-center justify-between gap-2 px-8">
-            <SidebarTrigger onClick={()=>{ glb_params.updPastaOrig("")}} className="-ml-1" />
+            <SidebarTrigger onClick={()=>{ glb_params.updPastaOrig("")}} className="-ml-1 hover:cursor-pointer" />
             <Label>{glb_params.title_form}</Label>
             <Avatar className={nameUser ? 'w-1/3' : 'w-10'}>
               <AvatarImage src="http://localhost:3000/assets/images/avatar.jpg" />
-              <AvatarFallback className="bg-gray-200" onClick={() => { setNameUser(!nameUser) }}>
+              <AvatarFallback className="bg-gray-200 hover:cursor-pointer hover:bg-gray-300" onClick={() => { setNameUser(!nameUser) }}>
                 {nameUser ? firstName : firstName?.charAt(0)?.toUpperCase()}
               </AvatarFallback>
             </Avatar>

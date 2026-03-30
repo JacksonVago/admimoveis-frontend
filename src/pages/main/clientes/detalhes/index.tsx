@@ -378,6 +378,7 @@ export const DetalhesClienteForm = ({
                 variant="outline"
                 size="sm"
                 onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
+                className='hover:cursor-pointer bg-gray-100 hover:bg-gray-200'
               >
                 <Edit className="mr-2 h-4 w-4" />
                 {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
@@ -394,7 +395,7 @@ export const DetalhesClienteForm = ({
           <div className="mt-4">
             {disabled && (
               <Button
-                className=""
+                className="hover:cursor-pointer"
                 disabled={
                   !clienteMethods.formState.isDirty || !clienteMethods.formState.isValid
                 }
@@ -856,7 +857,7 @@ export default function DetalhesCliente() {
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{cliente?.nome}</h1>
+        <h1 className="text-2xl font-bold">{cliente?.nome}</h1>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             {(isAdmin ||
@@ -864,7 +865,7 @@ export default function DetalhesCliente() {
               user?.permissions.includes("DELETE_PESSOA")
             ) && (
 
-                <Button variant="destructive">
+                <Button variant="destructive" className='h-full hover:cursor-pointer hover:bg-red-400'>
                   <Trash2 className="mr-2 h-4 w-4" />
                   Excluir Cliente
                 </Button>
@@ -888,11 +889,11 @@ export default function DetalhesCliente() {
         </AlertDialog>
       </div>
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
-        <TabsList>
-          <TabsTrigger value="personal-info" className='text-[0.7rem]'>Dados Pessoais</TabsTrigger>
-          <TabsTrigger value="propriedades" className='text-[0.7rem]'>Propriedades</TabsTrigger>
-          <TabsTrigger value="locacoes" className='text-[0.7rem]'>Locações</TabsTrigger>
-          <TabsTrigger value="finance" className='text-[0.7rem]'>Fianças</TabsTrigger>
+        <TabsList >
+          <TabsTrigger value="personal-info" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Dados Pessoais</TabsTrigger>
+          <TabsTrigger value="propriedades" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Propriedades</TabsTrigger>
+          <TabsTrigger value="locacoes" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Locações</TabsTrigger>
+          <TabsTrigger value="finance" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Fianças</TabsTrigger>
         </TabsList>
 
         <TabsContent value="personal-info" className="space-y-4">
@@ -908,6 +909,7 @@ export default function DetalhesCliente() {
               user?.permissions.includes("UPDATE_PROPRIETARIO")
             ) && (
                 <Button
+                  className='hover:cursor-pointer hover:bg-gray-600'
                   size={"sm"}
                   onClick={handlerNewProp}>
                   <Plus className="mr-2 h-4 w-4" />
@@ -925,7 +927,8 @@ export default function DetalhesCliente() {
 
                 <form className="space-y-4" onSubmit={clienteProp.handleSubmit(handleSubmitPropriedade)}>
                   <div className="grid grid-cols-1 gap-4 flex items-center">
-                    <Button onClick={() => { handlerSelImovel('propriedades') }}>
+                    <Button onClick={() => { handlerSelImovel('propriedades') }}
+                      className='hover:cursor-pointer'>
                       <Search className="mr-2 h-4 w-4" />
                       Imóveis
                     </Button>
@@ -958,7 +961,7 @@ export default function DetalhesCliente() {
                     <Card id='teste' className='h-full'>
                       <div className="flex  justify-end">
                         <Button onClick={() => { setSelImovel(false) }}
-                          className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
+                          className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400 hover:cursor-pointer'>X</Button>
                       </div>
                       <CardHeader>
                         <DialogTitle className='flex items-center justify-center'>Selecionar o Imóvel</DialogTitle>
@@ -978,7 +981,8 @@ export default function DetalhesCliente() {
                   </div>
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button type="submit" size={"sm"}
+                      <Button type="submit" size={"sm"} 
+                      className='hover:cursor-pointer hover:bg-gray-600'
                       >Adicionar Propriedade</Button>
                     </DialogClose>
                   </DialogFooter>
@@ -1020,7 +1024,7 @@ export default function DetalhesCliente() {
                   ) && (
                       <div className="grid grid-cols-3 gap-4 flex items-end mt-2">
                         <Button
-                          className='col-start-3'
+                          className='col-start-3 hover:cursor-pointer hover:bg-gray-200'
                           variant="secondary"
                           size="sm"
                           onClick={() => { handlerDetailImovel(proprietario.imovelId) }}
@@ -1044,6 +1048,7 @@ export default function DetalhesCliente() {
                       ) && (
 
                           <Button variant="outline" size="sm"
+                          className='hover:cursor-pointer hover:bg-gray-200'
                             onClick={() => { handlerEditPropriedade(proprietario) }}>
                             <Edit className="mr-2 h-4 w-4" />
                             Editar
@@ -1099,6 +1104,7 @@ export default function DetalhesCliente() {
                         <DialogFooter>
                           <DialogClose asChild>
                             <Button type="submit"
+                            className='hover:cursor-pointer hover:bg-gray-600'
                             >Salvar Alterações</Button>
                           </DialogClose>
                         </DialogFooter>
@@ -1110,6 +1116,7 @@ export default function DetalhesCliente() {
                     user?.permissions.includes("DELETE_PROPRIETARIO")
                   ) && (
                       <Button variant="destructive" size="sm"
+                      className='hover:cursor-pointer hover:bg-red-400'
                         onClick={() => { handleDeletePropriedade(proprietario) }}>
                         <Trash2 className="mr-2 h-4 w-4" />
                         Excluir
@@ -1167,7 +1174,7 @@ export default function DetalhesCliente() {
                       ) && (
                           <div className='grid grid-cols-3 gap-4 flex items-end mt-2'>
                             <Button
-                              className='col-start-3'
+                              className='col-start-3 hover:cursor-pointer hover:bg-gray-200'
                               variant="secondary"
                               size="sm"
                               onClick={() => { handlerDetailImovel(parseFloat(locacao?.imovelId.toString())) }}
@@ -1191,6 +1198,7 @@ export default function DetalhesCliente() {
                           ) && (
                               <Button variant="outline" size="sm"
                                 onClick={() => { handlerEditLocacao(locacao) }}
+                                className='hover:cursor-pointer hover:bg-gray-200'
                               >
                                 <Edit className="mr-2 h-4 w-4" />
                                 Editar
@@ -1402,7 +1410,7 @@ export default function DetalhesCliente() {
                             </div>
                           </form>
                           <DialogFooter>
-                            <Button type="submit">Salvar Locação</Button>
+                            <Button type="submit" className='hover:cursor-pointer hover:bg-gray-600'>Salvar Locação</Button>
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
@@ -1410,7 +1418,9 @@ export default function DetalhesCliente() {
                         user?.permissions.includes("ALL") ||
                         user?.permissions.includes("DELETE_LOCACAO")
                       ) && (
-                      <Button variant="destructive" size="sm">
+                      <Button variant="destructive" size="sm"
+                      className='hover:cursor-pointer hover:bg-red-400'
+                      >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Excluir
                       </Button>
@@ -1470,9 +1480,10 @@ export default function DetalhesCliente() {
                 </div>
                 <div className='grid grid-cols-2 gap-3 flex items-end mt-2'>
                   <Button
-                    className='col-start-3'
+                    className='col-start-3 hover:cursor-pointer hover:bg-gray-200'
                     variant="secondary"
                     size="sm"
+                    
                     onClick={() => { handlerDetailImovel(parseFloat(locacao?.imovelId.toString())) }}
                     style={
                       {
@@ -1487,7 +1498,8 @@ export default function DetalhesCliente() {
               <CardFooter className="flex justify-end space-x-2">
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm"
+                    className='hover:cursor-pointer hover:bg-gray-200'>
                       <Edit className="mr-2 h-4 w-4" />
                       Editar
                     </Button>
@@ -1515,7 +1527,7 @@ export default function DetalhesCliente() {
                       </div>
                     </form>
                     <DialogFooter>
-                      <Button type="submit">Adicionar Propriedade</Button>
+                      <Button type="submit" className='hover:cursor-pointer hover:bg-gray-600'>Adicionar Propriedade</Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -1523,7 +1535,8 @@ export default function DetalhesCliente() {
                   <Edit className="mr-2 h-4 w-4" />
                   Editar
                 </Button> */}
-                <Button variant="destructive" size="sm">
+                <Button variant="destructive" size="sm"
+                className='hover:cursor-pointer hover:bg-red-400'>
                   <Trash2 className="mr-2 h-4 w-4" />
                   Excluir
                 </Button>

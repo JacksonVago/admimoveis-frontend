@@ -278,7 +278,7 @@ export default function ListarTiposLancamento() {
           }}
         >
           <DialogTrigger asChild>
-            <Button size={"sm"}>
+            <Button size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'>
               <Plus className="mr-2 h-4 w-4 font-[Poppins-regular]" /> Criar Tipo de Lançamento
             </Button>
           </DialogTrigger>
@@ -382,7 +382,7 @@ export default function ListarTiposLancamento() {
             </div>
 
             <DialogFooter>
-              <Button onClick={handleCreateTipo}>Criar Tipo</Button>
+              <Button onClick={handleCreateTipo} className='hover:cursor-pointer hover:bg-gray-600'>Criar Tipo</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

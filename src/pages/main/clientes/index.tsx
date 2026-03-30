@@ -166,7 +166,7 @@ export default function ListarClientes({
           user?.permissions.includes("ALL") ||
           user?.permissions.includes("CREATE_PESSOA")
         ) && (
-            <Button onClick={handleClickCreateCliente} size={"sm"}>
+            <Button onClick={handleClickCreateCliente} size={"sm"} className='hover:cursor-pointer hover:bg-gray-700'>
               <Plus className="h-4 w-4" />Criar Cliente
             </Button>
           )}
@@ -240,7 +240,7 @@ export default function ListarClientes({
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="w-full"
+                    className="w-full hover:cursor-pointer hover:bg-gray-200"
                     onClick={handleClickVerDetalhes(cliente.id)}
                     style={
                       {

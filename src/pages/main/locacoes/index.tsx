@@ -32,6 +32,7 @@ import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { LocacaoStatus } from '@/enums/locacao/enums-locacao'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
+import { usdFormatter } from '@/utils/format-money'
 
 // Types
 interface GetLocacoesParams {
@@ -255,13 +256,13 @@ export default function ListarLocacoes({
             <Card key={locacao.id} className="flex flex-col">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span className="truncate"
+                  <span className="text-wrap"
                     style={
                       {
                         fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
                       }}
 
-                  >{locacao?.imovel?.endereco?.logradouro}</span>
+                  >{(locacao?.locatarios ? locacao?.locatarios[0].pessoa?.nome : '') + ' - ' + locacao?.imovel?.endereco?.logradouro + ' - ' + locacao?.imovel?.endereco?.complemento}</span>
                   <Badge variant="secondary">
                     {locacao?.locatarios?.length}
                     {locacao?.locatarios?.length && locacao?.locatarios?.length > 1
@@ -273,7 +274,7 @@ export default function ListarLocacoes({
               <CardContent className="flex-grow">
                 <dl className="grid grid-cols-2 gap-1 text-sm">
                   <dt className="font-semibold">Valor do Aluguel:</dt>
-                  <dd className="truncate">{locacao?.valorAluguel}</dd>
+                  <dd className="truncate">{usdFormatter.format(locacao?.valorAluguel)}</dd>
                   <dt className="font-semibold">Dia de vencimento:</dt>
                   <dd className="truncate">{locacao?.diaVencimento || 'N/A'}</dd>
                   <dt className="font-semibold">Situacao:</dt>

@@ -37,12 +37,6 @@ export const CondominioFormContent = ({
   disabled?: boolean
 }) => {
 
-
-
-  console.log('condominio dados', createCondominioMethods.formState.errors);
-  console.log('condominio dados', createCondominioMethods.formState.isValid);
-  console.log('condominio dados', createCondominioMethods.formState.isDirty);
-
   return (
     <div className="space-y-4">
       <div>
@@ -276,14 +270,14 @@ export const CondominioFormSubmitButton = ({
     <div className="">
       <Button
         type="submit"
-        className="mt-4"
+        className="mt-4 hover:cursor-pointer hover:bg-gray-600"
         size={"sm"}
         disabled={
           disabled
           ||
           !createCondominioMethods.formState.isDirty ||
           !createCondominioMethods.formState.isValid
-        }
+        }        
       >
         Criar Condomínio
       </Button>

@@ -150,7 +150,7 @@ export default function ListarCondominios({
   const hasSearchResults = Boolean(!isLoading && search && condominios?.length === 0)
 
   const handleClickVerDetalhes = (id: string) => {
-    navigate(`${ROUTE.CONDOMINIOS}/findbyid/${id}`)
+    navigate(`${ROUTE.CONDOMINIOS}/${id}`)
   }
 
   const handlerClickMaps = (endereco: Endereco) => {
@@ -165,8 +165,8 @@ export default function ListarCondominios({
         {!onSelectCondominio && (
           <div className='grid grid-cols-3'>
             {showcard ?
-              (<Table onClick={() => { setShowCard(!showcard) }} color='black' />) :
-              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' />)
+              (<Table onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer ' />) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer'/>)
             }
             {/* <h1 className="col-span-2 text-2xl font-bold">Imoveis</h1> 
           <Button className='flex justify-center' style={{ 'backgroundColor': 'transparent'}}
@@ -180,7 +180,7 @@ export default function ListarCondominios({
           user?.permissions.includes("ALL") ||
           user?.permissions.includes("CREATE_CONDOMINIO")
         ) && !onSelectCondominio) && (
-            <Button size={"sm"} onClick={handleClickCreateCondominio}>
+            <Button size={"sm"} onClick={handleClickCreateCondominio} className='hover:cursor-pointer hover:bg-gray-600'>
               <Plus className="mr-2 h-4 w-4" /> Criar condomínio
             </Button>
           )
@@ -238,6 +238,7 @@ export default function ListarCondominios({
                       <CardFooter className="flex justify-between">
                         <div className='grid grid-cols-2 gap-10'>
                           <Button
+                          className='hover:cursor-pointer hover:bg-gray-200'
                             variant="secondary"
                             size="sm"
                             onClick={() => handleClickVerDetalhes(condominio?.id.toString())}
@@ -246,6 +247,7 @@ export default function ListarCondominios({
                           </Button>
                           {onSelectCondominio && (
                             <Button
+                              className='hover:cursor-pointer hover:bg-gray-200'
                               variant="secondary"
                               size="sm"
                               onClick={() => {
@@ -288,6 +290,7 @@ export default function ListarCondominios({
                           <td className="border-b p-2">
                             <div className="flex space-x-2">
                               <Button
+                                className='hover:cursor-pointer hover:bg-gray-600'
                                 size="sm"
                                 onClick={() => handleClickVerDetalhes(condominio?.id.toString())}
                               >
@@ -311,11 +314,11 @@ export default function ListarCondominios({
         <PaginationContent>
           {/* Previous & Next Buttons */}
           <PaginationItem>
-            <PaginationPrevious onClick={() => handlePageChange(page - 1)} />
+            <PaginationPrevious onClick={() => handlePageChange(page - 1)} className='hover:cursor-pointer hover:bg-gray-200 rounded' />
           </PaginationItem>
           {generatePaginationLinks(page, !totalPages ? 1 : totalPages, (limit === 1 ? limit : isBigScreen ? 10 : isPortrait ? 10 : isTablet ? 5 : 1), handlePageChange)}
           <PaginationItem>
-            <PaginationNext onClick={() => handlePageChange(page + 1)} />
+            <PaginationNext onClick={() => handlePageChange(page + 1)} className='hover:cursor-pointer hover:bg-gray-200 rounded' />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
