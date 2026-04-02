@@ -251,8 +251,8 @@ export default function ListarImoveis({
         {!onSelectImovel && (
           <div className='grid grid-cols-3'>
             {showcard ?
-              (<Table onClick={() => { setShowCard(!showcard) }} color='black' />) :
-              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' />)
+              (<Table onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-200'/>) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-200'/>)
             }
             {/* <h1 className="col-span-2 text-2xl font-bold">Imoveis</h1> 
           <Button className='flex justify-center' style={{ 'backgroundColor': 'transparent'}}
@@ -267,7 +267,7 @@ export default function ListarImoveis({
           user?.permissions.includes("CREATE_IMOVEL")
         ) && !onSelectImovel) && (
             <div>
-              <Button size={"sm"} onClick={handleClickCreateImovel}>
+              <Button size={"sm"} onClick={handleClickCreateImovel} className='hover:cursor-pointer hover:bg-gray-700'>
                 <Plus className="mr-2 h-4 w-4" /> Criar imovel
               </Button>
             </div>
@@ -287,7 +287,7 @@ export default function ListarImoveis({
         {/* Filter Selects */}
         <div className="flex gap-2">
           <Select onValueChange={(value) => { handlerChangeTipo(value) }}>
-            <SelectTrigger className="h-4 w-[160px]">
+            <SelectTrigger className="h-4 w-[160px] hover:cursor-pointer hover:outline">
               <SelectValue placeholder="Tipo" />
             </SelectTrigger>
             <SelectContent>
@@ -368,6 +368,7 @@ export default function ListarImoveis({
                             variant="secondary"
                             size="sm"
                             onClick={() => handleClickVerDetalhes(imovel?.id.toString())}
+                            className='hover:cursor-pointer hover:bg-gray-300'
                           >
                             Ver detalhes
                           </Button>
@@ -407,7 +408,7 @@ export default function ListarImoveis({
                     </thead>
                     <tbody>
                       {imoveis?.map((imovel) => (
-                        <tr key={imovel.id} className="hover:bg-gray-100">
+                        <tr key={imovel.id} className="hover:bg-gray-300">
                           <td className={imovel.status === ImovelStatus.INDISPONIVEL ? "border-b p-2 text-red-600" : "border-b p-2"}>
                             {imovel.description} -
                             {getEnderecoFormatado(imovel?.endereco)}
@@ -443,6 +444,7 @@ export default function ListarImoveis({
                               <Button
                                 size="sm"
                                 onClick={() => handleClickVerDetalhes(imovel?.id.toString())}
+                                className='hover:cursor-pointer hover:bg-gray-700'
                               >
                                 Ver detalhes
                               </Button>

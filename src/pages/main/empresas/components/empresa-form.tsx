@@ -12,14 +12,17 @@ import {
 import { ESTADOS } from '@/constants/estados'
 import { ApiCep } from '@/interfaces/cep'
 import api from '@/services/axios/api'
-import { Controller, UseFormReturn } from 'react-hook-form'
+import { Controller, useFormContext, UseFormReturn } from 'react-hook-form'
 import { EmpresaSchema } from '@/schemas/empresa.schema'
 import { formatCpfCnpj, formatPhone } from '@/utils/format-cpfcnpj'
 import { Switch, Thumb } from "@radix-ui/react-switch"
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { TipoLancamento } from '@/interfaces/lancamentotipo'
 import { useQuery } from '@tanstack/react-query'
 import { useGlobalParams } from '@/globals/GlobalParams'
+import { Download, ImagePlus } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob'
 
 export const getTipos = async (empresaId: number) => {
   return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
@@ -49,6 +52,18 @@ export const EmpresaFormContent = ({
   const [showBoleto, setShowBoleto] = useState(createEmpresaMethods.getValues("emiteBoleto") === "S" ? true : false);
   //Globals
   const glb_params = useGlobalParams();
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (files) {
+      createEmpresaMethods.setValue('logo', URL.createObjectURL(files[0]), {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true
+      })
+    }
+  }
 
   //Consulta Tipo imóvel
   const {
@@ -58,7 +73,24 @@ export const EmpresaFormContent = ({
     queryFn: () => getTipos(Number(glb_params.id_empresa))
   });
 
-  console.log(tipoLancamento);
+  const handleAddImageClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const downloadDocument = async (logo: any) => {
+    try {
+      const blobName = AZURE_BLOB_CONTAINER + logo;
+      const a = document.createElement('a');
+      a.href = blobName;
+      a.download = logo; // Desired filename for download
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
   return (
     <>
       <div className="space-y-4 font-[Poppins-Regular]">
@@ -405,6 +437,45 @@ export const EmpresaFormContent = ({
                 {createEmpresaMethods.formState.errors.porcentagemComissao.message}
               </p>)}
           </Label>
+
+        </div>
+
+        {/*Logo */}
+        <div className="mb-6 w-full space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-2xlg font-semibold">Imagens do Imóvel</h3>
+            {!disabled && (
+              <Button onClick={handleAddImageClick} variant="outline" size="sm" type="button">
+                <ImagePlus className="mr-2 h-4 w-4" />
+                Adicionar Logo
+              </Button>
+            )}
+          </div>
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            ref={fileInputRef}
+            disabled={disabled}
+            onChange={handleImageUpload}
+          />
+            <div className="p-1">
+              <Card>
+                <CardContent className="relative flex aspect-square items-center justify-center p-2">
+                  <img
+                    src={createEmpresaMethods.getValues("logo")}
+                    className="h-full w-full rounded-md object-cover"
+                  />
+                  <Button
+                    className="absolute left-98 top-7 h-6 w-2 opacity-0 hover:opacity-75"
+                    onClick={() => downloadDocument("logo")}
+                    type="button"
+                  >
+                    <Download />
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
 
         </div>
 

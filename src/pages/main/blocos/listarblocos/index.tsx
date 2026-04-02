@@ -17,7 +17,7 @@ import { useAuth } from '@/hooks/auth/use-auth'
 import { Bloco } from '@/interfaces/bloco'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { IdCard, Plus, Search, Table } from 'lucide-react'
+import { IdCard, List, Plus, Search, Table } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -156,6 +156,12 @@ export default function ListarBlocos({
     }
   }, [totalPages, page, limit, search])
 
+  useEffect(() => {
+    if (isMobile){
+      setShowCard(true);
+    }
+  }, [isMobile])
+
   // Event Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const search = e.target.value
@@ -193,8 +199,8 @@ export default function ListarBlocos({
         {!onSelectBloco && (
           <div className='grid grid-cols-3'>
             {showcard ?
-              (<Table onClick={() => { setShowCard(!showcard) }} color='black' />) :
-              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' />)
+              (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer '/>) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer '/>)
             }
             {/* <h1 className="col-span-2 text-2xl font-bold">Imoveis</h1> 
           <Button className='flex justify-center' style={{ 'backgroundColor': 'transparent'}}
@@ -208,7 +214,8 @@ export default function ListarBlocos({
           user?.permissions.includes("ALL") ||
           user?.permissions.includes("CREATE_BLOCO")
         ) && !onSelectBloco) && (
-            <Button size={"sm"} onClick={handleClickCreateBloco}>
+            <Button size={"sm"} onClick={handleClickCreateBloco}
+            className='hover:bg-gray-500 hover:cursor-pointer'>
               <Plus className="mr-2 h-4 w-4" /> Criar bloco
             </Button>
           )
@@ -266,6 +273,7 @@ export default function ListarBlocos({
                             variant="secondary"
                             size="sm"
                             onClick={() => handleClickVerDetalhes(bloco?.id.toString())}
+                            className='hover:bg-gray-200 hover:cursor-pointer'
                           >
                             Ver detalhes
                           </Button>
@@ -303,7 +311,7 @@ export default function ListarBlocos({
                     </thead>
                     <tbody>
                       {blocos?.map((bloco) => (
-                        <tr key={bloco.id} className="hover:bg-gray-100">
+                        <tr key={bloco.id} className="hover:bg-gray-300">
                           <td className="border-b p-2">
                             {bloco?.name}
                           </td>
@@ -312,10 +320,11 @@ export default function ListarBlocos({
                             {getEnderecoFormatado(bloco?.condominio.endereco)}
                           </td>
                           <td className="border-b p-2">
-                            <div className="flex space-x-2">
+                            <div className="flex space-x-2 justify-end">
                               <Button
                                 size="sm"
                                 onClick={() => handleClickVerDetalhes(bloco?.id.toString())}
+                                className="hover:bg-gray-500 hover:cursor-pointer"
                               >
                                 Ver detalhes
                               </Button>
@@ -337,11 +346,13 @@ export default function ListarBlocos({
         <PaginationContent>
           {/* Previous & Next Buttons */}
           <PaginationItem>
-            <PaginationPrevious onClick={() => handlePageChange(page - 1)} />
+            <PaginationPrevious onClick={() => handlePageChange(page - 1)} 
+              className='hover:bg-gray-200 hover:cursor-pointer'/>
           </PaginationItem>
           {generatePaginationLinks(page, !totalPages ? 1 : totalPages, (limit === 1 ? limit : isBigScreen ? 10 : isPortrait ? 10 : isTablet ? 5 : 1), handlePageChange)}
           <PaginationItem>
-            <PaginationNext onClick={() => handlePageChange(page + 1)} />
+            <PaginationNext onClick={() => handlePageChange(page + 1)} 
+              className='hover:bg-gray-200 hover:cursor-pointer'/>
           </PaginationItem>
         </PaginationContent>
       </Pagination>

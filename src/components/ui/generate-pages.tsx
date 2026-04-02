@@ -38,6 +38,7 @@ export const generatePaginationLinks = (
           <PaginationLink
             onClick={() => onPageChange(i)}
             isActive={i === currentPage}
+            className="hover:cursor-pointer hover:bg-gray-200 rounded"
           >
             {i}
           </PaginationLink>

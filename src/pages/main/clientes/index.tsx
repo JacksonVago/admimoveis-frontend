@@ -12,8 +12,8 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { Plus, Search } from 'lucide-react'
-import { useEffect } from 'react'
+import { IdCard, List, Plus, Search, Table } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
 import { Pessoa } from '@/interfaces/pessoa'
@@ -22,6 +22,7 @@ import { useGlobalParams } from '@/globals/GlobalParams'
 import { generatePaginationLinks } from '@/components/ui/generate-pages'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
+import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 
 // Types
 interface GetClientesParams {
@@ -82,8 +83,9 @@ export default function ListarClientes({
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
-  const isMobile = useMediaQuery({ query: '(min-width: 200px)' })
+  const isMobile = useMediaQuery({ query: '(max-width: 450px)' })
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
+  const [showcard, setShowCard] = useState(false);
 
   const navigate = useNavigate()
 
@@ -93,7 +95,7 @@ export default function ListarClientes({
   const [searchParams, setSearchTerm] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
   //const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
-  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
+  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 100 : isMobile ? 3 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || '';
 
   const { data, isLoading } = useQuery(
@@ -124,6 +126,12 @@ export default function ListarClientes({
     }
   }, [totalPages, page, navigate, limit, search])
 
+  useEffect(() => {
+    if (isMobile){
+      setShowCard(true);
+    }
+  }, [isMobile])
+  
   // Event Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const search = e.target.value
@@ -162,6 +170,12 @@ export default function ListarClientes({
         {glb_params.origin_url.indexOf('lista') > -1 && (
           <h1 className="text-2xl font-bold">Clientes</h1>
         )}
+        <div className='grid grid-cols-3'>
+          {showcard ?
+            (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />) :
+            (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300'/>)
+          }
+        </div>
         {(isAdmin ||
           user?.permissions.includes("ALL") ||
           user?.permissions.includes("CREATE_PESSOA")
@@ -198,8 +212,12 @@ export default function ListarClientes({
           <div className="bg-transparent flex justify-center items-center col-span-full">
             <Loader />
           </div>
-        ) : (
-          clientes?.map((cliente) => (
+        ) : 
+        (
+                      showcard ?
+              (
+                <>
+                  {clientes?.map((cliente) => (
             <Card key={cliente.id} className="flex flex-col">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -269,6 +287,61 @@ export default function ListarClientes({
               </CardFooter>
             </Card>
           ))
+}
+                </>
+              ) :
+              (
+                <div className='col-span-3'>
+                  <table className="w-full table-fixed">
+                    <thead className="sticky top-0">
+                      <tr>
+                        <th className="border-b p-2 text-left">Cliente</th>
+                        <th className="border-b p-2 text-left">Telefone</th>
+                        <th className="border-b p-2 text-left">Documento</th>
+                        <th className="border-b p-2 text-left">Email</th>
+                        <th className="border-b p-2 text-left"></th>
+                      </tr>
+                    </thead>
+                  </table>
+                  <div className='h-[500px] flex-1 overflow-y-auto'>
+                    <table className='w-full table-fixed'>
+                      <tbody>
+                        {clientes?.map((cliente) => (
+                          <tr key={cliente.id} className="hover:bg-gray-300">
+                            <td className={cliente.status === PessoaStatus.CANCELADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                              {cliente.nome}
+                            </td>
+                            <td className={cliente.status === PessoaStatus.CANCELADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                              {cliente.telefone}
+                            </td>
+                            <td className={cliente.status === PessoaStatus.CANCELADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                              <div>
+                                {cliente.documento}
+                              </div>
+                            </td>
+                            <td className={cliente.status === PessoaStatus.CANCELADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                              <div>
+                                {cliente.email}
+                              </div>
+                            </td>
+                            <td className="border-b p-2 flex justify-end">
+                              <div className="flex space-x-2 ">
+                                <Button
+                                  size="sm"
+                                  onClick={handleClickVerDetalhes(cliente.id)}
+                                  className='hover:cursor-pointer hover:bg-gray-700'
+                                >
+                                  Ver detalhes
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )          
         )}
       </div>
 

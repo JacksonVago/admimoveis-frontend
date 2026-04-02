@@ -545,7 +545,7 @@ export const DetalhesBloco = () => {
                 user?.permissions.includes("ALL") ||
                 user?.permissions.includes("DELETE_BLOCO")
               ) && (
-                  <Button variant="destructive">
+                  <Button variant="destructive" className='h-full hover:cursor-pointer hover:bg-red-400'>
                     <Trash2 className="mr-2 h-4 w-4" />
                     Excluir Bloco
                   </Button>)}
@@ -575,9 +575,9 @@ export const DetalhesBloco = () => {
 
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <TabsList>
-          <TabsTrigger value="bloco-info">Dados do Bloco</TabsTrigger>
-          <TabsTrigger value="imoveis">Imóveis</TabsTrigger>
-          <TabsTrigger value="lancamentos">Lançamentos</TabsTrigger>
+          <TabsTrigger value="bloco-info" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Dados do Bloco</TabsTrigger>
+          <TabsTrigger value="imoveis" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Imóveis</TabsTrigger>
+          <TabsTrigger value="lancamentos" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Lançamentos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bloco-info" className="space-y-4 font-[Poppins-regular]">
@@ -594,6 +594,7 @@ export const DetalhesBloco = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
+                      className='hover:cursor-pointer hover:bg-gray-200'
                     >
                       <Edit className="mr-2 h-4 w-4" />
                       {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
@@ -631,17 +632,18 @@ export const DetalhesBloco = () => {
         <TabsContent value="imoveis" className="space-y-4 font-[Poppins-regular]">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Imóveis</h2>
-            {(isAdmin ||
+            {/*(isAdmin ||
               user?.permissions.includes("ALL") ||
               user?.permissions.includes("UPDATE_PROPRIETARIO")
             ) && (
                 <Button
                   size={"sm"}
-                  onClick={handlerNewLancamento}>
+                  onClick={handlerNewLancamento}
+                  className='hover:cursor-pointer hover:bg-gray-400'>
                   <Plus className="mr-2 h-4 w-4" />
                   Propriedade
                 </Button>
-              )}
+              )*/}
           </div>
 
           <div className={(isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
@@ -693,7 +695,7 @@ export const DetalhesBloco = () => {
                       ) && (
 
                           <Button
-                            className='mt-2'
+                            className='mt-2 hover:cursor-pointer hover:bg-gray-200'
                             variant="secondary"
                             size="sm"
                             onClick={() => { handlerDetailImovel(imovel.id) }}

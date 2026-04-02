@@ -114,6 +114,7 @@ export const DetalhesLocacaoForm = ({
   desvincularlocacaoImovel?: () => void
 }) => {
 
+  const navigate = useNavigate();
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
 
@@ -152,6 +153,7 @@ export const DetalhesLocacaoForm = ({
         queryClient.invalidateQueries({ queryKey: [key] })
       })
       toast({ title: 'Locação alterada com sucesso' });
+      navigate(ROUTE.LOCACOES);
     },
     onError: (error) => {
       // Access the Axios error object here
@@ -217,8 +219,8 @@ export const DetalhesLocacaoForm = ({
     () => ({
       //...transformNullToUndefined(locacao || {}),
       empresaId: locacao?.empresaId,
-      dataInicio: moment(locacao?.dataInicio).format('YYYY-MM-DD'),
-      dataFim: moment(locacao?.dataFim).format('YYYY-MM-DD'),
+      dataInicio: moment.utc(locacao?.dataInicio).format('YYYY-MM-DD'),
+      dataFim: moment.utc(locacao?.dataFim).format('YYYY-MM-DD'),
       valorAluguel: locacao?.valorAluguel,
       diaVencimento: locacao?.diaVencimento,
       status: locacao?.status || 'ATIVA',
@@ -235,7 +237,7 @@ export const DetalhesLocacaoForm = ({
       tituloCap: (locacao?.garantiaTituloCapitalizacao ? { numeroTitulo: locacao?.garantiaTituloCapitalizacao?.numeroTitulo } : undefined),
       seguroFianca: locacao?.garantiaSeguroFianca ? { numeroSeguro: locacao?.garantiaSeguroFianca?.numeroSeguro } : undefined,
       depCalcao: locacao?.garantiaDepositoCalcao ? { valorDeposito: locacao?.garantiaDepositoCalcao?.quantidadeMeses, quantidadeMeses: locacao?.garantiaDepositoCalcao?.valorDeposito, localDeposito: locacao?.garantiaDepositoCalcao.localDeposito } : undefined,
-      seguroIncendio: locacao?.seguroIncendio ? { numeroApolice: locacao?.seguroIncendio?.numeroApolice, vigenciaInicio: moment(locacao?.seguroIncendio?.vigenciaInicio).format('YYYY-MM-DD'), vigenciaFim: moment(locacao?.seguroIncendio?.vigenciaFim).format('YYYY-MM-DD') } : undefined,
+      seguroIncendio: locacao?.seguroIncendio ? { numeroApolice: locacao?.seguroIncendio?.numeroApolice, vigenciaInicio: moment.utc(locacao?.seguroIncendio?.vigenciaInicio).format('YYYY-MM-DD'), vigenciaFim: moment.utc(locacao?.seguroIncendio?.vigenciaFim).format('YYYY-MM-DD') } : undefined,
     }),
     [locacao, documentFiles]
   )
@@ -397,7 +399,8 @@ export default function DetalhesLocacao() {
       cidade: enderecoData?.cidade,
       cep: enderecoData?.cep,
       estado: enderecoData?.estado,
-      documentos: documentFiles?.filter((doc) => doc !== null)
+      documentos: documentFiles?.filter((doc) => doc !== null),
+      dataInicial: moment.utc(locacao?.dataInicio).format("YYYY-MM-DD")
     }),
     [locacao, documentFiles]
   )
@@ -896,7 +899,7 @@ export default function DetalhesLocacao() {
                 user?.permissions.includes("DELETE_LOCACAO")
               ) && (
 
-                  <Button variant="destructive" className='' size={"sm"}>
+                  <Button variant="destructive" className='h-full hover:cursor-pointer hover:bg-red-400' size={"sm"}>
                     <Trash2 className="mr-2 h-4 w-4" />
                     Excluir Locação
                   </Button>

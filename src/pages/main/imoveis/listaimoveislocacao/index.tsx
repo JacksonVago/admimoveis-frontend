@@ -216,7 +216,7 @@ export default function ListarImoveisLocacao({
                 {/* Filter Selects */}
                 <div className="flex gap-2">
                     <Select onValueChange={(value) => { handlerChangeTipo(value) }}>
-                        <SelectTrigger className="h-4 w-[160px]">
+                        <SelectTrigger className="h-4 w-[160px] hover:cursor-pointer hover:outline">
                             <SelectValue placeholder="Tipo" />
                         </SelectTrigger>
                         <SelectContent>
@@ -298,11 +298,11 @@ export default function ListarImoveisLocacao({
                 <PaginationContent>
                     {/* Previous & Next Buttons */}
                     <PaginationItem>
-                        <PaginationPrevious onClick={() => handlePageChange(page - 1)} />
+                        <PaginationPrevious onClick={() => handlePageChange(page - 1)} className='hover:cursor-pointer hover:bg-gray-200 rounded'/>
                     </PaginationItem>
                     {generatePaginationLinks(page, !totalPages ? 1 : totalPages, (limit === 1 ? limit : isBigScreen ? 10 : isPortrait ? 10 : isTablet ? 5 : 1), handlePageChange)}
                     <PaginationItem>
-                        <PaginationNext onClick={() => handlePageChange(page + 1)} />
+                        <PaginationNext onClick={() => handlePageChange(page + 1)} className='hover:cursor-pointer hover:bg-gray-200 rounded'/>
                     </PaginationItem>
                 </PaginationContent>
             </Pagination>

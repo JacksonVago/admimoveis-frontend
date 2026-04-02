@@ -159,7 +159,7 @@ export function DocumentUpload({
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">{title}</h3>
         {!disabled && (
-        <Button onClick={handleAddDocumentClick} variant="outline" size="sm" type="button">
+        <Button onClick={handleAddDocumentClick} variant="outline" size="sm" type="button" className='hover:cursor-pointer hover:bg-gray-200'>
           <FileUp className="mr-2 h-4 w-4" />
           Adicionar documento
         </Button>

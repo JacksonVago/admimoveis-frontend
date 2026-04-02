@@ -31,12 +31,14 @@ export const DetalhesEmpresaForm = () => {
   //Globals
   const glb_params = useGlobalParams();
 
+  console.log(glb_params.id_empresa);
+
   const { data: empresa } = useQuery({
     queryKey: ['empresa', (glb_params.id_empresa ? glb_params.id_empresa : 0)],
     queryFn: async () => {
       try {
         const data = await api.get<Empresa>(`/empresas/${glb_params.id_empresa ? glb_params.id_empresa : 0}`)
-        //console.log(data.data.id ? data.data.id.toString() : 'test');
+        console.log(data.data.id ? data.data.id.toString() : 'test');
         glb_params.updId_empresa(data.data.id ? data.data.id.toString() : '0')
         return data.data;
       }

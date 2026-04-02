@@ -1076,7 +1076,7 @@ export const DetalhesImovel = () => {
                 user?.permissions.includes("ALL") ||
                 user?.permissions.includes("DELETE_IMOVEL")
               ) && (
-                  <Button variant="destructive">
+                  <Button variant="destructive" className='h-full hover:cursor-pointer hover:bg-red-400'>
                     <Trash2 className="mr-2 h-4 w-4" />
                     Excluir Imóvel
                   </Button>)}
@@ -1106,9 +1106,9 @@ export const DetalhesImovel = () => {
 
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <TabsList>
-          <TabsTrigger value="personal-info">Dados do Imóvel</TabsTrigger>
-          <TabsTrigger value="proprietarios">Proprietários</TabsTrigger>
-          <TabsTrigger value="locacoes">Locação</TabsTrigger>
+          <TabsTrigger value="personal-info" className='hover:cursor-pointer hover:bg-gray-200'>Dados do Imóvel</TabsTrigger>
+          <TabsTrigger value="proprietarios" className='hover:cursor-pointer hover:bg-gray-200'>Proprietários</TabsTrigger>
+          <TabsTrigger value="locacoes" className='hover:cursor-pointer hover:bg-gray-200'>Locação</TabsTrigger>
         </TabsList>
 
         <TabsContent value="personal-info" className="space-y-4 font-[Poppins-regular]">
@@ -1125,6 +1125,7 @@ export const DetalhesImovel = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
+                      className='hover:cursor-pointer hover:bg-gray-200'
                     >
                       <Edit className="mr-2 h-4 w-4" />
                       {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
@@ -1167,7 +1168,7 @@ export const DetalhesImovel = () => {
               user?.permissions.includes("DELETE_IMOVEL")
             ) && (
 
-                <Button onClick={handlerNewProp} size={"sm"}>
+                <Button onClick={handlerNewProp} size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'>
                   <Plus className="mr-2 h-4 w-4" />
                   Novo Proprietrário
                 </Button>
@@ -1222,7 +1223,7 @@ export const DetalhesImovel = () => {
                     <Card id='teste' className='h-full'>
                       <div className="flex  justify-end">
                         <Button onClick={() => { setSelPessoa(false) }}
-                          className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
+                          className='w-4 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400 hover:cursor-pointer'>X</Button>
                       </div>
                       <CardHeader>
                         <DialogTitle className='flex items-center justify-center'>Selecionar o Proprietário</DialogTitle>
@@ -1242,7 +1243,8 @@ export const DetalhesImovel = () => {
                     </div>
                   )}
                   <DialogFooter>
-                    <Button type="submit" className={(selPessoa ? "hidden" : "dblock")}>Adicionar Proprietário</Button>
+                    <Button type="submit" className={(selPessoa ? "hidden hover:cursor-pointer hover:bg-gray-600" : "dblock hover:cursor-pointer hover:bg-gray-600")}
+                    >Adicionar Proprietário</Button>
                   </DialogFooter>
                 </form>
               </DialogContent>
@@ -1289,7 +1291,7 @@ export const DetalhesImovel = () => {
                     ) && (
 
                         <Button
-                          className='mt-2'
+                          className='mt-2 hover:cursor-pointer hover:bg-gray-300'
                           variant="secondary"
                           size="sm"
                           onClick={() => { handlerDetailProp(proprietario.pessoaId) }}
@@ -1314,6 +1316,7 @@ export const DetalhesImovel = () => {
 
                           <Button variant="outline" size="sm"
                             onClick={() => { handlerEditProprietario(proprietario) }}
+                            className='hover:cursor-pointer hover:bg-gray-300'
                           >
                             <Edit className="mr-2 h-4 w-4" />
                             Editar
@@ -1403,6 +1406,7 @@ export const DetalhesImovel = () => {
 
                       <Button variant="destructive" size="sm"
                         onClick={() => { handleDeleteProprietario(proprietario) }}
+                        className='hover:cursor-pointer hover:bg-red-600'
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Excluir
@@ -1691,6 +1695,7 @@ export const DetalhesImovel = () => {
                     {locacao.locatarios?.map((locatario) => (
                       <div className='flex justify-start'>
                         <Button
+                          className='hover:cursor-pointer hover:bg-gray-300'
                           variant="secondary"
                           size="sm"
                           onClick={() => { handlerDetailPessoa(parseFloat(locatario.pessoaId.toString())) }}
@@ -1779,6 +1784,7 @@ export const DetalhesImovel = () => {
 
                           <Button variant="outline" size="sm"
                             onClick={() => { handlerEditLocacao(locacao) }}
+                            className='hover:cursor-pointer hover:bg-gray-300'
                           >
                             <Edit className="mr-2 h-4 w-4" />
                             Editar
@@ -2055,6 +2061,7 @@ export const DetalhesImovel = () => {
                     && (
                       <Button variant="destructive" size="sm"
                         onClick={() => { handleDeleteLocacao(locacao) }}
+                        className='hover:cursor-pointer hover:bg-red-600'
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Excluir

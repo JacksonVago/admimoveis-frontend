@@ -17,7 +17,7 @@ import { useAuth } from '@/hooks/auth/use-auth'
 import { Condominio } from '@/interfaces/condominio'
 import { Endereco } from '@/interfaces/endereco'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { IdCard, MapPin, Plus, Search, Table } from 'lucide-react'
+import { IdCard, List, MapPin, Plus, Search, Table } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -58,7 +58,7 @@ export default function ListarCondominios({
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
   const isMobile = useMediaQuery({ query: '(min-width: 200px)' })
-
+  
   const navigate = useNavigate()
   //Globals
   const glb_params = useGlobalParams();
@@ -68,7 +68,7 @@ export default function ListarCondominios({
 
   const [searchParams, setSearchTerm] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1
-  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : (isMobile && limitView > 2) ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
+  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 100 : (isMobile && limitView > 2) ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || ''
 
   const { data, isLoading } = useQuery(
@@ -117,13 +117,18 @@ export default function ListarCondominios({
       resetStatePessoa();
     }
 
-
     if (totalPages && page > totalPages) {
       navigate({
         search: `?page=1&limit=${limit}&search=${search}}`
       })
     }
   }, [totalPages, page, limit, search])
+
+  useEffect(() => {
+    if (isMobile){
+      setShowCard(true);
+    }
+  }, [isMobile])
 
   // Event Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,7 +170,7 @@ export default function ListarCondominios({
         {!onSelectCondominio && (
           <div className='grid grid-cols-3'>
             {showcard ?
-              (<Table onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer ' />) :
+              (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer ' />) :
               (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer'/>)
             }
             {/* <h1 className="col-span-2 text-2xl font-bold">Imoveis</h1> 
@@ -280,7 +285,7 @@ export default function ListarCondominios({
                     </thead>
                     <tbody>
                       {condominios?.map((condominio) => (
-                        <tr key={condominio.id} className="hover:bg-gray-100">
+                        <tr key={condominio.id} className="hover:bg-gray-300">
                           <td className="border-b p-2">
                             {condominio?.name}
                           </td>

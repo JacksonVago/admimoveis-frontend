@@ -245,11 +245,6 @@ export const LocacaoFormContent = ({
     setSelLocatario(false);
   }
 
-  console.log('createLocacaoMethods errors', createLocacaoMethods.formState.errors)
-  console.log('createLocacaoMethods dirtyFields', createLocacaoMethods.formState.isDirty)
-  console.log('createLocacaoMethods isvalid', createLocacaoMethods.formState.isValid)
-  console.log('createLocacaoMethods errors', createLocacaoMethods.getValues())
-
   //Retorno ao selecionar o imóvel
   const handleSelectedImovel = (imovel: Imovel | undefined) => {
 
@@ -315,27 +310,28 @@ export const LocacaoFormContent = ({
         <div style={{ display: (!selFiador ? 'block' : 'none') }}>
           <div>
             {(!selLocatario && !selImovel && !selFiador) && (
-              <div>                
+              <div>
                 {(locacaoImoveis.fields.length > 0) ? (
-                  
-                  <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
+                  <>
                     <Label className='text-base' >Imóvel</Label>
-                    {locacaoImoveis.fields.map((field, index) => (
-                      <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
-                        <Label >{field.nome}</Label>
-                        <button disabled={disabled}
-                          className='border bg-zinc-200 hover:bg-zinc-400'
-                          type="button"
-                          onClick={() => {
-                            createLocacaoMethods.setValue('imovelId', 0, { shouldDirty: false, shouldValidate: false });
-                            locacaoImoveis.remove(index);
-                          }}
-                        >
-                          <X className='px-1'></X>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
+                      {locacaoImoveis.fields.map((field, index) => (
+                        <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                          <Label >{field.nome}</Label>
+                          <button disabled={disabled}
+                            className='border bg-zinc-200 hover:bg-zinc-400'
+                            type="button"
+                            onClick={() => {
+                              createLocacaoMethods.setValue('imovelId', 0, { shouldDirty: false, shouldValidate: false });
+                              locacaoImoveis.remove(index);
+                            }}
+                          >
+                            <X className='px-1'></X>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 ) : (
                   <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
                     <Button type='button'
@@ -343,17 +339,6 @@ export const LocacaoFormContent = ({
                         handlerSelImovel('imoveis')
                       }}
                     >Adicionar imóvel</Button>
-                    {/*<div className='flex justify-end items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
-                      <button disabled={disabled}
-                        className='border bg-zinc-200 hover:bg-zinc-400'
-                        type="button"
-                        onClick={() => {
-                          handlerSelImovel('imoveis')
-                        }}
-                      >
-                        <Search className='px-1'></Search>
-                      </button>
-                    </div>*/}
                   </div>
                 )}
                 {!!createLocacaoMethods?.formState?.errors?.imovelId?.message && (

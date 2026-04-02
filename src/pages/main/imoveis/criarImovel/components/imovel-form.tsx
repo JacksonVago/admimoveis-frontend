@@ -118,12 +118,6 @@ export const ImovelFormContent = ({
     }
   }
 
-  console.log('imovel erros', createImovelMethods.formState.errors);
-  console.log('imovel valid', createImovelMethods.formState.isValid);
-  console.log('imovel dirty', createImovelMethods.formState.isDirty);
-  console.log('imovel dados', createImovelMethods.getValues());
-  console.log('imovel erro numero', createImovelMethods.getFieldState('numero'));
-
   return (
     <div className="space-y-4">
       <div>

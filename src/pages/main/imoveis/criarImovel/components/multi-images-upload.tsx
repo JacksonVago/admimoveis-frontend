@@ -22,7 +22,6 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
 
   const { watch, setValue } = useFormContext()
   const images = watch('imovelPhotos') || []
-  console.log('propter img', images)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
