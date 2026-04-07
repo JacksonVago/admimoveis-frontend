@@ -12,7 +12,7 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { IdCard, List, Plus, Search, Table } from 'lucide-react'
+import { IdCard, List, Plus, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
@@ -33,7 +33,7 @@ interface GetClientesParams {
 }
 
 // API & Query Logic
-export const getClientes = async (empresaId:number, { page, limit, search, exclude }: GetClientesParams) => {
+export const getClientes = async (empresaId: number, { page, limit, search, exclude }: GetClientesParams) => {
   return await api.get<BasePaginationData<Pessoa>>('pessoas/' + empresaId.toString(), {
     params: {
       page,
@@ -44,7 +44,7 @@ export const getClientes = async (empresaId:number, { page, limit, search, exclu
   })
 }
 
-export const useGetClientesQueryOptions = (empresaId:number, {
+export const useGetClientesQueryOptions = (empresaId: number, {
   search,
   page,
   limit,
@@ -85,7 +85,7 @@ export default function ListarClientes({
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
   const isMobile = useMediaQuery({ query: '(max-width: 450px)' })
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
-  const [showcard, setShowCard] = useState(false);
+  const [showcard, setShowCard] = useState((txtVinc != '' ? false : true) || (isMobile ? false : true));
 
   const navigate = useNavigate()
 
@@ -95,7 +95,7 @@ export default function ListarClientes({
   const [searchParams, setSearchTerm] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
   //const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
-  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 100 : isMobile ? 3 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
+  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 100 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || '';
 
   const { data, isLoading } = useQuery(
@@ -127,11 +127,11 @@ export default function ListarClientes({
   }, [totalPages, page, navigate, limit, search])
 
   useEffect(() => {
-    if (isMobile){
+    if (isMobile) {
       setShowCard(true);
     }
   }, [isMobile])
-  
+
   // Event Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const search = e.target.value
@@ -171,9 +171,11 @@ export default function ListarClientes({
           <h1 className="text-2xl font-bold">Clientes</h1>
         )}
         <div className='grid grid-cols-3'>
-          {showcard ?
-            (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />) :
-            (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300'/>)
+          {(txtVinc === '' ?
+            (showcard ?
+              (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />)
+            ) : (<></>))
           }
         </div>
         {(isAdmin ||
@@ -212,82 +214,82 @@ export default function ListarClientes({
           <div className="bg-transparent flex justify-center items-center col-span-full">
             <Loader />
           </div>
-        ) : 
-        (
-                      showcard ?
+        ) :
+          (
+            showcard ?
               (
                 <>
                   {clientes?.map((cliente) => (
-            <Card key={cliente.id} className="flex flex-col">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="truncate"
-                    style={
-                      {
-                        fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
-                      }}
+                    <Card key={cliente.id} className="flex flex-col">
+                      <CardHeader>
+                        <CardTitle className="flex items-center justify-between">
+                          <span className="truncate"
+                            style={
+                              {
+                                fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
+                              }}
 
-                  >{cliente?.nome}</span>
-                  <Badge variant="secondary">
-                    {(cliente?.locatarios?.length && cliente?.locatarios?.length > 0
-                      ? 'Locatário'
-                      : (cliente?.proprietarios?.length && cliente?.proprietarios?.length > 0
-                        ? 'Proprietário'
-                        : (cliente?.fiador
-                          ? 'Fiador'
-                          : 'Cliente')))}
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <dl className="grid grid-cols-2 gap-1 text-sm">
-                  <dt className="font-semibold">CPF/CNPJ:</dt>
-                  <dd className="truncate">{cliente?.documento}</dd>
-                  <dt className="font-semibold">Profissão:</dt>
-                  <dd className="truncate">{cliente?.profissao || 'N/A'}</dd>
-                  <dt className="font-semibold">Estado Civil:</dt>
-                  <dd>{cliente?.estadoCivil || 'N/A'}</dd>
-                  <dt className="font-semibold">Email:</dt>
-                  <dd className="truncate">{cliente?.email || 'N/A'}</dd>
-                  <dt className="font-semibold">Telefone:</dt>
-                  <dd>{cliente?.telefone || 'N/A'}</dd>
-                </dl>
-              </CardContent>
-              <CardFooter>
-                <div className="grid grid-cols-2 gap-10">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full hover:cursor-pointer hover:bg-gray-200"
-                    onClick={handleClickVerDetalhes(cliente.id)}
-                    style={
-                      {
-                        fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
-                      }}
-                  >
-                    Ver detalhes
-                  </Button>
-                  {(txtVinc !== '' && onSelectCliente) && (
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => {
-                        onSelectCliente(cliente);
-                      }}
-                      style={{
-                        fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
-                        textWrap: 'inherit'
-                      }}
-
-                    >
-                      {txtVinc}
-                    </Button>
-                  )}
-                </div>
-              </CardFooter>
-            </Card>
-          ))
-}
+                          >{cliente?.nome}</span>
+                          <Badge variant="secondary">
+                            {(cliente?.locatarios?.length && cliente?.locatarios?.length > 0
+                              ? 'Locatário'
+                              : (cliente?.proprietarios?.length && cliente?.proprietarios?.length > 0
+                                ? 'Proprietário'
+                                : (cliente?.fiador
+                                  ? 'Fiador'
+                                  : 'Cliente')))}
+                          </Badge>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="flex-grow">
+                        <dl className="grid grid-cols-2 gap-1 text-sm">
+                          <dt className="font-semibold">CPF/CNPJ:</dt>
+                          <dd className="truncate">{cliente?.documento}</dd>
+                          <dt className="font-semibold">Profissão:</dt>
+                          <dd className="truncate">{cliente?.profissao || 'N/A'}</dd>
+                          <dt className="font-semibold">Estado Civil:</dt>
+                          <dd>{cliente?.estadoCivil || 'N/A'}</dd>
+                          <dt className="font-semibold">Email:</dt>
+                          <dd className="truncate">{cliente?.email || 'N/A'}</dd>
+                          <dt className="font-semibold">Telefone:</dt>
+                          <dd>{cliente?.telefone || 'N/A'}</dd>
+                        </dl>
+                      </CardContent>
+                      <CardFooter>
+                        <div className="grid grid-cols-2 gap-10">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="w-full hover:cursor-pointer hover:bg-gray-200"
+                            onClick={handleClickVerDetalhes(cliente.id)}
+                            style={
+                              {
+                                fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
+                              }}
+                          >
+                            Ver detalhes
+                          </Button>
+                          {(txtVinc !== '' && onSelectCliente) && (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => {
+                                onSelectCliente(cliente);
+                              }}
+                              style={{
+                                fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
+                                textWrap: 'inherit'
+                              }}
+                              className='hover:cursor-pointer hover:bg-gray-200'
+                            >
+                              {txtVinc}
+                            </Button>
+                          )}
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  ))
+                  }
                 </>
               ) :
               (
@@ -341,8 +343,8 @@ export default function ListarClientes({
                     </table>
                   </div>
                 </div>
-              )          
-        )}
+              )
+          )}
       </div>
 
       {/* Pagination */}
@@ -350,13 +352,14 @@ export default function ListarClientes({
         <PaginationContent>
           {/* Previous & Next Buttons */}
           <PaginationItem key={"prev"}>
-            <PaginationPrevious onClick={() => handlePageChange(page - 1)} />
+            <PaginationPrevious onClick={() => handlePageChange(page - 1)} className='hover:cursor-pointer hover:bg-gray-200' />
           </PaginationItem>
           {generatePaginationLinks(page, !totalPages ? 1 : totalPages, (limit === 1 ? 1 : isBigScreen ? 10 : isPortrait ? 10 : isTablet ? 5 : 2), handlePageChange)}
           <PaginationItem key={"next"}>
             <PaginationNext
               onClick={() => handlePageChange(page + 1)}
               aria-disabled={(page > (!totalPages ? 1 : totalPages - 1) ? "true" : "false")}
+              className='hover:cursor-pointer hover:bg-gray-200'
             />
           </PaginationItem>
         </PaginationContent>

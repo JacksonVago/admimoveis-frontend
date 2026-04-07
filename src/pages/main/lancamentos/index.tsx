@@ -11,7 +11,7 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { MapPin, Pencil, Receipt, Search } from 'lucide-react'
+import { IdCard, List, MapPin, Pencil, Receipt, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
@@ -20,7 +20,7 @@ import { useGlobalParams } from '@/globals/GlobalParams'
 import { generatePaginationLinks } from '@/components/ui/generate-pages'
 import { LancamentoStatus } from '@/enums/locacao/enums-locacao'
 import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-endereco-formatado'
-import { Locacao } from '@/interfaces/locacao'
+import { Locacao, LocacaoStatus } from '@/interfaces/locacao'
 import { Endereco } from '@/interfaces/endereco'
 import { Label } from '@/components/ui/label'
 import moment from 'moment'
@@ -44,7 +44,7 @@ interface GetLancamentosParams {
 }
 
 // API & Query Logic
-export const getLancamentos = async (empresaId:number, { page, limit, search, status, exclude, dataInicial, dataFinal }: GetLancamentosParams) => {
+export const getLancamentos = async (empresaId: number, { page, limit, search, status, exclude, dataInicial, dataFinal }: GetLancamentosParams) => {
   return await api.get<BasePaginationData<Locacao>>('lancamentos/' + empresaId.toString(), {
     params: {
       page,
@@ -58,7 +58,7 @@ export const getLancamentos = async (empresaId:number, { page, limit, search, st
   })
 }
 
-export const useGetLancamentosQueryOptions = (empresaId:number, {
+export const useGetLancamentosQueryOptions = (empresaId: number, {
   search,
   page,
   limit,
@@ -99,6 +99,7 @@ export default function ListarLancamentos({
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
   const isMobile = useMediaQuery({ query: '(max-width: 420px)' })
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
+  const [showcard, setShowCard] = useState((isMobile ? false : true));
 
   const navigate = useNavigate()
 
@@ -108,14 +109,14 @@ export default function ListarLancamentos({
   const [searchParams, setSearchTerm] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
   //const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
-  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
+  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 100 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || '';
   const status = searchParams.get('status') || '';
   const [dataInicial, setdataInicial] = useState(moment(new Date()).format("YYYY-MM-DD"));
   const [dataFinal, setdataFinal] = useState(moment(new Date()).format("YYYY-MM-DD"));
 
   const { data, isLoading } = useQuery(
-    useGetLancamentosQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,{
+    useGetLancamentosQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {
       page,
       limit,
       search,
@@ -163,6 +164,13 @@ export default function ListarLancamentos({
       })
     }
   }, [totalPages, page, navigate, limit, search])
+
+  useEffect(() => {
+    if (isMobile) {
+      setShowCard(true);
+    }
+  }, [isMobile])
+
 
   // Event Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -214,6 +222,12 @@ export default function ListarLancamentos({
         {glb_params.origin_url.indexOf('lista') > -1 && (
           <h1 className="text-2xl font-bold">Lançamentos de Locações</h1>
         )}
+      </div>
+      <div className='grid grid-cols-3'>
+        {showcard ?
+          (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />) :
+          (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />)
+        }
       </div>
 
       <div className=
@@ -279,123 +293,182 @@ export default function ListarLancamentos({
           </div>
         ) :
           (
-            locacoes.map((locacao) => (
-              <Card key={locacao.id} className="">
-                <CardHeader className="flex flex-row justify-between">
-                  <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
-                    <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
-                      <MapPin className="inline-block h-4 w-4 cursor-pointer"
-                        onClick={() => { handlerClickMaps(locacao.imovel?.endereco) }}
-                        color='green'
-                      />
-                      {getEnderecoFormatado(locacao.imovel?.endereco)}
-                    </p>
+            showcard ?
+              (
+                <>
+                  {locacoes.map((locacao) => (
+                    <Card key={locacao.id} className="">
+                      <CardHeader className="flex flex-row justify-between">
+                        <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
+                          <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                            <MapPin className="inline-block h-4 w-4 cursor-pointer"
+                              onClick={() => { handlerClickMaps(locacao.imovel?.endereco) }}
+                              color='green'
+                            />
+                            {getEnderecoFormatado(locacao.imovel?.endereco)}
+                          </p>
 
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Label className="font-bold flex justify-end">
-                    Aluguel R$ {locacao.valorAluguel?.toLocaleString('pt-BR')}
-                  </Label>
-                  {(locacao.lancamentos && locacao.lancamentos?.length > 0) ? (
-                    <>
-                      <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
-                      <div className='rounded-md border'>
-                        <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
-                          <Label className='col-span-2' style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
-                          {!isMobile ? (
-                            <Label style={{ 'fontSize': '0.7rem' }}>Emissão</Label>)
-                            : (<></>)
-                          }
-                          <Label style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
-                          <Label className={!isMobile ? 'flex justify-end' : 'flex justify-end col-span-2'} style={{ 'fontSize': '0.7rem' }}>Valor</Label>
-                        </div>
-
-                        <div className='grid grid-cols-5 m-2 gap-1' >
-                          {locacao.lancamentos?.map((lancamento) => (
-                            <>
-                              <Label className={lancamento.status === LancamentoStatus.ABERTO ? 'col-span-2 text-red-600' : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
-                              {!isMobile ? (<Label className={lancamento.status === LancamentoStatus.ABERTO ? 'text-red-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
-                                : (<></>)
-                              }
-                              <Label className={lancamento.status === LancamentoStatus.ABERTO ? (!isMobile ? 'text-red-600' : 'text-red-600 col-span-2') : (!isMobile ? '' : 'col-span-2')} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
-                              <Label className={lancamento.status === LancamentoStatus.ABERTO ? 'flex justify-end text-red-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
-                            </>
-                          ))}
-                        </div>
-                      </div>
-                      <div className='grid grid-cols-2 font-[Poppins-bold] mt-5 '>
-                        <Label className={locacao.lancamentos && locacao.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-start text-red-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total</Label>
-                        <Label className={locacao.lancamentos && locacao.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-end text-red-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
-                          {usdFormatter.format(locacao.valorAluguel +
-                            locacao.lancamentos.reduce((total, lancamento) => {
-                              return total + lancamento.valorLancamento;
-                            }, 0))}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <Label className="font-bold flex justify-end">
+                          Aluguel R$ {locacao.valorAluguel?.toLocaleString('pt-BR')}
                         </Label>
-                      </div>
-                    </>
-                  )
-                    : (<p className="text-center text-muted-foreground mt-5">
-                      Não há lançamentos para essa locação
-                    </p>
-                    )
-                  }
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  <div className='grid grid-cols-2 gap-10'>
-                    {((isAdmin ||
-                      user?.permissions.includes("ALL") ||
-                      user?.permissions.includes("UPDATE_LANCAMENTO"))) && (
+                        {(locacao.lancamentos && locacao.lancamentos?.length > 0) ? (
+                          <>
+                            <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
+                            <div className='rounded-md border'>
+                              <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
+                                <Label className='col-span-2' style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
+                                {!isMobile ? (
+                                  <Label style={{ 'fontSize': '0.7rem' }}>Emissão</Label>)
+                                  : (<></>)
+                                }
+                                <Label style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
+                                <Label className={!isMobile ? 'flex justify-end' : 'flex justify-end col-span-2'} style={{ 'fontSize': '0.7rem' }}>Valor</Label>
+                              </div>
 
-                        <Button variant="secondary"
-                          onClick={() => handleClickVerDetalhes(locacao?.id)}
-                          size={"sm"}>
-                          <Pencil className='h4 w4' /> Lançamentos
-                        </Button>
-                      )}
-                    {((isAdmin ||
-                      user?.permissions.includes("ALL") ||
-                      user?.permissions.includes("CREATE_PAGAMENTO")) &&
-                      (locacao.lancamentos && locacao.lancamentos?.length > 0 && locacao.lancamentos[0].status === LancamentoStatus.ABERTO)) && (
-                        /*<Button variant="secondary"
-                          onClick={() => handleGerarBoleto(locacao)}
-                          size={"sm"}>
-                          <Receipt className="h-4 w-4" />Gerar Boleto
-                        </Button>*/
+                              <div className='grid grid-cols-5 m-2 gap-1' >
+                                {locacao.lancamentos?.map((lancamento) => (
+                                  <>
+                                    <Label className={lancamento.status === LancamentoStatus.ABERTO ? 'col-span-2 text-red-600' : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
+                                    {!isMobile ? (<Label className={lancamento.status === LancamentoStatus.ABERTO ? 'text-red-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
+                                      : (<></>)
+                                    }
+                                    <Label className={lancamento.status === LancamentoStatus.ABERTO ? (!isMobile ? 'text-red-600' : 'text-red-600 col-span-2') : (!isMobile ? '' : 'col-span-2')} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
+                                    <Label className={lancamento.status === LancamentoStatus.ABERTO ? 'flex justify-end text-red-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
+                                  </>
+                                ))}
+                              </div>
+                            </div>
+                            <div className='grid grid-cols-2 font-[Poppins-bold] mt-5 '>
+                              <Label className={locacao.lancamentos && locacao.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-start text-red-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total</Label>
+                              <Label className={locacao.lancamentos && locacao.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-end text-red-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
+                                {usdFormatter.format(locacao.valorAluguel +
+                                  locacao.lancamentos.reduce((total, lancamento) => {
+                                    return total + lancamento.valorLancamento;
+                                  }, 0))}
+                              </Label>
+                            </div>
+                          </>
+                        )
+                          : (<p className="text-center text-muted-foreground mt-5">
+                            Não há lançamentos para essa locação
+                          </p>
+                          )
+                        }
+                      </CardContent>
+                      <CardFooter className="flex justify-between">
+                        <div className='grid grid-cols-2 gap-10'>
+                          {((isAdmin ||
+                            user?.permissions.includes("ALL") ||
+                            user?.permissions.includes("UPDATE_LANCAMENTO"))) && (
 
-                        <>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon" onClick={(e) => {
-                                e.stopPropagation()
-                                //setSelectedTipo(tipo)
-                              }
-                              } title='Geração de Boleto'>
-                                <Receipt className="h-4 w-4" />
+                              <Button variant="secondary"
+                                onClick={() => handleClickVerDetalhes(locacao?.id)}
+                                size={"sm"}>
+                                <Pencil className='h4 w4' /> Lançamentos
                               </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  'Isso irá confirmar os lançamentos para geração do boleto.'
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleGerarBoleto(locacao)}>
-                                  'Sim, confirmar boleto.'
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </>
-                      )}
+                            )}
+                          {((isAdmin ||
+                            user?.permissions.includes("ALL") ||
+                            user?.permissions.includes("CREATE_PAGAMENTO")) &&
+                            (locacao.lancamentos && locacao.lancamentos?.length > 0 && locacao.lancamentos[0].status === LancamentoStatus.ABERTO)) && (
+                              /*<Button variant="secondary"
+                                onClick={() => handleGerarBoleto(locacao)}
+                                size={"sm"}>
+                                <Receipt className="h-4 w-4" />Gerar Boleto
+                              </Button>*/
+
+                              <>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" onClick={(e) => {
+                                      e.stopPropagation()
+                                      //setSelectedTipo(tipo)
+                                    }
+                                    } title='Geração de Boleto'>
+                                      <Receipt className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        'Isso irá confirmar os lançamentos para geração do boleto.'
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleGerarBoleto(locacao)}>
+                                        'Sim, confirmar boleto.'
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </>
+                            )}
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  )
+                  )
+                  }
+                </>
+              ) :
+              (
+                <div className='col-span-3'>
+                  <table className="w-full table-fixed">
+                    <thead className="sticky top-0">
+                      <tr>
+                        <th className="border-b p-2 text-left">Locacao</th>
+                        <th className="border-b p-2 text-left">Telefone</th>
+                        <th className="border-b p-2 text-left">Documento</th>
+                        <th className="border-b p-2 text-left">Email</th>
+                        <th className="border-b p-2 text-left"></th>
+                      </tr>
+                    </thead>
+                  </table>
+                  <div className='h-[500px] flex-1 overflow-y-auto'>
+                    <table className='w-full table-fixed'>
+                      <tbody>
+                        {locacoes?.map((locacao) => (
+                          <tr key={locacao.id} className="hover:bg-gray-300">
+                            <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                              {(locacao.locatarios && locacao.locatarios.length > 0 ? (locacao.locatarios[0].pessoa ? locacao.locatarios[0].pessoa.nome : 'Sem locatário') : 'Sem locatário')
+                              + ' - ' + (locacao.imovel?.endereco ? getEnderecoFormatado(locacao.imovel.endereco) : 'Sem endereço')}
+                            </td>
+                            <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                              {locacao.locatarios && locacao.locatarios.length > 0 ? (locacao.locatarios[0].pessoa ? locacao.locatarios[0].pessoa.telefone : 'Sem telefone') : 'Sem telefone'}
+                            </td>
+                            <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                              <div>
+                                {locacao.locatarios && locacao.locatarios.length > 0 ? (locacao.locatarios[0].pessoa ? locacao.locatarios[0].pessoa.documento : 'Sem documento') : 'Sem documento'}
+                              </div>
+                            </td>
+                            <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                              <div>
+                                {locacao.locatarios && locacao.locatarios.length > 0 ? (locacao.locatarios[0].pessoa ? locacao.locatarios[0].pessoa.email : 'Sem email') : 'Sem email'}
+                              </div>
+                            </td>
+                            <td className="border-b p-2">
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() =>{handleClickVerDetalhes(locacao.id)}}
+                                  className='hover:cursor-pointer hover:bg-gray-700'
+                                >
+                                  Ver detalhes
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                </CardFooter>
-              </Card>
-            )
-            )
+                </div>
+              )
           )
         }
       </div>
@@ -405,13 +478,15 @@ export default function ListarLancamentos({
         <PaginationContent>
           {/* Previous & Next Buttons */}
           <PaginationItem>
-            <PaginationPrevious onClick={() => handlePageChange(page - 1)} />
+            <PaginationPrevious onClick={() => handlePageChange(page - 1)}
+              className='hover:cursor-pointer hover:bg-gray-200' />
           </PaginationItem>
           {generatePaginationLinks(page, !totalPages ? 1 : totalPages, (limit === 1 ? 1 : isBigScreen ? 10 : isPortrait ? 10 : isTablet ? 5 : 2), handlePageChange)}
           <PaginationItem>
             <PaginationNext
               onClick={() => handlePageChange(page + 1)}
               aria-disabled={(page > (!totalPages ? 1 : totalPages - 1) ? "true" : "false")}
+              className='hover:cursor-pointer hover:bg-gray-200'
             />
           </PaginationItem>
         </PaginationContent>

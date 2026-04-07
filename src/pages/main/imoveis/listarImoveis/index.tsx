@@ -127,7 +127,7 @@ export default function ListarImoveis({
   const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
-  const isMobile = useMediaQuery({ query: '(min-width: 200px)' })
+  const isMobile = useMediaQuery({ query: '(max-width: 450px)' })
 
   const navigate = useNavigate()
   //Globals
@@ -159,8 +159,7 @@ export default function ListarImoveis({
       exclude,
     })
   )
-
-  console.log(data?.data?.data);
+  
   const imoveis = data?.data?.data || []
   const totalPages = data?.data?.totalPages
   //const googleMaps = "https://www.google.com/maps/place/R.+Jo%C3%A3o+Kopke,+236+-+Bom+Retiro,+S%C3%A3o+Paulo+-+SP,+01124-030";

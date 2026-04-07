@@ -406,13 +406,15 @@ export default function ListarLancamentosCondominios({
         <PaginationContent>
           {/* Previous & Next Buttons */}
           <PaginationItem>
-            <PaginationPrevious onClick={() => handlePageChange(page - 1)} />
+            <PaginationPrevious onClick={() => handlePageChange(page - 1)} 
+              className='hover:cursor-pointer hover:bg-gray-200'/>
           </PaginationItem>
           {generatePaginationLinks(page, !totalPages ? 1 : totalPages, (limit === 1 ? 1 : isBigScreen ? 10 : isPortrait ? 10 : isTablet ? 5 : 2), handlePageChange)}
           <PaginationItem>
             <PaginationNext
               onClick={() => handlePageChange(page + 1)}
               aria-disabled={(page > (!totalPages ? 1 : totalPages - 1) ? "true" : "false")}
+              className='hover:cursor-pointer hover:bg-gray-200'
             />
           </PaginationItem>
         </PaginationContent>

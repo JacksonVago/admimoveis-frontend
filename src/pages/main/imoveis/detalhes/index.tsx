@@ -1701,7 +1701,7 @@ export const DetalhesImovel = () => {
                           onClick={() => { handlerDetailPessoa(parseFloat(locatario.pessoaId.toString())) }}
                           style={
                             {
-                              fontSize: (isPortrait ? '1rem' : isTablet ? '1rem' : isMobile ? '0.7rem' : '1.5rem'),
+                              fontSize: (isPortrait ? '0.8rem' : isTablet ? '0.6rem' : isMobile ? '0.5rem' : '0.8rem'),
                               fontWeight: 'Bold'
                             }}
                         >

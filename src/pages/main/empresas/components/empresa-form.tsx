@@ -12,7 +12,7 @@ import {
 import { ESTADOS } from '@/constants/estados'
 import { ApiCep } from '@/interfaces/cep'
 import api from '@/services/axios/api'
-import { Controller, useFormContext, UseFormReturn } from 'react-hook-form'
+import { Controller,  UseFormReturn } from 'react-hook-form'
 import { EmpresaSchema } from '@/schemas/empresa.schema'
 import { formatCpfCnpj, formatPhone } from '@/utils/format-cpfcnpj'
 import { Switch, Thumb } from "@radix-ui/react-switch"

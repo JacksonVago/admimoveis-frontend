@@ -19,14 +19,13 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { IdCard, List, Plus, Search, Table } from 'lucide-react'
+import { IdCard, List, Plus, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
 //import { Pessoa } from '@/interfaces/pessoa'
 import { useMediaQuery } from 'react-responsive'
 import { useGlobalParams } from '@/globals/GlobalParams'
-import { generatePaginationLinks } from '@/components/ui/generate-pages'
 import { Locacao } from '@/interfaces/locacao'
 import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { LocacaoStatus } from '@/enums/locacao/enums-locacao'
@@ -146,7 +145,7 @@ export default function ListarLocacoes({
     setSearchTerm({ search })
   }
 
-  const handlePageChange = (newpage: number) => {
+  /*const handlePageChange = (newpage: number) => {
     // Check if the new page is within the total pages
     // const canGoNext = !!totalPages && newpage <= totalPages ||
 
@@ -156,7 +155,8 @@ export default function ListarLocacoes({
     navigate({
       search: `?page=${newpage}&limit=${limit}&search=${search}&status=${(status !== null ? status : '')}`
     })
-  }
+  }*/
+
   const handleClickCreateLocacao = () => {
     navigate(ROUTE.LOCACOES_CRIAR)
   }
@@ -198,8 +198,8 @@ export default function ListarLocacoes({
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         <div className='grid grid-cols-3'>
           {showcard ?
-            (<List onClick={() => { setShowCard(!showcard) }} color='black' />) :
-            (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' />)
+            (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-200'/>) :
+            (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-200'/>)
           }
         </div>
         {(isAdmin ||

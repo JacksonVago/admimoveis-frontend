@@ -23,6 +23,7 @@ export interface Empresa {
   porcentagemMultaAtraso: number
   porcentagemJurosAtraso: number
 
+  logo?: string
   enderecoId: number
   endereco: Endereco
   createdAt: Date

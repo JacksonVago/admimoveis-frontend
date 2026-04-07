@@ -2,7 +2,7 @@
 
 import { Banknote, Building, Building2, CircleDollarSign, Cog, House, KeyRound, Lock, LogOut, ReceiptText, Shapes, Users } from 'lucide-react'
 import * as React from 'react'
-import logo  from '../assets/logo-molina.png';
+//import logo  from '../assets/logo-molina.png';
 
 import { NavMain } from '@/components/nav-main'
 import {
@@ -17,6 +17,7 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Link } from 'react-router-dom'
+import { useGlobalParams } from '@/globals/GlobalParams';
 
 const data = {
   navMain: [
@@ -101,7 +102,8 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   //const { user, logout, isAdmin } = useAuth()
   const { user, logout } = useAuth()
-
+  const glb_params = useGlobalParams();
+  
   const navMainData = React.useMemo(() => {
     return data.navMain.filter((item) => {
       const isAdmin = user?.role === 'ADMIN';
@@ -142,6 +144,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     })
   }, [user])
 
+
   return (
     <Sidebar className="border-r bg-white font-[Poppins-Regular]" variant="inset" {...props}>
       <SidebarHeader>        
@@ -152,8 +155,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {/* <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"> */}
                 <div className="flex justify-center rounded-lg">
                   <img
-                    src={logo}
-                    alt={`Property image`}
+                    src={(glb_params.logo_url ? glb_params.logo_url : '')}
                     className="rounded-md object-contain h-26"
                   />
                 </div>
