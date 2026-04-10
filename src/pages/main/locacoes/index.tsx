@@ -99,7 +99,7 @@ export default function ListarLocacoes({
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
   const isMobile = useMediaQuery({ query: '(min-width: 200px)' })
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
-  const [showcard, setShowCard] = useState(false);
+  const [showcard, setShowCard] = useState((txtVinc != '' ? false : true) || (isMobile ? false : true));
 
   const navigate = useNavigate()
 
@@ -138,6 +138,12 @@ export default function ListarLocacoes({
       })
     }
   }, [totalPages, page, navigate, limit, search])
+
+  useEffect(() => {
+    if (isMobile) {
+      setShowCard(true);
+    }
+  }, [isMobile])
 
   // Event Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,9 +203,11 @@ export default function ListarLocacoes({
       {/* Search & Filters */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         <div className='grid grid-cols-3'>
-          {showcard ?
-            (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-200'/>) :
-            (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-200'/>)
+          {(txtVinc === '' ?
+            (showcard ?
+              (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />)
+            ) : (<></>))
           }
         </div>
         {(isAdmin ||
@@ -212,7 +220,7 @@ export default function ListarLocacoes({
           )}
       </div>
 
-      <div className={isTablet ? 'grid grid-cols-6 gap-4' : 'grid grid-cols-1 gap-4'}>
+      <div className={isTablet ? (txtVinc === '' ? 'grid grid-cols-6 gap-4' : 'grid grid-cols-1 gap-4') : 'grid grid-cols-1 gap-4'}>
         <div className="col-span-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -224,6 +232,7 @@ export default function ListarLocacoes({
             />
           </div>
         </div>
+        
         <div>
           <Select onValueChange={(value) => { handlerChangeStatus(value) }}>
             <SelectTrigger className="w-[160px] h-6 hover:cursor-pointer hover:outline">

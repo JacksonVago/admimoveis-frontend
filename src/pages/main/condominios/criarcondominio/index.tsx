@@ -87,10 +87,6 @@ export const CriarCondominio = () => {
 
       form.append('empresaId', glb_params.id_empresa ? glb_params.id_empresa : "0");
       
-      const dataObject = Object.fromEntries(form.entries());
-      const jsonData = JSON.stringify(dataObject);
-      console.log(jsonData);
-
       await api.post('condominios', form, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });

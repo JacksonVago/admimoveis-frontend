@@ -36,7 +36,7 @@ import api from '@/services/axios/api'
 import { queryClient } from '@/services/react-query/query-client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { CircleCheck, Pencil, Trash2 } from 'lucide-react'
+import { CircleArrowLeft, CircleCheck, Pencil, Trash2 } from 'lucide-react'
 import * as React from 'react'
 import { useForm, Controller, FormProvider } from 'react-hook-form'
 import { LancamentoStatus, BoletoStatus } from '@/enums/locacao/enums-locacao'
@@ -46,12 +46,13 @@ import { useMediaQuery } from 'react-responsive';
 import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
 import { TipoLancamento } from '@/interfaces/lancamentotipo'
 import axios from 'axios'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { boletoSchema, BoletoSchema } from '@/schemas/boleto.schema'
 import { Boleto } from '@/interfaces/boleto'
 import { usdFormatter } from '@/utils/format-money'
 import { STATUS_BOLETO_OPTIONS } from '@/constants/status-boletos'
 import { DocumentUpload } from '../../imoveis/criarImovel/components/document-upload'
+import { ROUTE } from '@/enums/routes.enum'
 
 export const getTipos = async () => {
   return await api.get<TipoLancamento[]>('tipolancamento')
@@ -102,6 +103,7 @@ export const DetalhesBoleto = () => {
 
   //Globals
   const glb_params = useGlobalParams();
+  const navigate = useNavigate();
 
   const { data: boleto } = useQuery({
     queryKey: ['boleto', id],
@@ -130,7 +132,7 @@ export const DetalhesBoleto = () => {
       })
     },
     onSuccess: () => {
-      ['boleto','documentFiles', id].forEach((key) => {
+      ['boleto', 'documentFiles', id].forEach((key) => {
         queryClient.invalidateQueries({ queryKey: [key] })
       })
     }
@@ -189,13 +191,13 @@ export const DetalhesBoleto = () => {
 
       form.append('id', data.id.toString())
 
-      const newDocuments = data?.documentos?.filter((doc:any) => !doc.id)
-      newDocuments?.forEach((doc:any) => {
+      const newDocuments = data?.documentos?.filter((doc: any) => !doc.id)
+      newDocuments?.forEach((doc: any) => {
         form.append('documentos', doc.file)
       })
 
       if (data?.documentosToDeleteIds?.length) {
-        data.documentosToDeleteIds.forEach((docId:any) => {
+        data.documentosToDeleteIds.forEach((docId: any) => {
           form.append('documentosToDeleteIds[]', docId.toString())
         })
       }
@@ -283,36 +285,72 @@ export const DetalhesBoleto = () => {
     deleteBoleto.mutate(idBoleto);
   }
 
-/*  const handleEditBoleto = (boleto: Boleto) => {
-    setTitulo("Alterar Boleto")
-    setIsCreateDialogOpen(true);
-    boletoMethods.setValue("id", boleto.id);
-    boletoMethods.setValue("dataPagamento", moment.utc(boleto.dataPagamento).format("YYYY-MM-DD"));
-    boletoMethods.setValue("dataEmissao", moment.utc(boleto.dataEmissao).format("YYYY-MM-DD"));
-    boletoMethods.setValue("dataVencimento", moment.utc(boleto.dataVencimento).format("YYYY-MM-DD"));
-    boletoMethods.setValue("valorOriginal", boleto.valorOriginal);
-    boletoMethods.setValue("valorPago", boleto.valorPago);
-    boletoMethods.setValue("status", boleto.status);
-    boletoMethods.setValue("locatarioId", (boleto.locatario ? boleto.locatario.id : 0));
-    boletoMethods.setValue("locacaoId", boleto.locacaoId);
-  }*/
+  /*  const handleEditBoleto = (boleto: Boleto) => {
+      setTitulo("Alterar Boleto")
+      setIsCreateDialogOpen(true);
+      boletoMethods.setValue("id", boleto.id);
+      boletoMethods.setValue("dataPagamento", moment.utc(boleto.dataPagamento).format("YYYY-MM-DD"));
+      boletoMethods.setValue("dataEmissao", moment.utc(boleto.dataEmissao).format("YYYY-MM-DD"));
+      boletoMethods.setValue("dataVencimento", moment.utc(boleto.dataVencimento).format("YYYY-MM-DD"));
+      boletoMethods.setValue("valorOriginal", boleto.valorOriginal);
+      boletoMethods.setValue("valorPago", boleto.valorPago);
+      boletoMethods.setValue("status", boleto.status);
+      boletoMethods.setValue("locatarioId", (boleto.locatario ? boleto.locatario.id : 0));
+      boletoMethods.setValue("locacaoId", boleto.locacaoId);
+    }*/
+
+  const handlerBackNav = () => {
+      navigate(`${ROUTE.PAGAMENTOS}/?page=1&dataInicial=${glb_params.data_inicial}&dataFinal=${glb_params.data_final}`)
+  }
 
   return (
     <div className="scale mx-auto flex max-w-screen-xl transform flex-col items-center px-4 transition-transform">
       <div className="mx-auto w-full rounded-md">
         <Card className='font-[Poppins-regular]'>
           <CardHeader>
+            <CircleArrowLeft
+              className='mb-5 hover:cursor-pointer hover:text-gray-500'
+              onClick={handlerBackNav}
+            ></CircleArrowLeft>
             <CardTitle className="flex items-center justify-between">
-              <div className='grid grid-cols-1 font-bold'>
+              <div className='font-bold w-full'>
                 <div className='flex flex-direction-row'>
-                  <Label className="font-bold">Locatário : &nbsp;</Label>
-                  <Label className="font-normal">{(boleto?.locatario ? boleto?.locatario.pessoa?.nome : '')}</Label>
+                  <Label className="font-bold">Boleto : &nbsp;</Label>
+                  <Label className="font-normal">{boleto?.id}</Label>
                 </div>
                 <div className='flex flex-direction-row'>
-                  <Label className="font-bold mt-2">Imóvel : &nbsp;</Label>
-                  <Label className="font-normal mt-2">{getEnderecoFormatado(boleto?.locacao?.imovel?.endereco)}</Label>
+                  <Label className="font-bold mt-2">Locação : &nbsp;</Label>
+                  <Label className="font-normal mt-2">
+                    {boleto?.locatario ? boleto.locatario.pessoa?.nome : ''} -
+                    {boleto?.locacao?.imovel?.endereco.complemento} -
+                    {boleto?.locacao?.imovel?.condominio ? boleto.locacao.imovel.condominio.name : ''}
+                  </Label>
+                </div>
+                <div className='grid grid-cols-3'>
+                  <div className='flex flex-direction-row'>
+                    <Label className="font-bold mt-2">Emissão : &nbsp;</Label>
+                    <Label className="font-normal mt-2">{moment.utc(boleto?.dataEmissao).format("DD/MM/YYYY")}</Label>
+                  </div>
+                  <div className='flex flex-direction-row'>
+                    <Label className="font-bold mt-2">Vencimento : &nbsp;</Label>
+                    <Label className="font-normal mt-2">{moment.utc(boleto?.dataVencimento).format("DD/MM/YYYY")}</Label>
+                  </div>
+                  <div className='flex flex-direction-row'>
+                    <Label className="font-bold mt-2">Pagamento : &nbsp;</Label>
+                    <Label className="font-normal mt-2">{moment.utc(boleto?.dataPagamento).format("DD/MM/YYYY")}</Label>
+                  </div>
                 </div>
 
+                <div className='grid grid-cols-3'>
+                  <div className='flex flex-direction-row'>
+                    <Label className="font-bold mt-2">Valor Original : &nbsp;</Label>
+                    <Label className="font-normal mt-2">{usdFormatter.format(boleto?.valorOriginal ? boleto.valorOriginal : 0)}</Label>
+                  </div>
+                  <div className='flex flex-direction-row'>
+                    <Label className="font-bold mt-2">Valor Pago : &nbsp;</Label>
+                    <Label className="font-normal mt-2">{usdFormatter.format(boleto?.valorPago ? boleto.valorPago : 0)}</Label>
+                  </div>
+                </div>
 
               </div>
             </CardTitle>
@@ -410,111 +448,113 @@ export const DetalhesBoleto = () => {
             )}
           </CardContent>
           <CardFooter>
-            <Dialog
-              open={isCreateDialogOpen}
-              onOpenChange={(value) => {
-                setIsCreateDialogOpen(value)
-                if (!value) {
-                  setTitulo("Detalhes pagamento");
-                  boletoMethods.reset(defaultValues);
-                }
-              }}
-            >
-              <DialogTrigger asChild>
-                <Button size={'sm'}>
-                  <CircleCheck className="mr-2 h-4 w-4" /> Pagamento
-                </Button>
-              </DialogTrigger>
-              <DialogContent className=' font-[Poppins-regular]'>
-                <DialogHeader>
-                  <DialogTitle>{titulo}</DialogTitle>
-                  <DialogDescription>{titulo.includes('novo') ? 'Preencha os dados do novo lançamento abaixo.' : ''}</DialogDescription>
-                </DialogHeader>
-                <FormProvider {...boletoMethods}>
-                  <DocumentUpload disabled={disabled} downloadDocuments={disabled} />
-                </FormProvider>
-                <form onSubmit={boletoMethods.handleSubmit(onSubmitBoletoData)}>
-                  <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-2" : "grid grid-cols-1 gap-4 mt-2")}>
-                    <Label className="text-base">
-                      Data Vencimento
-                      <Input
-                        className="mt-2"
-                        type="date"
-                        disabled={disabled}
-                        placeholder="Data Vencimento"
-                        {...boletoMethods.register('dataVencimento')}
-                      />
-                      {boletoMethods.formState?.errors?.dataVencimento?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.dataVencimento?.message}</p>}
-                    </Label>
-                    <Label className="text-base">
-                      Data do Pagamento
-                      <Input
-                        type='date'
-                        className="mt-2"
-                        disabled={true}
-                        placeholder="Data do pagamento"
-                        {...boletoMethods.register('dataPagamento')}
-                      />
-                      {boletoMethods.formState?.errors?.dataPagamento?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{boletoMethods.formState?.errors?.dataPagamento?.message}</p>}
-                    </Label>
-                  </div>
-
-                  <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-3" : "grid grid-cols-1 gap-4 mt-3")}>
-                    <Label className="text-base">
-                      Valor do Lançamento
-                      <Input
-                        type="number"
-                        step={'any'}
-                        className="mt-1"
-                        disabled={true}
-                        placeholder="Valor do boleto"
-                        {...boletoMethods.register('valorOriginal')}
-                      />
-                      {boletoMethods.formState?.errors?.valorOriginal?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.valorOriginal?.message}</p>}
-                    </Label>
-                  </div>
-
-                  <div className='mt-2 mr-5'>
-                    <Label className='text-base font-[Poppins-Regular]'>
-                      Situação do Pagamento
-                      <div className='mt-2 border rounded-md pr-4'>
-                        <Controller
-                          name="status"
-                          control={boletoMethods.control}
+            {boleto?.status !== BoletoStatus.PAGO && (
+              <Dialog
+                open={isCreateDialogOpen}
+                onOpenChange={(value) => {
+                  setIsCreateDialogOpen(value)
+                  if (!value) {
+                    setTitulo("Detalhes pagamento");
+                    boletoMethods.reset(defaultValues);
+                  }
+                }}
+              >
+                <DialogTrigger asChild>
+                  <Button size={'sm'}>
+                    <CircleCheck className="mr-2 h-4 w-4" /> Pagamento
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className=' font-[Poppins-regular]'>
+                  <DialogHeader>
+                    <DialogTitle>{titulo}</DialogTitle>
+                    <DialogDescription>{titulo.includes('novo') ? 'Preencha os dados do novo lançamento abaixo.' : ''}</DialogDescription>
+                  </DialogHeader>
+                  <FormProvider {...boletoMethods}>
+                    <DocumentUpload disabled={disabled} downloadDocuments={disabled} />
+                  </FormProvider>
+                  <form onSubmit={boletoMethods.handleSubmit(onSubmitBoletoData)}>
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-2" : "grid grid-cols-1 gap-4 mt-2")}>
+                      <Label className="text-base">
+                        Data Vencimento
+                        <Input
+                          className="mt-2"
+                          type="date"
                           disabled={disabled}
-                          render={({ field }) => (
-                            <Select
-                              disabled={true}
-                              onValueChange={(value) => field.onChange(value)}
-                              value={String(field.value)}
-                            >
-                              <SelectTrigger className='h-4'>
-                                <SelectValue placeholder="" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {STATUS_BOLETO_OPTIONS.map((status) => (
-                                  <SelectItem key={status.label} value={status.value}>
-                                    {status.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
+                          placeholder="Data Vencimento"
+                          {...boletoMethods.register('dataVencimento')}
                         />
-                        {boletoMethods.formState.errors.status?.message &&
-                          (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                            {boletoMethods.formState.errors.status.message}
-                          </p>)}
-                      </div>
-                    </Label>
-                  </div>
+                        {boletoMethods.formState?.errors?.dataVencimento?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.dataVencimento?.message}</p>}
+                      </Label>
+                      <Label className="text-base">
+                        Data do Pagamento
+                        <Input
+                          type='date'
+                          className="mt-2"
+                          disabled={true}
+                          placeholder="Data do pagamento"
+                          {...boletoMethods.register('dataPagamento')}
+                        />
+                        {boletoMethods.formState?.errors?.dataPagamento?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{boletoMethods.formState?.errors?.dataPagamento?.message}</p>}
+                      </Label>
+                    </div>
 
-                  <DialogFooter className='mt-2'>
-                    <Button size={"sm"} type='submit'>Confirmar Pagamento</Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-3" : "grid grid-cols-1 gap-4 mt-3")}>
+                      <Label className="text-base">
+                        Valor do Lançamento
+                        <Input
+                          type="number"
+                          step={'any'}
+                          className="mt-1"
+                          disabled={true}
+                          placeholder="Valor do boleto"
+                          {...boletoMethods.register('valorOriginal')}
+                        />
+                        {boletoMethods.formState?.errors?.valorOriginal?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.valorOriginal?.message}</p>}
+                      </Label>
+                    </div>
+
+                    <div className='mt-2 mr-5'>
+                      <Label className='text-base font-[Poppins-Regular]'>
+                        Situação do Pagamento
+                        <div className='mt-2 border rounded-md pr-4'>
+                          <Controller
+                            name="status"
+                            control={boletoMethods.control}
+                            disabled={disabled}
+                            render={({ field }) => (
+                              <Select
+                                disabled={true}
+                                onValueChange={(value) => field.onChange(value)}
+                                value={String(field.value)}
+                              >
+                                <SelectTrigger className='h-4'>
+                                  <SelectValue placeholder="" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {STATUS_BOLETO_OPTIONS.map((status) => (
+                                    <SelectItem key={status.label} value={status.value}>
+                                      {status.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          />
+                          {boletoMethods.formState.errors.status?.message &&
+                            (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                              {boletoMethods.formState.errors.status.message}
+                            </p>)}
+                        </div>
+                      </Label>
+                    </div>
+
+                    <DialogFooter className='mt-2'>
+                      <Button size={"sm"} type='submit'>Confirmar Pagamento</Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
           </CardFooter>
         </Card>
       </div>

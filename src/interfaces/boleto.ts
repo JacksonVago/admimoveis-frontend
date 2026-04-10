@@ -20,6 +20,7 @@ export interface Boleto {
   
     valorOriginal:number;
     valorPago:number;
+    observacao:string;
     documentos?:GenericAnexo[]
     lanctoLocacao?:LancamentoLocacao[];
     locatario?:Locatario;

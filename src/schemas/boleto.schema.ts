@@ -5,10 +5,9 @@ import moment from "moment";
 import { z } from "zod";
 
 export const boletoSchema = z.object({
-  id: z.coerce.number(),
   dataEmissao: z.string().transform((val) => {
     const data: string = val;
-    return moment(data.substring(0, 10)).format("YYYY-MM-DD");
+    return moment.utc(data.substring(0, 10)).format("YYYY-MM-DD");
   }),
   dataPagamento: z.string().transform((val) => {
     const data: string = val;
@@ -16,12 +15,13 @@ export const boletoSchema = z.object({
   }),
   dataVencimento: z.string().transform((val) => {
     const data: string = val;
-    return moment(data.substring(0, 10)).format("YYYY-MM-DD");
+    return moment.utc(data.substring(0, 10)).format("YYYY-MM-DD");
   }),
   valorOriginal: z.coerce.number().min(1, 'Valor do boleto é obrigatório'),
   valorPago: z.coerce.number().optional(),
+  observacao: z.string().optional(),
   status: z.enum(Object.values(BoletoStatus) as [string, ...string[]]),
-  locatarioId: z.coerce.number().optional(),
+  locatarioId: z.coerce.number().min(1, 'Locatário é obrigatório'),
   locacaoId: z.coerce.number().min(1, 'Locação é obrigatório'),
   documentos: z
     .array(
@@ -48,7 +48,16 @@ export const boletoSchema = z.object({
 
   documentosToDeleteIds: z.array(z.number()).optional(),
   //documentosToDeleteIds: z.array(z.object({id:z.number(), file:z.string()})).optional(),
-
+  locacao: z.array(
+    z.object(
+      {
+        nome: z.string(),
+        id: z.number(),
+        locatarioId: z.number(),
+      }
+    )
+  ).optional(),
+  empresaId: z.number().min(1, 'Empresa é obrigatória'),
 });
 
 export type BoletoSchema = z.infer<typeof boletoSchema>

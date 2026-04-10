@@ -14,6 +14,8 @@ type globalParams = {
     title_form:string;
     origin_url:string;
     logo_url:string;
+    data_inicial:string;
+    data_final:string;
     updLogin: (login: globalParams['login']) => void;
     updPwd: (pwd: globalParams['pwd']) => void;
     updId_orig: (id_orig: globalParams['id_orig']) => void;
@@ -24,6 +26,8 @@ type globalParams = {
     updTitle_form: (title_form:globalParams['title_form']) => void;
     updOrigin_url: (origin_url:globalParams['origin_url']) => void;
     updLogo_url: (logo_url: globalParams['logo_url']) => void;
+    updData_inicial: (data_inicial: globalParams['data_inicial']) => void;
+    updData_final: (data_final: globalParams['data_final']) => void;
 };
 
 export const useGlobalParams = create<globalParams>((set)=>(
@@ -38,6 +42,8 @@ export const useGlobalParams = create<globalParams>((set)=>(
     title_form:'',
     origin_url:'',
     logo_url:'',
+    data_inicial:'',
+    data_final:'',
     updLogin: (Plogin:string) => set(() => ({ login: Plogin })),
     updPwd: (Ppwd:string) => set(() => ({ pwd: Ppwd })),
     updId_orig: (Pid_orig:string) => set(() => ({ id_orig: Pid_orig })),
@@ -48,6 +54,8 @@ export const useGlobalParams = create<globalParams>((set)=>(
     updTitle_form: (Ptitle:any) => set(() => ({ title_form: Ptitle })),
     updOrigin_url:(Porigin:any) => set(() => ({ origin_url: Porigin })),
     updLogo_url: (logo_url: globalParams['logo_url']) => set(() => ({ logo_url: logo_url })),
+    updData_inicial: (data_inicial: globalParams['data_inicial']) => set(() => ({ data_inicial: data_inicial })),
+    updData_final: (data_final: globalParams['data_final']) => set(() => ({ data_final: data_final })),
 }));
 
 //Pessoa

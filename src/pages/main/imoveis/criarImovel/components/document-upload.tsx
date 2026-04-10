@@ -155,7 +155,7 @@ export function DocumentUpload({
   };
 
   return (
-    <div className="mb-6 w-full space-y-4">
+    <div className="mb-6 w-full space-y-4 font-[Poppins-Regular]">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">{title}</h3>
         {!disabled && (
