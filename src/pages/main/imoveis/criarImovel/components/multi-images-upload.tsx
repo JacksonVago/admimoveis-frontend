@@ -9,7 +9,6 @@ import {
   CarouselNext,
   CarouselPrevious
 } from '@/components/ui/carousel'
-import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob'
 import { Download, ImagePlus, X } from 'lucide-react'
 import { useRef } from 'react'
 import { useFormContext } from 'react-hook-form'
@@ -66,7 +65,7 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
   const downloadDocument = async (index:number) => {
     try {
       console.log('images', images[index]);
-      const blobName = AZURE_BLOB_CONTAINER + images[index]?.file.name;
+      const blobName = import.meta.env.VITE_AZURE_BLOB_CONTAINER + images[index]?.file.name;
       const a = document.createElement('a');
       a.href = blobName;
       a.download = images[index]?.file.name; // Desired filename for download

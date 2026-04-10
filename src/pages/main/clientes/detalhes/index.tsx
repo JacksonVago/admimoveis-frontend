@@ -66,7 +66,6 @@ import { BasePaginationData } from '../../imoveis/listarImoveis';
 import { useMediaQuery } from 'react-responsive';
 import ListarImoveisLocacao from '../../imoveis/listaimoveislocacao'
 import { useAuth } from '@/hooks/auth/use-auth'
-import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob'
 
 // Mock data for demonstration
 /*const cliente = {
@@ -119,11 +118,11 @@ const fetchDocumentFiles = async (documents: Pessoa['documentos']) => {
   const documentFilesPromises =
     documents?.map(async (doc) => {
       try {
-        console.log('link',AZURE_BLOB_CONTAINER + doc.url);
+        console.log('link',import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url);
 
         const response = await fetch(
           //'https://jrseqfittadsxfbmlwvz.supabase.co/storage/v1/object/public/' + doc.url
-          AZURE_BLOB_CONTAINER + doc.url
+          import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url
         )
         console.log('response',response);
 

@@ -1,4 +1,0 @@
-export const AZURE_BLOB_CONTAINER='https://appimg.blob.core.windows.net/appimage/'
-//export const AZURE_CONTAINER_CONNECTSTRING='DefaultEndpointsProtocol=https;AccountName=appimg;AccountKey=IReCz9+NvyT/keKM1+9iRc8TK75pRyOw8qtBKHhVE1vzj5Vh7HiW1fw0UkHVyEUfoJFK63MYRFIC+AStxYvdkg==;EndpointSuffix=core.windows.net'
-export const AZURE_CONTAINER_CONNECTSTRING='BlobEndpoint=https://appimg.blob.core.windows.net/;QueueEndpoint=https://appimg.queue.core.windows.net/;FileEndpoint=https://appimg.file.core.windows.net/;TableEndpoint=https://appimg.table.core.windows.net/;SharedAccessSignature=sp=racwdli&st=2025-09-22T16:57:16Z&se=2026-09-30T01:12:16Z&spr=https&sv=2024-11-04&sr=c&sig=pcN3pdlOULYXBl0VaEviwoaSHXmf6hUJ37lqb6CnWBY%3D'
-export const AZURE_CONTAINER_NAME= 'appimage'

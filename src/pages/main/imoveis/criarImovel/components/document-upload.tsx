@@ -13,7 +13,6 @@ import { Download, File, FileText, FileUp, Image, X } from 'lucide-react'
 import { useRef } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useMediaQuery } from 'react-responsive'
-import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob';
 
 export function DocumentUpload({
   disabled,
@@ -142,7 +141,7 @@ export function DocumentUpload({
       document.body.removeChild(a);
       URL.revokeObjectURL(url);*/
 
-      const blobName = AZURE_BLOB_CONTAINER + documents[index]?.url;
+      const blobName = import.meta.env.VITE_AZURE_BLOB_CONTAINER + documents[index]?.url;
       const a = document.createElement('a');
       a.href = blobName;
       a.download = documents[index]?.name; // Desired filename for download

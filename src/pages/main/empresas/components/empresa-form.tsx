@@ -22,7 +22,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { Download, ImagePlus } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob'
 
 export const getTipos = async (empresaId: number) => {
   return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
@@ -79,7 +78,7 @@ export const EmpresaFormContent = ({
 
   const downloadDocument = async (logo: any) => {
     try {
-      const blobName = AZURE_BLOB_CONTAINER + logo;
+      const blobName = import.meta.env.VITE_AZURE_BLOB_CONTAINER + logo;
       const a = document.createElement('a');
       a.href = blobName;
       a.download = logo; // Desired filename for download

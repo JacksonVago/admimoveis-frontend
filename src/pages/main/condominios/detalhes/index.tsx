@@ -34,7 +34,6 @@ import { useGlobalParams } from '@/globals/GlobalParams'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { usdFormatter } from '@/utils/format-money'
 import { Condominio } from '@/interfaces/condominio'
-import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob'
 import React from 'react'
 import { condominioSchema, CondominioSchema } from '@/schemas/condominio.schema'
 import { ImovelStatus } from '@/enums/imovel/enums-imovel'
@@ -62,12 +61,12 @@ export const getFormattedDefaultValues = (condominio: Condominio | undefined) =>
 
 const fetchDocumentFiles = async (documents: Condominio['documentos']) => {
   const documentFilesPromises =
-    documents?.map(async (doc) => {
+      documents?.map(async (doc) => {
       try {
-        console.log('link', AZURE_BLOB_CONTAINER + doc.url);
+        console.log('link', import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url);
 
         const response = await fetch(
-          AZURE_BLOB_CONTAINER + doc.url
+          import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url
         )
         console.log('response', response);
 

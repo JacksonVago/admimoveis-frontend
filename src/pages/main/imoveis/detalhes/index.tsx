@@ -60,7 +60,6 @@ import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { usdFormatter } from '@/utils/format-money'
-import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob'
 
 //REFACTOR: move to another directory
 //const LOCATARIO_ERROR_MESSAGES = ['A location already exists for this property']
@@ -414,9 +413,9 @@ export const DetalhesImovel = () => {
           'https://jrseqfittadsxfbmlwvz.supabase.co/storage/v1/object/public/' + image.url
         )*/
 
-        console.log('link', AZURE_BLOB_CONTAINER + image.url);
+        console.log('link', import.meta.env.VITE_AZURE_BLOB_CONTAINER + image.url);
         const response = await fetch(
-          AZURE_BLOB_CONTAINER + image.url
+          import.meta.env.VITE_AZURE_BLOB_CONTAINER + image.url
         )
         console.log('response', response);
         if (!response.ok) {

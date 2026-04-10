@@ -42,7 +42,6 @@ import { LancamentoStatus } from '@/enums/locacao/enums-locacao'
 import { Textarea } from '@/components/ui/textarea'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { useAuth } from '@/hooks/auth/use-auth'
-import { AZURE_BLOB_CONTAINER } from '@/constants/azure-blob'
 import React from 'react'
 import { BlocoForm } from '../criarbloco/components/bloco-form'
 import { Bloco } from '@/interfaces/bloco'
@@ -90,10 +89,10 @@ const fetchDocumentFiles = async (documents: Bloco['documentos']) => {
   const documentFilesPromises =
     documents?.map(async (doc) => {
       try {
-        console.log('link', AZURE_BLOB_CONTAINER + doc.url);
+        console.log('link', import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url);
 
         const response = await fetch(
-          AZURE_BLOB_CONTAINER + doc.url
+          import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url
         )
         console.log('response', response);
 
