@@ -5,6 +5,7 @@ import moment from "moment";
 import { z } from "zod";
 
 export const boletoSchema = z.object({
+  id: z.number().optional(),
   dataEmissao: z.string().transform((val) => {
     const data: string = val;
     return moment.utc(data.substring(0, 10)).format("YYYY-MM-DD");

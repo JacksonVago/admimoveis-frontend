@@ -428,6 +428,7 @@ export const EmpresaFormContent = ({
             <Input
               className="mt-2"
               type="number"
+              step="any"
               disabled={disabled}
               placeholder="Porcentagem comissão"
               {...createEmpresaMethods.register('porcentagemComissao', { valueAsNumber: true })}
@@ -580,6 +581,7 @@ export const EmpresaFormContent = ({
                 <Input
                   className="mt-2"
                   type="number"
+                  step="any"
                   disabled={disabled}
                   placeholder="Porcentagem de juros"
                   {...createEmpresaMethods.register('porcentagemJurosAtraso', { valueAsNumber: true })}

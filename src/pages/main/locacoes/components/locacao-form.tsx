@@ -426,6 +426,7 @@ export const LocacaoFormContent = ({
                   Valor do Aluguel
                   <Input
                     type="number"
+                    step="any"
                     className="mt-1"
                     disabled={disabled}
                     placeholder="Valor do Aluguel"
@@ -639,7 +640,7 @@ export const LocacaoFormContent = ({
               <div>
                 <div className='mt-2 text-base'>
                   <Label>Valor do depósito</Label>
-                  <Input type="number" placeholder='0,00' disabled={disabled}
+                  <Input type="number" step="any" placeholder='0,00' disabled={disabled}
                     {...createLocacaoMethods.register('depCalcao.valorDeposito')}
                   />
                   {createLocacaoMethods.formState?.errors?.depCalcao?.valorDeposito?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {createLocacaoMethods.formState?.errors?.depCalcao?.valorDeposito?.message}</p>}

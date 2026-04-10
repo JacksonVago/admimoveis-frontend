@@ -185,7 +185,7 @@ export const DetalhesBoleto = () => {
         form.append('locacaoId', data.locacaoId.toString())
       }
 
-      form.append('id', data.id.toString())
+      form.append('id', data.id ? data.id.toString() : '')
 
       const newDocuments = data?.documentos?.filter((doc:any) => !doc.id)
       newDocuments?.forEach((doc:any) => {

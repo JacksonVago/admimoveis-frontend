@@ -1236,7 +1236,7 @@ export const DetalhesImovel = () => {
                   {!selPessoa && (
                     <div>
                       <Label htmlFor="cotaImovel">Cota do Imóvel</Label>
-                      <Input id="cotaImovel" type="number" placeholder="0.00"
+                      <Input id="cotaImovel" type="number" step="any" placeholder="0.00"
                         {...imovelProp.register('cotaImovel')}
                         helperText={imovelProp.formState?.errors?.cotaImovel?.message}
                       />

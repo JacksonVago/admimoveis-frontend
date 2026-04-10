@@ -12,15 +12,13 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { IdCard, List, MapPin, Plus, Receipt, Search, Trash, X } from 'lucide-react'
+import { IdCard, List, Plus, Receipt, Search, Trash, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
 import { useMediaQuery } from 'react-responsive'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { generatePaginationLinks } from '@/components/ui/generate-pages'
-import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-endereco-formatado'
-import { Endereco } from '@/interfaces/endereco'
 import { Label } from '@/components/ui/label'
 import moment from 'moment'
 import { toast } from '@/hooks/use-toast'
@@ -137,7 +135,7 @@ export default function ListarBoletos({
   const [dataInicial, setdataInicial] = useState(searchParams.get('dataInicial') || moment.utc(new Date()).format("YYYY-MM-DD"));
   const [dataFinal, setdataFinal] = useState(searchParams.get('dataFinal') || moment.utc(new Date()).format("YYYY-MM-DD"));
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  //const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   const boletoMethods = useForm<BoletoSchema>({
     resolver: zodResolver(boletoSchema),
@@ -174,8 +172,9 @@ export default function ListarBoletos({
   const createBoletoMutation = useMutation({
     mutationFn: ({ data }: { data: FormData }) => createBoleto(data),
     onSuccess: ({ data: clienteData }) => {
-      toast({ title: 'Boleto criada com sucesso' });
+      toast({ title: `Boleto ${clienteData.id} criada com sucesso.` });
 
+      navigate(ROUTE.PAGAMENTOS);
       /*if (glb_params.origin_url === 'imoveis') {
         navigate(`${ROUTE.IMOVEIS}/${glb_params.id_orig}`);
       }
@@ -291,13 +290,13 @@ export default function ListarBoletos({
   // UI Logic
   const hasSearchResults = Boolean(!isLoading && search && boletos?.length === 0)
 
-  const googleMaps = "https://www.google.com/maps/place/";
+  /*const googleMaps = "https://www.google.com/maps/place/";
   const handlerClickMaps = (endereco: Endereco | undefined) => {
     if (endereco) {
       const urlGoogleMaps = googleMaps + getEnderecoFormatMaps(endereco);
       window.open(urlGoogleMaps);
     }
-  }
+  }*/
 
   const usdFormatter = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
