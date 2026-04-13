@@ -160,7 +160,6 @@ export default function ListarClientes({
   }
   // UI Logic
   const hasSearchResults = Boolean(!isLoading && search && clientes?.length === 0)
-  console.log(data);
 
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
@@ -305,7 +304,7 @@ export default function ListarClientes({
                       </tr>
                     </thead>
                   </table>
-                  <div className='h-[500px] flex-1 overflow-y-auto'>
+                  <div className='h-[450px] flex-1 overflow-y-auto'>
                     <table className='w-full table-fixed'>
                       <tbody>
                         {clientes?.map((cliente) => (

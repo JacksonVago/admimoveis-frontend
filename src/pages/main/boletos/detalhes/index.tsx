@@ -351,6 +351,13 @@ export const DetalhesBoleto = () => {
                   </div>
                 </div>
 
+                <div className='grid grid-cols-1'>
+                  <div className='flex flex-direction-row'>
+                    <Label className="font-bold mt-2">Observação : &nbsp;</Label>
+                    <Label className="font-normal mt-2">{boleto?.observacao}</Label>
+                  </div>
+                </div>
+
               </div>
             </CardTitle>
           </CardHeader>
@@ -437,7 +444,6 @@ export const DetalhesBoleto = () => {
                   <Label className='flex items-center font-bold' style={{ 'fontSize': '0.7rem' }}>{moment.utc(boleto.dataVencimento).format('DD/MM/YYYY')}</Label>
                   <Label className='flex justify-end items-center font-bold' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(boleto.valorOriginal)}</Label>
                 </div>
-
               </div>
 
             ) : (

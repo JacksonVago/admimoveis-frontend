@@ -30,7 +30,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { STATUS_BOLETO_OPTIONS } from '@/constants/status-boletos'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { boletoSchema, BoletoSchema } from '@/schemas/boleto.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form'
@@ -129,7 +129,7 @@ export default function ListarBoletos({
   const [searchParams, setSearchTerm] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
   //const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
-  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
+  const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 100 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || '';
   const status = searchParams.get('status') || '';
   const [dataInicial, setdataInicial] = useState(searchParams.get('dataInicial') || moment.utc(new Date()).format("YYYY-MM-DD"));
@@ -244,7 +244,7 @@ export default function ListarBoletos({
     glb_params.updTitle_form('Boletos');
     if (totalPages && page > totalPages) {
       navigate({
-        search: `?page=1&limit=${limit}&search=${search}`
+        search: `?page=1&limit=${limit}&search=${search}&status=${(status !== null ? status : '')}`
       })
     }
   }, [totalPages, page, navigate, limit, search])
@@ -415,6 +415,15 @@ export default function ListarBoletos({
     setSelLocacao(false);
   }
 
+  const handlerNewBoleto = () => {
+    console.log('novo boleto');
+    boletoMethods.reset();
+    if (locacao.fields.length > 0) {
+      locacao.remove(0);
+    }
+    setIsCreateDialogOpen(!isCreateDialogOpen);
+
+  }
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}
@@ -434,180 +443,175 @@ export default function ListarBoletos({
           user?.permissions.includes("ALL") ||
           user?.permissions.includes("CREATE_PAGAMENTO")
         ) && (
-            <div>
-              <Dialog
-                open={isCreateDialogOpen}
-                onOpenChange={(value) => {
-                  setIsCreateDialogOpen(value)
-                }}
-              >
-                <DialogTrigger asChild>
-                  <Button size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'>
-                    <Plus className="mr-2 h-4 w-4" /> Criar Boleto
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader className='font-[Poppins-Regular]'>
-                    <DialogTitle>Criar novo Boleto</DialogTitle>
-                    <DialogDescription>Preencha os dados do novo Boleto abaixo.</DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <FormProvider {...boletoMethods}>
-                      <DocumentUpload disabled={false} downloadDocuments={true} />
-                    </FormProvider>
+            <Button size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'
+             onClick={() => { handlerNewBoleto(); }}>
+              <Plus className="mr-2 h-4 w-4" /> Criar Boleto
+            </Button>
+          )}
+        <Dialog
+          open={isCreateDialogOpen}
+          onOpenChange={(value) => {
+            setIsCreateDialogOpen(value)
+          }}
+        >
+          <DialogContent>
+            <DialogHeader className='font-[Poppins-Regular]'>
+              <DialogTitle>Criar novo Boleto</DialogTitle>
+              <DialogDescription>Preencha os dados do novo Boleto abaixo.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <FormProvider {...boletoMethods}>
+                <DocumentUpload disabled={false} downloadDocuments={true} />
+              </FormProvider>
 
-                    <form className="space-y-4 font-[Poppins-Regular]" onSubmit={boletoMethods.handleSubmit(handleSubmitBoleto)}>
-                      <div className="grid grid-cols-2 items-center gap-4">
+              <form className="space-y-4 font-[Poppins-Regular]" onSubmit={boletoMethods.handleSubmit(handleSubmitBoleto)}>
+                <div className="grid grid-cols-2 items-center gap-4">
 
-                        {(!selLocacao) && (
-                          <div className='col-span-2'>
-                            {(locacao.fields.length > 0) ? (
-                              <>
-                                <Label className='text-base' >Locação</Label>
-                                <div className="grid grid-cols-1 gap-4 flex items-center">
-                                  {locacao.fields.map((field, index) => (
-                                    <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
-                                      <Label >{field.nome}</Label>
-                                      <button
-                                        className='border bg-zinc-200 hover:bg-zinc-400'
-                                        type="button"
-                                        onClick={() => {
-                                          boletoMethods.setValue('locacaoId', 0, { shouldDirty: false, shouldValidate: false });
-                                          locacao.remove(index);
-                                        }}
-                                      >
-                                        <X className='px-1'></X>
-                                      </button>
-                                    </div>
-                                  ))}
-                                </div>
-                              </>
-                            ) : (
-                              <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
-                                <Button type='button'
+                  {(!selLocacao) && (
+                    <div className='col-span-2'>
+                      {(locacao.fields.length > 0) ? (
+                        <>
+                          <Label className='text-base' >Locação</Label>
+                          <div className="grid grid-cols-1 gap-4 flex items-center">
+                            {locacao.fields.map((field, index) => (
+                              <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                                <Label >{field.nome}</Label>
+                                <button
+                                  className='border bg-zinc-200 hover:bg-zinc-400'
+                                  type="button"
                                   onClick={() => {
-                                    setSelLocacao(true);
+                                    boletoMethods.setValue('locacaoId', 0, { shouldDirty: false, shouldValidate: false });
+                                    locacao.remove(index);
                                   }}
-                                >Adicionar locação</Button>
+                                >
+                                  <X className='px-1'></X>
+                                </button>
                               </div>
-                            )}
-                            {!!boletoMethods?.formState?.errors?.locacaoId?.message && (
-                              boletoMethods.formState?.errors?.locacaoId?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.locacaoId?.message}</p>
-                            )}
-
+                            ))}
                           </div>
-                        )}
+                        </>
+                      ) : (
+                        <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
+                          <Button type='button'
+                            onClick={() => {
+                              setSelLocacao(true);
+                            }}
+                          >Adicionar locação</Button>
+                        </div>
+                      )}
+                      {!!boletoMethods?.formState?.errors?.locacaoId?.message && (
+                        boletoMethods.formState?.errors?.locacaoId?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.locacaoId?.message}</p>
+                      )}
 
-                        {/*Seleção de locacao */}
-                        {selLocacao && (
-                          <Card id='teste' className='h-full col-span-2'>
-                            <div className="flex  justify-end">
-                              <Button onClick={() => { handleSelectedLocacao(undefined) }}
-                                className='w-4 h-8 -top-5 -right-5 relative rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
-                            </div>
-                            <CardHeader>
-                              <h1 className='flex items-center justify-center font-bold'>Selecionar Imóvel</h1>
-                            </CardHeader>
-                            <CardContent className='mt-2 h-120'>
-                              <ListarLocacoes limitView={1} txtVinc='Selecionar' exclude='' onSelectLocacao={handleSelectedLocacao} />
-                            </CardContent>
-                          </Card>
-                        )}
+                    </div>
+                  )}
 
-                        {!selLocacao && (
-                          <>
-                            <div>
-                              <Label htmlFor="cotaImovel">Data de Emissão</Label>
-                              <Input id="dataEmissao" type="date" placeholder="0.00"
-                                {...boletoMethods.register('dataEmissao')}
-                              />
-                              {boletoMethods.formState?.errors?.dataEmissao?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.dataEmissao?.message}</p>}
-                            </div>
-
-                            <div>
-                              <Label htmlFor="cotaImovel">Data de Vencimento</Label>
-                              <Input id="dataVencimento" type="date" placeholder="0.00"
-                                {...boletoMethods.register('dataVencimento')}
-                              />
-                              {boletoMethods.formState?.errors?.dataVencimento?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.dataEmissao?.message}</p>}
-                            </div>
-
-                            <div>
-                              <Label htmlFor="cotaImovel">Valor</Label>
-                              <Input id="valorOriginal" type="number" step="0.01" placeholder="0.00"
-                                {...boletoMethods.register('valorOriginal')}
-                              />
-                              {boletoMethods.formState?.errors?.valorOriginal?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.valorOriginal?.message}</p>}
-                            </div>
-
-                            <div>
-                              <Label htmlFor="cotaImovel">Valor Pago</Label>
-                              <Input id="valorPago" type="number" step="0.01" placeholder="0.00"
-                                {...boletoMethods.register('valorPago')}
-                              />
-                              {boletoMethods.formState?.errors?.valorPago?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.valorOriginal?.message}</p>}
-                            </div>
-
-                            <div>
-                              <Label htmlFor="cotaImovel">Data de Pagamento</Label>
-                              <Input id="dataPagamento" type="date" placeholder=""
-                                {...boletoMethods.register('dataPagamento')}
-                              />
-                              {boletoMethods.formState?.errors?.dataPagamento?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.dataEmissao?.message}</p>}
-                            </div>
-
-
-                            <div className='mt-2 text-base'>
-                              <Label className='text-base'>Situação do boleto</Label>
-                              <div className='mt-2 mr-5'>
-                                <Controller
-                                  name="status"
-                                  control={boletoMethods.control}
-
-                                  render={({ field }) => (
-                                    <Select
-                                      onValueChange={(value: BoletoStatus) => field.onChange(value)}
-                                      value={field.value}
-                                    >
-                                      <SelectTrigger className='h-4'>
-                                        <SelectValue placeholder="Selecione a situação" />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {STATUS_BOLETO_OPTIONS.map((status) => (
-                                          <SelectItem className='text-base' key={status.label} value={status.value}>
-                                            {status.label}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  )}
-                                />
-                                <span>{boletoMethods?.formState?.errors?.status?.message}</span>
-                              </div>
-                            </div>
-
-
-                            <div className='mt-2 col-span-2'>
-                              <Label htmlFor="observacoes">Observações</Label>
-                              <Textarea id="observacoes" placeholder="Detalhes adicionais sobre po boleto"
-                                {...boletoMethods.register('observacao')}
-                              />
-                              {boletoMethods.formState?.errors?.observacao?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.observacao?.message}</p>}
-                            </div>
-                          </>
-                        )}
+                  {/*Seleção de locacao */}
+                  {selLocacao && (
+                    <Card id='teste' className='h-full col-span-2'>
+                      <div className="flex  justify-end">
+                        <Button onClick={() => { handleSelectedLocacao(undefined) }}
+                          className='w-4 h-8 -top-5 -right-5 relative rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
                       </div>
-                      <DialogFooter>
-                        <Button type='submit' className='hover:cursor-pointer hover:bg-gray-600'>Criar Boleto</Button>
-                      </DialogFooter>
-                    </form>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          )
-        }
+                      <CardHeader>
+                        <h1 className='flex items-center justify-center font-bold'>Selecionar Imóvel</h1>
+                      </CardHeader>
+                      <CardContent className='mt-2 h-120'>
+                        <ListarLocacoes limitView={1} txtVinc='Selecionar' exclude='' onSelectLocacao={handleSelectedLocacao} />
+                      </CardContent>
+                    </Card>
+                  )}
 
+                  {!selLocacao && (
+                    <>
+                      <div>
+                        <Label htmlFor="cotaImovel">Data de Emissão</Label>
+                        <Input id="dataEmissao" type="date" placeholder="0.00"
+                          {...boletoMethods.register('dataEmissao')}
+                        />
+                        {boletoMethods.formState?.errors?.dataEmissao?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.dataEmissao?.message}</p>}
+                      </div>
+
+                      <div>
+                        <Label htmlFor="cotaImovel">Data de Vencimento</Label>
+                        <Input id="dataVencimento" type="date" placeholder="0.00"
+                          {...boletoMethods.register('dataVencimento')}
+                        />
+                        {boletoMethods.formState?.errors?.dataVencimento?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.dataEmissao?.message}</p>}
+                      </div>
+
+                      <div>
+                        <Label htmlFor="cotaImovel">Valor</Label>
+                        <Input id="valorOriginal" type="number" step="0.01" placeholder="0.00"
+                          {...boletoMethods.register('valorOriginal')}
+                        />
+                        {boletoMethods.formState?.errors?.valorOriginal?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.valorOriginal?.message}</p>}
+                      </div>
+
+                      <div>
+                        <Label htmlFor="cotaImovel">Valor Pago</Label>
+                        <Input id="valorPago" type="number" step="0.01" placeholder="0.00"
+                          {...boletoMethods.register('valorPago')}
+                        />
+                        {boletoMethods.formState?.errors?.valorPago?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.valorOriginal?.message}</p>}
+                      </div>
+
+                      <div>
+                        <Label htmlFor="cotaImovel">Data de Pagamento</Label>
+                        <Input id="dataPagamento" type="date" placeholder=""
+                          {...boletoMethods.register('dataPagamento')}
+                        />
+                        {boletoMethods.formState?.errors?.dataPagamento?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.dataEmissao?.message}</p>}
+                      </div>
+
+
+                      <div className='mt-2 text-base'>
+                        <Label className='text-base'>Situação do boleto</Label>
+                        <div className='mt-2 mr-5'>
+                          <Controller
+                            name="status"
+                            control={boletoMethods.control}
+
+                            render={({ field }) => (
+                              <Select
+                                onValueChange={(value: BoletoStatus) => field.onChange(value)}
+                                value={field.value}
+                              >
+                                <SelectTrigger className='h-4'>
+                                  <SelectValue placeholder="Selecione a situação" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {STATUS_BOLETO_OPTIONS.map((status) => (
+                                    <SelectItem className='text-base' key={status.label} value={status.value}>
+                                      {status.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          />
+                          <span>{boletoMethods?.formState?.errors?.status?.message}</span>
+                        </div>
+                      </div>
+
+
+                      <div className='mt-2 col-span-2'>
+                        <Label htmlFor="observacoes">Observações</Label>
+                        <Textarea id="observacoes" placeholder="Detalhes adicionais sobre po boleto"
+                          {...boletoMethods.register('observacao')}
+                        />
+                        {boletoMethods.formState?.errors?.observacao?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.observacao?.message}</p>}
+                      </div>
+                    </>
+                  )}
+                </div>
+                <DialogFooter>
+                  <Button type='submit' className='hover:cursor-pointer hover:bg-gray-600'>Criar Boleto</Button>
+                </DialogFooter>
+              </form>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className=
@@ -843,7 +847,7 @@ export default function ListarBoletos({
                     </tr>
                   </thead>
                 </table>
-                <div className='h-[500px] flex-1 overflow-y-auto'>
+                <div className='h-[400px] flex-1 overflow-y-auto'>
                   <table className='w-full table-fixed'>
                     <tbody>
                       {boletos?.map((boleto) => (
@@ -868,7 +872,7 @@ export default function ListarBoletos({
                             <div className="flex space-x-2 ">
                               <Button
                                 size="sm"
-                                onClick={() =>handleClickVerDetalhes(boleto.id)}
+                                onClick={() => handleClickVerDetalhes(boleto.id)}
                                 className='hover:cursor-pointer hover:bg-gray-700'
                               >
                                 Ver detalhes
