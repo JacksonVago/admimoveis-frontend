@@ -101,7 +101,8 @@ export const DetalhesEmpresaForm = () => {
     try {
       const form = new FormData()
 
-      console.log(id);
+      const newDocs = data?.documentos?.filter((doc: any) => !doc.id) || []
+
       if (data?.nome) {
         form.append('nome', data.nome)
       }
@@ -204,6 +205,18 @@ export const DetalhesEmpresaForm = () => {
       if (data?.tipoId) {
         form.append('tipoId', data.tipoId.toString());
       }
+      if (data?.logo) {
+        const root = import.meta.env.VITE_AZURE_BLOB_CONTAINER; 
+        console.log(root);
+        console.log(import.meta.env);
+        form.append('logo', root + 'admimoveis/' + (glb_params.id_empresa ? glb_params.id_empresa : '0') + '/empresas/' + newDocs[0].file?.name.replace(' ', '_'));
+      }
+      
+      newDocs?.forEach((doc: any) => {
+        if (doc?.file) {
+          form.append('documentos[]', doc.file)
+        }
+      });
 
 
       if (glb_params.id_empresa !== undefined && Number(glb_params.id_empresa) > 0) {
@@ -261,7 +274,7 @@ export const DetalhesEmpresaForm = () => {
       cidade: enderecoData?.cidade,
       cep: enderecoData?.cep,
       estado: enderecoData?.estado,
-      tipoId : empresa?.tipoLancamento,
+      tipoId: empresa?.tipoLancamento,
     }),
     [empresa]
   )
@@ -287,11 +300,6 @@ export const DetalhesEmpresaForm = () => {
     }
   }, [id, empresa])
 
-  
-  console.log('erro',empresaMethods.formState.errors);
-  console.log('erro',empresaMethods.formState.isDirty);
-  console.log('erro',empresaMethods.formState.isValid);
-  console.log('values',empresaMethods.getValues());
 
   return (
     <Card>
@@ -323,7 +331,7 @@ export const DetalhesEmpresaForm = () => {
                 }
                 className='hover:cursor-pointer'
               >
-               Salvar Alterações
+                Salvar Alterações
               </Button>
             )}
           </div>

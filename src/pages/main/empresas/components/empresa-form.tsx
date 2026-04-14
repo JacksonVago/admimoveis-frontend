@@ -12,7 +12,7 @@ import {
 import { ESTADOS } from '@/constants/estados'
 import { ApiCep } from '@/interfaces/cep'
 import api from '@/services/axios/api'
-import { Controller,  UseFormReturn } from 'react-hook-form'
+import { Controller, UseFormReturn } from 'react-hook-form'
 import { EmpresaSchema } from '@/schemas/empresa.schema'
 import { formatCpfCnpj, formatPhone } from '@/utils/format-cpfcnpj'
 import { Switch, Thumb } from "@radix-ui/react-switch"
@@ -21,7 +21,6 @@ import { TipoLancamento } from '@/interfaces/lancamentotipo'
 import { useQuery } from '@tanstack/react-query'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { Download, ImagePlus } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
 
 export const getTipos = async (empresaId: number) => {
   return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
@@ -53,6 +52,7 @@ export const EmpresaFormContent = ({
   const glb_params = useGlobalParams();
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (files) {
@@ -60,7 +60,17 @@ export const EmpresaFormContent = ({
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true
+      });
+      const newLogo = Array.from(files).map((file) => ({
+        file,
+        preview: URL.createObjectURL(file)
+      }));
+      createEmpresaMethods.setValue('documentos', newLogo, {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true
       })
+
     }
   }
 
@@ -443,7 +453,7 @@ export const EmpresaFormContent = ({
         {/*Logo */}
         <div className="mb-6 w-full space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-2xlg font-semibold">Imagens do Imóvel</h3>
+            <h3 className="text-2xlg font-semibold">Logo da empresa</h3>
             {!disabled && (
               <Button onClick={handleAddImageClick} variant="outline" size="sm" type="button">
                 <ImagePlus className="mr-2 h-4 w-4" />
@@ -459,23 +469,19 @@ export const EmpresaFormContent = ({
             disabled={disabled}
             onChange={handleImageUpload}
           />
-            <div className="p-1">
-              <Card>
-                <CardContent className="relative flex aspect-square items-center justify-center p-2">
-                  <img
-                    src={createEmpresaMethods.getValues("logo")}
-                    className="h-full w-full rounded-md object-cover"
-                  />
-                  <Button
-                    className="absolute left-98 top-7 h-6 w-2 opacity-0 hover:opacity-75"
-                    onClick={() => downloadDocument("logo")}
-                    type="button"
-                  >
-                    <Download />
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+          <div className="p-1 border rounded-md w-52 h-52 relative">
+            <img
+              src={createEmpresaMethods.getValues("logo")}
+              className="h-52 w-52 rounded-md object-contain"
+            />
+            <Button
+              className="absolute left-98 top-7 h-6 w-2 opacity-0 hover:opacity-75"
+              onClick={() => downloadDocument("logo")}
+              type="button"
+            >
+              <Download />
+            </Button>
+          </div>
 
         </div>
 

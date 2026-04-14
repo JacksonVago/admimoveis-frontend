@@ -52,8 +52,25 @@ import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
 import { Textarea } from '@/components/ui/textarea'
 import { STATUS_LANCAMENTO_OPTIONS } from '@/constants/status-lancamentos'
 
+// Types
+interface GetLocacaoParams {
+  status?: string
+  dataInicial?: string
+  dataFinal?: string
+}
+
 export const getTipos = async (empresaId: number) => {
   return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
+}
+
+export const getLocacao = async (locacaoId: number, { status, dataInicial, dataFinal }: GetLocacaoParams) => {
+  return await api.get<Locacao>(`/locacoes/findbyid/${locacaoId}`,{
+    params: {
+      status,
+      dataInicial,
+      dataFinal
+    }
+  })
 }
 
 const fetchDocumentFiles = async (documents: Locacao['documentos']) => {
@@ -130,7 +147,8 @@ export const DetalhesLocacaoForm = ({
   const { data: locacao } = useQuery({
     queryKey: ['locacao', id],
     queryFn: async () => {
-      const { data } = await api.get<Locacao>(`/locacoes/findbyid/${id}`)
+      //const { data } = await api.get<Locacao>(`/locacoes/findbyid/${id}`)
+      const { data } = await getLocacao(id!, { status: undefined, dataInicial: undefined, dataFinal: undefined });
       return data
     },
     enabled: !!id
@@ -426,12 +444,6 @@ export default function DetalhesLocacao() {
     let int_mes = dt_hoje.getMonth() + 1;
 
     if (locacao) {
-      console.log(int_ano);
-      console.log(int_mes);
-      console.log(locacao.diaVencimento);
-      console.log(dt_hoje);
-      console.log(dt_hoje.getDate());
-
       if (locacao.diaVencimento < dt_hoje.getDate()) {
         if (int_mes === 12) {
           dt_vencto = new Date((int_ano + 1).toString() + '-01-' + (locacao.diaVencimento < 10 ? '0' + locacao.diaVencimento.toString() : locacao.diaVencimento.toString()) + ' 00:00:00');
@@ -880,6 +892,12 @@ export default function DetalhesLocacao() {
       search: `?status=${status}`
     })
   }
+
+  const usdFormatter = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+
 
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
@@ -1538,11 +1556,11 @@ export default function DetalhesLocacao() {
                       <div className='grid grid-cols-5 m-2' >
                         {locacao.boletos?.map((boleto) => (
                           <>
-                            <Label className={!isMobile ? 'flex items-center' : 'flex items-center col-span-2'} style={{ 'fontSize': '0.7rem' }}>{boleto.dataEmissao}</Label>
-                            {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(boleto.dataEmissao).format("DD/MM/YYYY")}</Label>) : (<></>)}
-                            <Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(boleto.dataVencimento).format("DD/MM/YYYY")}</Label>
-                            <Label className='flex justify-end items-center' style={{ 'fontSize': '0.7rem' }}>{boleto.valorOriginal}</Label>
-                            <div className='flex justify-center'>
+                            <Label className={!isMobile ? 'flex items-center mt-2' : 'flex items-center col-span-2 mt-2'} style={{ 'fontSize': '0.7rem' }}>{boleto.observacao}</Label>
+                            {!isMobile ? (<Label className='flex items-center mt-2' style={{ 'fontSize': '0.7rem' }}>{moment.utc(boleto.dataEmissao).format("DD/MM/YYYY")}</Label>) : (<></>)}
+                            <Label className='flex items-center  mt-2' style={{ 'fontSize': '0.7rem' }}>{moment.utc(boleto.dataVencimento).format("DD/MM/YYYY")}</Label>
+                            <Label className='flex justify-end items-center mt-2' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(boleto.valorOriginal)}</Label>
+                            <div className='flex justify-center mt-2'>
                               {((isAdmin ||
                                 user?.permissions.includes("ALL") ||
                                 user?.permissions.includes("UPDATE_LANCAMENTO")

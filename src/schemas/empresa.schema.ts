@@ -1,4 +1,6 @@
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
+import { MAX_DOCUMENT_FILE_SIZE } from '@/pages/main/imoveis/constants/max_document_file_size';
+import { ACCEPTED_DOCUMENT_TYPES } from '@/pages/main/proprietarios/constants/accepted-document-types';
 import { z } from 'zod'
 
 export const empresaSchema = z.object({
@@ -64,8 +66,31 @@ export const empresaSchema = z.object({
     ])
     .optional(),
   //tipoId: z.coerce.number().min(1, 'Tipo de lançamento é obrigatório'),
-  logo: z.any().optional(),
+  logo: z.string().optional(),
   tipoId: z.coerce.number().optional(),
+  documentos: z
+    .array(
+      z.object({
+        file: z.instanceof(File).optional(),
+        size: z
+          .number()
+          .max(
+            MAX_DOCUMENT_FILE_SIZE,
+            `O tamanho do documento não pode ser maior que ${MAX_DOCUMENT_FILE_SIZE / 1024 / 1024}MB.`
+          )
+          .optional(),
+        type: z
+          .string()
+          .refine(
+            (type) => ACCEPTED_DOCUMENT_TYPES.includes(type),
+            'Tipo de arquivo não suportado. Por favor, envie um formato válido.'
+          )
+          .optional(),
+        id: z.number().optional()
+      })
+    )
+    .optional(),
+
 
 })
 

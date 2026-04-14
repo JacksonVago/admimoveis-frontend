@@ -104,6 +104,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const userData = await getUserInfo()
       setUser(userData)
       glb_params.updId_empresa(userData?.empresaId.toString() || '0');
+
+      //Carrega dados da empresa
+      const empresaResponse = await api.get(`/empresas/${userData.empresaId}`)
+      const empresaData = empresaResponse?.data
+      glb_params.updLogo_url(empresaData.logo || '');
       
     } catch (error) {
       //TODO: handle error (logout, refresh token, etc)
