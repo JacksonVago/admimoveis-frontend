@@ -59,6 +59,10 @@ export const permissions: { value: Permission; label: string }[] = [
   { value: 'UPDATE_TIPO', label: 'Atualizar Tipo de imóvel' },
   { value: 'DELETE_TIPO', label: 'Excluir Tipo de imóvel' },
   { value: 'VIEW_TIPOS', label: 'Ver Tipos de Imóvel' },
+  { value: 'CREATE_TIPOLANCAMENTO', label: 'Criar Tipo de Lançamento' },
+  { value: 'UPDATE_TIPOLANCAMENTO', label: 'Atualizar Tipo de Lançamento' },
+  { value: 'DELETE_TIPOLANCAMENTO', label: 'Excluir Tipo de Lançamento' },
+  { value: 'VIEW_TIPOLANCAMENTOS', label: 'Ver Tipos de Lançamento' },
   { value: 'CREATE_LOCACAO', label: 'Criar Locação' },
   { value: 'UPDATE_LOCACAO', label: 'Atualizar Locação' },
   { value: 'DELETE_LOCACAO', label: 'Excluir Locação' },
@@ -71,6 +75,22 @@ export const permissions: { value: Permission; label: string }[] = [
   { value: 'UPDATE_PAGAMENTO', label: 'Atualizar pagamento' },
   { value: 'DELETE_PAGAMENTO', label: 'Excluir Pagamento' },
   { value: 'VIEW_PAGAMENTOS', label: 'Ver Pagamentos' },
+  { value: 'CREATE_CONDOMINIO', label: 'Criar Condomínio' },
+  { value: 'UPDATE_CONDOMINIO', label: 'Atualizar Condomínio' },
+  { value: 'DELETE_CONDOMINIO', label: 'Excluir Condomínio' },
+  { value: 'VIEW_CONDOMINIOS', label: 'Ver Condomínios' },
+  { value: 'CREATE_BLOCO', label: 'Criar Bloco' },
+  { value: 'UPDATE_BLOCO', label: 'Atualizar Bloco' },
+  { value: 'DELETE_BLOCO', label: 'Excluir Bloco' },
+  { value: 'VIEW_BLOCOS', label: 'Ver Blocos' },
+  { value: 'CREATE_LANCAMENTO_CONDOMINIO', label: 'Criar Lançamento de Condomínio' },
+  { value: 'UPDATE_LANCAMENTO_CONDOMINIO', label: 'Atualizar Lançamento de Condomínio' },
+  { value: 'DELETE_LANCAMENTO_CONDOMINIO', label: 'Excluir Lançamento de Condomínio' },
+  { value: 'VIEW_LANCAMENTOS_CONDOMINIOS', label: 'Ver Lançamentos de Condomínio' },
+  { value: 'CREATE_MORADOR', label: 'Criar Morador' },
+  { value: 'UPDATE_MORADOR', label: 'Atualizar Morador' },
+  { value: 'DELETE_MORADOR', label: 'Excluir Morador' },
+  { value: 'VIEW_MORADORES', label: 'Ver Moradores' },
 ]
 
 const imoveisPermissions: { value: Permission; label: string }[] = [
@@ -92,6 +112,20 @@ const pessoasPermissions: { value: Permission; label: string }[] = [
   { value: 'UPDATE_PESSOA', label: 'Atualizar Cliente' },
   { value: 'DELETE_PESSOA', label: 'Excluir Cliente' },
   { value: 'VIEW_PESSOAS', label: 'Ver Clientes' }
+]
+
+const tipoImovelPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_TIPO', label: 'Criar Tipo imóvel' },
+  { value: 'UPDATE_TIPO', label: 'Atualizar Tipo imóvel' },
+  { value: 'DELETE_TIPO', label: 'Excluir Tipo imóvel' },
+  { value: 'VIEW_TIPOS', label: 'Ver Tipos imóvel' }
+]
+
+const tipoLancamentoPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_TIPOLANCAMENTO', label: 'Criar Tipo de Lançamento' },
+  { value: 'UPDATE_TIPOLANCAMENTO', label: 'Atualizar Tipo de Lançamento' },
+  { value: 'DELETE_TIPOLANCAMENTO', label: 'Excluir Tipo de Lançamento' },
+  { value: 'VIEW_TIPOLANCAMENTOS', label: 'Ver Tipos de Lançamento' }
 ]
 
 /*const clientesPermissions: { value: Permission; label: string }[] = [
@@ -129,6 +163,34 @@ const locacoesPermissions: { value: Permission; label: string }[] = [
   { value: 'VIEW_LOCATARIOS', label: 'Ver Locatários' }
 ]*/
 
+const condominioPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_CONDOMINIO', label: 'Criar Condomínio' },
+  { value: 'UPDATE_CONDOMINIO', label: 'Atualizar Condomínio' },
+  { value: 'DELETE_CONDOMINIO', label: 'Excluir Condomínio' },
+  { value: 'VIEW_CONDOMINIOS', label: 'Ver Condomínios' }
+]
+
+const blocoPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_BLOCO', label: 'Criar Bloco' },
+  { value: 'UPDATE_BLOCO', label: 'Atualizar Bloco' },
+  { value: 'DELETE_BLOCO', label: 'Excluir Bloco' },
+  { value: 'VIEW_BLOCOS', label: 'Ver Blocos' }
+]
+
+const LancCondominioPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_LANCAMENTO_CONDOMINIO', label: 'Criar Lançamento' },
+  { value: 'UPDATE_LANCAMENTO_CONDOMINIO', label: 'Atualizar Lançamento' },
+  { value: 'DELETE_LANCAMENTO_CONDOMINIO', label: 'Excluir Lançamento' },
+  { value: 'VIEW_LANCAMENTOS_CONDOMINIOS', label: 'Ver Lançamentos' }
+]
+
+const moradorPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_MORADOR', label: 'Criar Morador' },
+  { value: 'UPDATE_MORADOR', label: 'Atualizar Morador' },
+  { value: 'DELETE_MORADOR', label: 'Excluir Morador' },
+  { value: 'VIEW_MORADORES', label: 'Ver Moradores' }
+]
+
 const loginSchema = z.object({
   login: z
     .string()
@@ -138,8 +200,8 @@ const loginSchema = z.object({
 
 //type LoginSchema = z.infer<typeof loginSchema>
 
-export const getUsers = async () => {
-  const response = await api.get<User[]>('/users/collaborators')
+export const getUsers = async (empresaId?: number) => {
+  const response = await api.get<User[]>(`/users/collaborators/${empresaId}`)
   return response;
 }
 
@@ -148,20 +210,23 @@ export const createUser = ({
   name,
   email,
   password,
-  permissions = []
+  permissions = [],
+  empresaId,
 }: {
   login: string
   name: string
   email: string
   password: string
-  permissions: Permission[]
+  permissions: Permission[],
+  empresaId?: number
 }) => {
   return api.post('/users', {
     login: login,
     name: name,
     email: email,
     password: password,
-    permissions: permissions
+    permissions: permissions,
+    empresaId: empresaId
   })
 }
 
@@ -171,7 +236,8 @@ export const putUpdateUser = (userData: {
   name: string
   email: string
   password: string
-  permissions: Permission[]
+  permissions: Permission[],
+  empresaId?: number
 }) => {
 
   console.log('userData', userData);
@@ -184,6 +250,7 @@ enum QueryKeys {
 
 import { PageLoader } from '@/pages/assistant/page-loader'
 import axios from 'axios'
+import { useGlobalParams } from '@/globals/GlobalParams'
 
 /*const createUserSchema = z.object({
   name: z.string().min(1, 'O nome é obrigatório.'),
@@ -226,10 +293,12 @@ export const ListarColaboradores = () => {
   const [newUser, setNewUser] = React.useState({ login: '', name: '', email: '', password: '' })
   const { toast } = useToast()
   const queryClient = useQueryClient()
+  //Globals
+  const glb_params = useGlobalParams();
 
   const { data: usersData, isLoading } = useQuery({
     queryKey: [QueryKeys.USERS_LIST],
-    queryFn: getUsers
+    queryFn: () => getUsers(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0)
   })  
 
   const createUserMutation = useMutation({
@@ -350,6 +419,67 @@ console.log('usersData', usersData);
     //   }
     // })
     //
+    if (permission?.includes('EMPRESA')) {
+      if (permission !== 'VIEW_EMPRESAS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_EMPRESAS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p.includes('EMPRESA'))
+          }
+        })
+      }
+    }
+
+    if (permission?.endsWith('_TIPO') || permission?.endsWith('_TIPOS')) {
+      if (permission !== 'VIEW_TIPOS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_TIPOS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p?.endsWith('_TIPO') || !p?.endsWith('_TIPOS'))
+            
+          }
+        })
+      }
+    }
+
+    if (permission?.includes('TIPOLANCAMENTO')) {
+      if (permission !== 'VIEW_TIPOLANCAMENTOS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_TIPOLANCAMENTOS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p.includes('TIPOLANCAMENTO'))
+          }
+        })
+      }
+    }
+
     if (permission?.includes('IMOVEL')) {
       if (permission !== 'VIEW_IMOVELS') {
         setUserPermissions((prevPermissions) => {
@@ -410,46 +540,6 @@ console.log('usersData', usersData);
       }
     }
 
-    if (permission?.includes('PESSOA')) {
-      if (permission !== 'VIEW_PESSOAS') {
-        setUserPermissions((prevPermissions) => {
-          if (checked) {
-            return [...(prevPermissions || []), permission, 'VIEW_PESSOAS']
-          } else {
-            return prevPermissions.filter((p) => p !== permission)
-          }
-        })
-      } else {
-        setUserPermissions((prevPermissions) => {
-          if (checked) {
-            return [...(prevPermissions || []), permission]
-          } else {
-            return prevPermissions.filter((p) => !p.includes('PESSOA'))
-          }
-        })
-      }
-    }
-
-    if (permission?.includes('LANCAMENTO')) {
-      if (permission !== 'VIEW_LANCAMENTOS') {
-        setUserPermissions((prevPermissions) => {
-          if (checked) {
-            return [...(prevPermissions || []), permission, 'VIEW_LANCAMENTOS']
-          } else {
-            return prevPermissions.filter((p) => p !== permission)
-          }
-        })
-      } else {
-        setUserPermissions((prevPermissions) => {
-          if (checked) {
-            return [...(prevPermissions || []), permission]
-          } else {
-            return prevPermissions.filter((p) => !p.includes('LANCAMENTO'))
-          }
-        })
-      }
-    }
-
     if (permission?.includes('LOCAC')) {
       if (permission !== 'VIEW_LOCACOES') {
         setUserPermissions((prevPermissions) => {
@@ -465,6 +555,48 @@ console.log('usersData', usersData);
             return [...(prevPermissions || []), permission]
           } else {
             return prevPermissions.filter((p) => !p.includes('LOCAC'))
+          }
+        })
+      }
+    }
+
+    if (permission?.endsWith('_LANCAMENTO') || permission?.endsWith('_LANCAMENTOS')) {
+      if (permission !== 'VIEW_LANCAMENTOS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_LANCAMENTOS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            //return prevPermissions.filter((p) => !p.includes('LANCAMENTO'))
+            return prevPermissions.filter((p) => !p?.endsWith('_LANCAMENTO') || !p?.endsWith('_LANCAMENTOS'))
+            
+          }
+        })
+      }
+    }
+
+    if (permission?.includes('PESSOA')) {
+      if (permission !== 'VIEW_PESSOAS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_PESSOAS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p.includes('PESSOA'))
           }
         })
       }
@@ -489,6 +621,88 @@ console.log('usersData', usersData);
         })
       }
     }
+
+    if (permission?.endsWith('_CONDOMINIO') || permission?.endsWith('_CONDOMINIOS')) {
+      if (permission !== 'VIEW_CONDOMINIOS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_CONDOMINIOS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p?.endsWith('_CONDOMINIO') || !p?.endsWith('_CONDOMINIOS'))
+            
+          }
+        })
+      }
+    }
+
+    if (permission?.includes('BLOCO')) {
+      if (permission !== 'VIEW_BLOCOS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_PAGAMENTOS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p.includes('BLOCO'))
+          }
+        })
+      }
+    }
+
+    if (permission?.includes('LANCAMENTO_CONDOMINIO') || permission?.includes('LANCAMENTOS_CONDOMINIOS')) {
+      if (permission !== 'VIEW_LANCAMENTOS_CONDOMINIOS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_LANCAMENTOS_CONDOMINIOS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p?.includes('LANCAMENTO_CONDOMINIO') || !p?.includes('LANCAMENTOS_CONDOMINIOS'))
+          }
+        })
+      }
+    }
+
+    if (permission?.includes('MORADOR')) {
+      if (permission !== 'VIEW_MORADORES') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_MORADORES']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p.includes('MORADOR'))
+          }
+        })
+      }
+    }
+
   }
 
   const handleSavePermissions = () => {
@@ -513,7 +727,8 @@ console.log('usersData', usersData);
         name: newUser.name,
         email: newUser.email,
         password: newUser.password,
-        permissions: []
+        permissions: [],
+        empresaId: glb_params.id_empresa ? Number(glb_params.id_empresa) : 0
       });
     }
     else {
@@ -535,7 +750,8 @@ console.log('usersData', usersData);
         name: selectedUser.name,
         email: selectedUser.email,
         password: selectedUser.password,
-        permissions: userPermissions
+        permissions: userPermissions,
+        empresaId: selectedUser.empresaId
       })
     }
   }
@@ -698,6 +914,90 @@ console.log('usersData', usersData);
               <ScrollArea className="h-full max-h-[500px] rounded-md border p-4">
                 <div className="grid grid-cols-2 gap-1">
                   <div className='grid grid-cols-1 gap-1  mt-2'>
+                    <h3 className="text-lg font-semibold">Tipo de Imóvel</h3>
+                    {tipoImovelPermissions.map((permission) => (
+                      <div key={permission.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={permission.value}
+                          checked={userPermissions.includes(permission.value)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(checked as boolean, permission.value)
+                          }
+                          style={{'border':'1px solid black'}}
+                        />
+                        <label
+                          htmlFor={permission.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  <div className='grid grid-cols-1 gap-1  mt-2'>
+                    <h3 className="text-lg font-semibold">Tipo de Lançamentos</h3>
+                    {tipoLancamentoPermissions.map((permission) => (
+                      <div key={permission.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={permission.value}
+                          checked={userPermissions.includes(permission.value)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(checked as boolean, permission.value)
+                          }
+                          style={{'border':'1px solid black'}}
+                        />
+                        <label
+                          htmlFor={permission.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  <div className='grid grid-cols-1 gap-1  mt-2'>
+                    <h3 className="text-lg font-semibold">Condomínios</h3>
+                    {condominioPermissions.map((permission) => (
+                      <div key={permission.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={permission.value}
+                          checked={userPermissions.includes(permission.value)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(checked as boolean, permission.value)
+                          }
+                          style={{'border':'1px solid black'}}
+                        />
+                        <label
+                          htmlFor={permission.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  <div className='grid grid-cols-1 gap-1  mt-2'>
+                    <h3 className="text-lg font-semibold">Blocos</h3>
+                    {blocoPermissions.map((permission) => (
+                      <div key={permission.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={permission.value}
+                          checked={userPermissions.includes(permission.value)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(checked as boolean, permission.value)
+                          }
+                          style={{'border':'1px solid black'}}
+                        />
+                        <label
+                          htmlFor={permission.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>                  
+                  <div className='grid grid-cols-1 gap-1  mt-2'>
                     <h3 className="text-lg font-semibold">Imoveis</h3>
                     {imoveisPermissions.map((permission) => (
                       <div key={permission.value} className="flex items-center space-x-2">
@@ -782,6 +1082,28 @@ console.log('usersData', usersData);
                     ))}
                   </div>
                   <div className='grid grid-cols-1 gap-1 mt-2'>
+                    <h3 className="text-lg font-semibold">Moradores</h3>
+                    {moradorPermissions.map((permission) => (
+                      <div key={permission.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={permission.value}
+                          checked={userPermissions.includes(permission.value)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(checked as boolean, permission.value)
+                          }
+                          style={{'border':'1px solid black'}}
+                        />
+                        <label
+                          htmlFor={permission.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className='grid grid-cols-1 gap-1 mt-2'>
                     <h3 className="text-lg font-semibold">Lançamentos</h3>
                     {lancamentoPermissions.map((permission) => (
                       <div key={permission.value} className="flex items-center space-x-2">
@@ -802,6 +1124,29 @@ console.log('usersData', usersData);
                       </div>
                     ))}
                   </div>
+
+                  <div className='grid grid-cols-1 gap-1 mt-2'>
+                    <h3 className="text-lg font-semibold">Lançamentos Condomínios</h3>
+                    {LancCondominioPermissions.map((permission) => (
+                      <div key={permission.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={permission.value}
+                          checked={userPermissions.includes(permission.value)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(checked as boolean, permission.value)
+                          }
+                          style={{'border':'1px solid black'}}
+                        />
+                        <label
+                          htmlFor={permission.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+
                   <div className='grid grid-cols-1 gap-1 mt-2'>
                     <h3 className="text-lg font-semibold">Boletos</h3>
                     {pagamentoPermissions.map((permission) => (

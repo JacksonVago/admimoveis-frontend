@@ -107,7 +107,7 @@ export const DetalhesBoleto = () => {
   const { data: boleto } = useQuery({
     queryKey: ['boleto', id],
     queryFn: async () => {
-      const { data } = await api.get<Boleto>(`/pagamentos/${id}`)
+      const { data } = await api.get<Boleto>(`/pagamentos/findbyid/${id}`)
       return data
     },
     enabled: !!id
