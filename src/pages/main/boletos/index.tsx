@@ -63,8 +63,8 @@ interface GetBoletosParams {
 }
 
 // API & Query Logic
-export const getBoletos = async ({ page, limit, search, status, exclude, dataInicial, dataFinal }: GetBoletosParams) => {
-  return await api.get<BasePaginationData<Boleto>>('pagamentos', {
+export const getBoletos = async (empresaId: number, { page, limit, search, status, exclude, dataInicial, dataFinal }: GetBoletosParams) => {
+  return await api.get<BasePaginationData<Boleto>>('pagamentos/' + empresaId.toString(), {
     params: {
       page,
       limit,
@@ -77,7 +77,7 @@ export const getBoletos = async ({ page, limit, search, status, exclude, dataIni
   })
 }
 
-export const useGetBoletosQueryOptions = ({
+export const useGetBoletosQueryOptions = (empresaId: number, {
   search,
   page,
   limit,
@@ -96,8 +96,8 @@ export const useGetBoletosQueryOptions = ({
   dataFinal?: string
 } = {}) => {
   return queryOptions({
-    queryKey: ['boletos', { search, page, limit, status, exclude, dataInicial, dataFinal }, queryKeys],
-    queryFn: () => getBoletos({ search, page, limit, status, exclude, dataInicial, dataFinal })
+    queryKey: ['boletos', empresaId, { search, page, limit, status, exclude, dataInicial, dataFinal }, queryKeys],
+    queryFn: () => getBoletos(empresaId,{ search, page, limit, status, exclude, dataInicial, dataFinal })
   })
 }
 
@@ -153,7 +153,7 @@ export default function ListarBoletos({
   })
 
   const { data, isLoading } = useQuery(
-    useGetBoletosQueryOptions({
+    useGetBoletosQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,{
       page,
       limit,
       search,
@@ -725,10 +725,10 @@ export default function ListarBoletos({
                       </div>
                       <div className='grid grid-cols-2 gap-4 mt-2'>
                         <Label className="font-bold flex justify-start">
-                          Valor Original R$ {boleto.valorOriginal.toLocaleString('pt-BR')}
+                          Valor Original {usdFormatter.format(boleto.valorOriginal)}
                         </Label>
                         <Label className="font-bold flex justify-end">
-                          Valor Pago R$ {boleto.valorPago.toLocaleString('pt-BR')}
+                          Valor Pago {usdFormatter.format(boleto.valorPago)}
                         </Label>
                       </div>
                       <Label className="font-bold flex justify-start mt-2">
