@@ -18,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Edit, Mail, Phone, Plus,  Trash2 } from 'lucide-react'
+import { Edit, Mail, Phone, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useMediaQuery } from 'react-responsive'
@@ -61,7 +61,7 @@ export const getFormattedDefaultValues = (condominio: Condominio | undefined) =>
 
 const fetchDocumentFiles = async (documents: Condominio['documentos']) => {
   const documentFilesPromises =
-      documents?.map(async (doc) => {
+    documents?.map(async (doc) => {
       try {
         console.log('link', import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url);
 
@@ -295,7 +295,7 @@ export const DetalhesCondominio = () => {
     setActiveTab(folder);
   }
 
-  const handlerNewBloco = () => { 
+  const handlerNewBloco = () => {
     navigate(ROUTE.BLOCOS_CRIAR.replace(':idCondominio', id ? id.toString() : '0'));
   }
 
@@ -539,26 +539,26 @@ export const DetalhesCondominio = () => {
 
                     <hr className="border-t border-gray-300 mt-3" />
                   </CardContent>
-                  <CardFooter className="flex justify-end space-x-2 font-[Poppins-regular]">    
-                                          {(isAdmin ||
-                        user?.permissions.includes("ALL") ||
-                        user?.permissions.includes("VIEW_BLOCOS")
-                      ) && (
+                  <CardFooter className="flex justify-end space-x-2 font-[Poppins-regular]">
+                    {(isAdmin ||
+                      user?.permissions.includes("ALL") ||
+                      user?.permissions.includes("VIEW_BLOCOS")
+                    ) && (
 
-                          <Button
-                            className="mt-2 hover:cursor-pointer hover:bg-gray-200"
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => { /*handlerDetailProp(proprietario.pessoaId)*/ }}
-                            style={
-                              {
-                                fontSize: '0.8rem',
-                              }}
-                          >
-                            Ver detalhes
-                          </Button>
-                        )}
-                
+                        <Button
+                          className="mt-2 hover:cursor-pointer hover:bg-gray-200"
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => { /*handlerDetailProp(proprietario.pessoaId)*/ }}
+                          style={
+                            {
+                              fontSize: '0.8rem',
+                            }}
+                        >
+                          Ver detalhes
+                        </Button>
+                      )}
+
                   </CardFooter>
                 </Card>
               ))}

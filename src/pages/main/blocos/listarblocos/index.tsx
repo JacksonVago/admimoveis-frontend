@@ -144,7 +144,6 @@ export default function ListarBlocos({
   useEffect(() => {
     if (onSelectBloco === undefined) {
       glb_params.updTitle_form('Blocos');
-      glb_params.updPastaOrig('bloco-info');
       resetStatePessoa();
     }
 

@@ -31,9 +31,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import moment from "moment";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Textarea } from '@/components/ui/textarea'
 import { ROUTE } from '@/enums/routes.enum'
 import { toast } from '@/hooks/use-toast'
 import api from '@/services/axios/api'
@@ -41,9 +39,9 @@ import { queryClient } from '@/services/react-query/query-client'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Edit, Link2Off, Plus, Search, Trash2, X } from 'lucide-react'
+import {  Edit, Link2Off, Plus, Search, Trash2, X } from 'lucide-react'
 import * as React from 'react'
-import { useForm, Controller, useFieldArray } from 'react-hook-form'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 import { Pessoa } from '@/interfaces/pessoa'
@@ -54,14 +52,7 @@ import { ImovelStatus } from '@/enums/imovel/enums-imovel'
 import { Imovel } from '@/interfaces/imovel'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { Proprietario } from '@/interfaces/proprietario'
-import { GARANTIA_LOCACAO_OPTIONS } from '@/constants/garantia-locacao'
-import ListarClientes from '..'
-import { GarantiaLocacao, LocacaoStatus } from '@/enums/locacao/enums-locacao'
-import { locacaoSchema, LocacaoSchema } from '@/schemas/locacao.schema'
-import { Locacao } from '@/interfaces/locacao'
-import { STATUS_LOCACAO_OPTIONS } from '@/constants/status-locacao'
 import { useGlobalParams } from '@/globals/GlobalParams';
-//import { boolean } from 'zod';
 import { BasePaginationData } from '../../imoveis/listarImoveis';
 import { useMediaQuery } from 'react-responsive';
 import ListarImoveisLocacao from '../../imoveis/listaimoveislocacao'
@@ -118,13 +109,13 @@ const fetchDocumentFiles = async (documents: Pessoa['documentos']) => {
   const documentFilesPromises =
     documents?.map(async (doc) => {
       try {
-        console.log('link',import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url);
+        console.log('link', import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url);
 
         const response = await fetch(
           //'https://jrseqfittadsxfbmlwvz.supabase.co/storage/v1/object/public/' + doc.url
           import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url
         )
-        console.log('response',response);
+        console.log('response', response);
 
         if (!response.ok) {
           throw new Error('Erro ao buscar documento')
@@ -176,7 +167,7 @@ export const DetalhesClienteForm = ({
   const { data: cliente } = useQuery({
     queryKey: ['cliente', id],
     queryFn: async () => {
-      const  data  = await api.get<Pessoa>(`/pessoas/findbyid/${id}`)
+      const data = await api.get<Pessoa>(`/pessoas/findbyid/${id}`)
       return data.data;
     },
     enabled: !!id
@@ -346,9 +337,6 @@ export const DetalhesClienteForm = ({
     }
   }, [id, cliente, documentFiles])
 
-  console.log('cliente methods', clienteMethods.formState.errors);
-  console.log('cliente methods', clienteMethods.formState.isDirty);
-  console.log('cliente methods', clienteMethods.formState.isValid)
   /*const handleDeleteProprietario = () => {
     deleteClienteMutation.mutate()
   }*/
@@ -431,8 +419,8 @@ export default function DetalhesCliente() {
   //const [selImovelAlt, setSelImovelAlt] = React.useState('');
   const [propEdit, setPropEdit] = React.useState<Proprietario>();
   //const [locEdit, setLocEdit] = React.useState<Locacao>();
-  const [selGarantia, setSelGarantia] = React.useState<GarantiaLocacao>();
-  const [selFiador, setSelFiador] = React.useState<boolean>(false);
+  //const [selGarantia, setSelGarantia] = React.useState<GarantiaLocacao>();
+  //const [selFiador, setSelFiador] = React.useState<boolean>(false);
   const [openImovel, setOpenImovel] = React.useState<boolean>(false);
   const [activeTab, setActiveTab] = React.useState('personal-info')
 
@@ -445,15 +433,12 @@ export default function DetalhesCliente() {
     queryKey: ['cliente', id],
     queryFn: async () => {
       console.log('antes de copmsul');
-      const  data = await api.get<Pessoa>(`/pessoas/findbyid/${id}`)
+      const data = await api.get<Pessoa>(`/pessoas/findbyid/${id}`)
       console.log(data.data);
       return data.data;
     },
     enabled: !!id
   })
-
-  console.log(id);
-  console.log(cliente);
 
   let imovelStatus = ImovelStatus.ALUGADO;
 
@@ -547,17 +532,17 @@ export default function DetalhesCliente() {
     resolver: zodResolver(propImoveSchema),
   });
 
-  const locacaoMethods = useForm<LocacaoSchema>({
+  /*const locacaoMethods = useForm<LocacaoSchema>({
     resolver: zodResolver(locacaoSchema),
-  });
+  });*/
 
-  const {
+  /*const {
     control,
     //handleSubmit,
     //formState: { errors },
-  } = locacaoMethods;
+  } = locacaoMethods;*/
 
-  const locacaoFiadores = useFieldArray({
+  /*const locacaoFiadores = useFieldArray({
     control,
     name: 'fiadores'
   });
@@ -565,7 +550,7 @@ export default function DetalhesCliente() {
   const imovelLocAlt = useForm<LocacaoSchema>({
     resolver: zodResolver(locacaoSchema),
     mode: "onBlur"
-  });
+  });*/
 
   //Imóveis lista 
   const clientePropers = useFieldArray({
@@ -574,6 +559,9 @@ export default function DetalhesCliente() {
   });
 
   React.useEffect(() => {
+    if (glb_params.pastaOrig === ""){
+      glb_params.updPastaOrig('personal-info');
+    }
     if (cliente) {
       clienteMethods.reset(defaultValues) // seta os valores do formulário com os dados do proprietário
     }
@@ -682,6 +670,11 @@ export default function DetalhesCliente() {
 
   }
 
+  const handlerDetailImovel = (id: number) => {
+    navigate(`${ROUTE.IMOVEIS}/${id}`)
+  }
+
+
   //Locação 
   /*const handlerNewLoc = () => {
     setCotaImovel(0);
@@ -692,6 +685,7 @@ export default function DetalhesCliente() {
     console.log((id! ? id : 0));
   }*/
 
+    /*
   const handlerEditLocacao = (locacao: Locacao) => {
     if (locacao) {
       setPropImovelIdAlt(0);
@@ -704,10 +698,6 @@ export default function DetalhesCliente() {
       imovelLocAlt.setValue('imovelId', locacao.imovelId);
       imovelLocAlt.setValue('fiadores', (locacao.fiadores ? locacao.fiadores.map(x => { return { id: x.id, nome: (x.pessoa ? x.pessoa?.nome : '') } }) : []));
     }
-  }
-
-  const handlerDetailImovel = (id: number) => {
-    navigate(`${ROUTE.IMOVEIS}/${id}`)
   }
 
   const handleSelectFiador = (fiador: Pessoa | undefined) => {
@@ -791,14 +781,12 @@ export default function DetalhesCliente() {
       locacaoMethods.setValue('tituloCap.numeroTitulo', '0');
     }
 
-  }
+  }*/
 
   const handlerSelImovel = (origin: string) => {
 
-    glb_params.updOrigin_url("imoveis");
-    console.log('seleciona ' + origin);
     switch (origin) {
-      case 'proprietarios':
+      case 'propriedades':
         if (clientePropers.fields.length > 0) {
           clientePropers.remove(0);
         }
@@ -815,7 +803,6 @@ export default function DetalhesCliente() {
   const handleSelectImovel = (imovel: Imovel | undefined) => {
 
     if (imovel) {
-      console.log(glb_params.pastaOrig);
 
       switch (glb_params.pastaOrig) {
         case 'propriedades':
@@ -831,9 +818,7 @@ export default function DetalhesCliente() {
             clienteProp.setValue('imovelId', imovel.id);
             clienteProp.setValue('pessoaId', id!);
           }
-          if (glb_params.origin_url === 'clientes') {
-            setOpenImovel(true);
-          }
+          setOpenImovel(true);
           break;
 
         case 'locacoes':
@@ -847,7 +832,6 @@ export default function DetalhesCliente() {
   }
 
   const handlerChangeFolder = (folder: string) => {
-    glb_params.updOrigin_url("imoveis");
     glb_params.updId_orig((id! ? id : 0).toString());
     glb_params.updPastaOrig(folder);
     setActiveTab(folder);
@@ -980,8 +964,8 @@ export default function DetalhesCliente() {
                   </div>
                   <DialogFooter>
                     <DialogClose asChild>
-                      <Button type="submit" size={"sm"} 
-                      className='hover:cursor-pointer hover:bg-gray-600'
+                      <Button type="submit" size={"sm"}
+                        className='hover:cursor-pointer hover:bg-gray-600'
                       >Adicionar Propriedade</Button>
                     </DialogClose>
                   </DialogFooter>
@@ -1047,7 +1031,7 @@ export default function DetalhesCliente() {
                       ) && (
 
                           <Button variant="outline" size="sm"
-                          className='hover:cursor-pointer hover:bg-gray-200'
+                            className='hover:cursor-pointer hover:bg-gray-200'
                             onClick={() => { handlerEditPropriedade(proprietario) }}>
                             <Edit className="mr-2 h-4 w-4" />
                             Editar
@@ -1103,7 +1087,7 @@ export default function DetalhesCliente() {
                         <DialogFooter>
                           <DialogClose asChild>
                             <Button type="submit"
-                            className='hover:cursor-pointer hover:bg-gray-600'
+                              className='hover:cursor-pointer hover:bg-gray-600'
                             >Salvar Alterações</Button>
                           </DialogClose>
                         </DialogFooter>
@@ -1115,7 +1099,7 @@ export default function DetalhesCliente() {
                     user?.permissions.includes("DELETE_PROPRIETARIO")
                   ) && (
                       <Button variant="destructive" size="sm"
-                      className='hover:cursor-pointer hover:bg-red-400'
+                        className='hover:cursor-pointer hover:bg-red-400'
                         onClick={() => { handleDeletePropriedade(proprietario) }}>
                         <Trash2 className="mr-2 h-4 w-4" />
                         Excluir
@@ -1186,8 +1170,8 @@ export default function DetalhesCliente() {
                             </Button>
                           </div>
                         )}
-                      <hr className="border-t border-gray-300 mt-5" />
                     </CardContent>
+                    {/*}
                     <CardFooter className="flex justify-end space-x-2">
                       <Dialog>
                         <DialogTrigger asChild>
@@ -1338,11 +1322,6 @@ export default function DetalhesCliente() {
                                   </div>
                                 ))}
                               </div>
-                              // <div>
-                              //   <div className='mt-2'>
-                              //     <Label>Fiador: {selFiador?.nome}</Label>
-                              //   </div>
-                              // </div>
                             )}
 
                             {selGarantia === GarantiaLocacao.TITULO_CAPITALIZACAO && (
@@ -1424,7 +1403,7 @@ export default function DetalhesCliente() {
                         Excluir
                       </Button>
                       )}
-                    </CardFooter>
+                    </CardFooter>*/}
                   </Card>
                 )
               })
@@ -1482,7 +1461,7 @@ export default function DetalhesCliente() {
                     className='col-start-3 hover:cursor-pointer hover:bg-gray-200'
                     variant="secondary"
                     size="sm"
-                    
+
                     onClick={() => { handlerDetailImovel(parseFloat(locacao?.imovelId.toString())) }}
                     style={
                       {
@@ -1498,7 +1477,7 @@ export default function DetalhesCliente() {
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm"
-                    className='hover:cursor-pointer hover:bg-gray-200'>
+                      className='hover:cursor-pointer hover:bg-gray-200'>
                       <Edit className="mr-2 h-4 w-4" />
                       Editar
                     </Button>
@@ -1535,7 +1514,7 @@ export default function DetalhesCliente() {
                   Editar
                 </Button> */}
                 <Button variant="destructive" size="sm"
-                className='hover:cursor-pointer hover:bg-red-400'>
+                  className='hover:cursor-pointer hover:bg-red-400'>
                   <Trash2 className="mr-2 h-4 w-4" />
                   Excluir
                 </Button>

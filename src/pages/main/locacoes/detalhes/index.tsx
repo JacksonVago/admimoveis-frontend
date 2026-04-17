@@ -64,7 +64,7 @@ export const getTipos = async (empresaId: number) => {
 }
 
 export const getLocacao = async (locacaoId: number, { status, dataInicial, dataFinal }: GetLocacaoParams) => {
-  return await api.get<Locacao>(`/locacoes/findbyid/${locacaoId}`,{
+  return await api.get<Locacao>(`/locacoes/findbyid/${locacaoId}`, {
     params: {
       status,
       dataInicial,
@@ -144,6 +144,9 @@ export const DetalhesLocacaoForm = ({
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
   //const params = useParams();
 
+    //Globals
+    const glb_params = useGlobalParams();
+  
   const { data: locacao } = useQuery({
     queryKey: ['locacao', id],
     queryFn: async () => {
@@ -269,6 +272,10 @@ export const DetalhesLocacaoForm = ({
   })
 
   React.useEffect(() => {
+    if (glb_params.pastaOrig === '') {
+      glb_params.updPastaOrig('personal-info');
+    }
+
     if (locacao) {
       locacaoMethods.reset(defaultValues) // seta os valores do formulário com os dados do proprietário
     }
@@ -902,13 +909,13 @@ export default function DetalhesLocacao() {
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
       <div className="flex items-center justify-between">
-                          <span className="text-wrap"
-                    style={
-                      {
-                        fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
-                      }}
+        <span className="text-wrap"
+          style={
+            {
+              fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
+            }}
 
-                  >{`${locacao?.imovel?.endereco.logradouro} ${locacao?.imovel?.endereco.numero} - ${locacao?.imovel?.description}`}</span>
+        >{`${locacao?.imovel?.endereco.logradouro} ${locacao?.imovel?.endereco.numero} - ${locacao?.imovel?.description}`}</span>
         {activeTab === 'personal-info' && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -1249,9 +1256,9 @@ export default function DetalhesLocacao() {
                   </SelectTrigger>
                   <SelectContent>
                     {STATUS_LANCAMENTO_OPTIONS.map((status) => (
-                            <SelectItem key={status.label} value={status.value}>
-                              {status.label}
-                            </SelectItem>
+                      <SelectItem key={status.label} value={status.value}>
+                        {status.label}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

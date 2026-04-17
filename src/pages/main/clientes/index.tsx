@@ -161,6 +161,8 @@ export default function ListarClientes({
   // UI Logic
   const hasSearchResults = Boolean(!isLoading && search && clientes?.length === 0)
 
+  console.log('url',glb_params.origin_url);
+
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}

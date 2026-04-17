@@ -15,7 +15,7 @@ import DetalhesLocatario from '@/pages/main/locatarios/detalhes'
 import ListarProprietarios from '@/pages/main/proprietarios'
 import { CriarProprietario } from '@/pages/main/proprietarios/criar'
 import DetalhesProprietario from '@/pages/main/proprietarios/detalhes'
-import { Outlet, Route } from 'react-router-dom'
+import { Outlet, Route, useNavigate } from 'react-router-dom'
 import SlideRoutes from 'react-slide-routes';
 import { AuthenticatedRoutesGuard } from './guards/authenticated-routes-guard'
 import { UnauthenticatedRoutesGuard } from './guards/unauthenticated-routes-guard'
@@ -48,6 +48,8 @@ import { DetalhesBloco } from '@/pages/main/blocos/detalhes'
 import ListarBlocos from '@/pages/main/blocos/listarblocos'
 import ListarLancamentosCondominios from '@/pages/main/lancamentoscondominio'
 import { DetalhesLancamentoCondominio } from '@/pages/main/lancamentoscondominio/detalhes'
+import { CircleArrowLeft } from 'lucide-react'
+import { Home } from '@/pages/main/home'
 
 export interface ProtectedRouteProps {
   permission: Permission
@@ -57,18 +59,34 @@ export interface ProtectedRouteProps {
 export const MainLayout = () => {
   const glb_params = useGlobalParams();
   const [nameUser, setNameUser] = useState(false);
+  const navigate = useNavigate();
 
   const { firstName } = useAuth()
 
   useEffect(() => { }, [glb_params]);
+
+  const handlerBackNav = () => {
+    glb_params.updPastaOrig("");
+    navigate(`${glb_params.origin_url}`);
+  }
+
+  console.log('pastaOrig:', glb_params.pastaOrig);
   return (
 
     <SidebarProvider className='font-[Poppins-Regular]'>
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 bg-gray-100">
-          <div className="flex w-full items-center justify-between gap-2 px-8">
-            <SidebarTrigger onClick={()=>{ glb_params.updPastaOrig("")}} className="-ml-1 hover:cursor-pointer" />
+          <SidebarTrigger className="ml-5 hover:cursor-pointer" />
+          <div className="flex w-full items-center justify-between gap-2 px-8">                        
+            {glb_params.pastaOrig !== "" ? 
+              <CircleArrowLeft
+                className='hover:cursor-pointer hover:text-gray-500'
+                onClick={handlerBackNav}
+              ></CircleArrowLeft>
+
+              : <div></div>
+            }
             <Label>{glb_params.title_form}</Label>
             <Avatar className={nameUser ? 'w-1/3' : 'w-10'}>
               <AvatarImage src="http://localhost:3000/assets/images/avatar.jpg" />
@@ -127,7 +145,7 @@ export const RoutesComponent = () => {
             element={user?.role === 'ADMIN' ? <ListarColaboradores /> : <UnauthorizedPage />}
           />
 
-          <Route path={ROUTE.HOME} element={<div>Home</div>} />
+          <Route path={ROUTE.HOME} element={<Home/>} />
 
           {/* Empresas */}
           <Route
@@ -211,7 +229,7 @@ export const RoutesComponent = () => {
               </ProtectedRoute>
             }
           />
-          
+
           {/* Imóveis */}
           <Route
             path={ROUTE.IMOVEIS_CRIAR}

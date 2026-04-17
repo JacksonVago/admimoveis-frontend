@@ -791,7 +791,6 @@ export const DetalhesImovel = () => {
   const handleSelectProp = (proprietario: Pessoa | undefined) => {
 
     if (proprietario) {
-      console.log(glb_params.pastaOrig);
 
       switch (glb_params.pastaOrig) {
         case 'proprietarios':

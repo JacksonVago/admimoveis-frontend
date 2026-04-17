@@ -113,7 +113,6 @@ export default function ListarCondominios({
   useEffect(() => {
     if (onSelectCondominio === undefined) {
       glb_params.updTitle_form('Condomínios');
-      glb_params.updPastaOrig('cond-info');
       resetStatePessoa();
     }
 

@@ -192,7 +192,6 @@ export default function ListarImoveis({
   useEffect(() => {
     if (onSelectImovel === undefined) {
       glb_params.updTitle_form('Imóveis');
-      glb_params.updPastaOrig('personal-info');
       resetStatePessoa();
     }
 

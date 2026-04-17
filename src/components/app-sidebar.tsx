@@ -152,17 +152,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild className='my-5 flex justify-center'>
               <Link to={ROUTE.HOME} className='h-auto'>
-                {/* <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"> */}
                 <div className="flex justify-center rounded-lg">
                   <img
                     src={(glb_params.logo_url ? glb_params.logo_url : '')}
                     className="rounded-md object-contain h-26"
                   />
                 </div>
-                {/* <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Imobiliaria</span>
-                  <span className="truncate text-xs">Sistema</span>
-                </div> */}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

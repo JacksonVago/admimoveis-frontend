@@ -73,6 +73,10 @@ export const LocacaoFormContent = ({
       const sel: GarantiaLocacao = GarantiaLocacao[createLocacaoMethods.getValues('garantiaLocacaoTipo') as keyof typeof GarantiaLocacao];
       setSelGarantia(sel);
     }
+
+    if (glb_params.pastaOrig === '') {
+      glb_params.updPastaOrig('personal-info');
+    }
   }, []);
 
   //Lista de imóveis

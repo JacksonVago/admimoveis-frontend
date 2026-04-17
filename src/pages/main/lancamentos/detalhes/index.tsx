@@ -264,6 +264,10 @@ export const DetalhesLancamento = () => {
 
   React.useEffect(() => {
     glb_params.updTitle_form(`Lancamentos - ${moment(dataInicial).format('DD/MM/YYYY')} à ${moment(dataFinal).format('DD/MM/YYYY')}`);
+    if (glb_params.pastaOrig === '') {
+      glb_params.updPastaOrig('personal-info');
+    }
+
     if (localStorage) lancamentoMethods.reset(defaultValues)
   }, [defaultValues])
 
