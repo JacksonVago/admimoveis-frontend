@@ -245,6 +245,10 @@ button {
   animation-delay: 0.2s; /* Stagger the animation of the third dot */
 }
 
+.slide-details {
+  animation: slide-details 2s; /* Apply the slide animation */
+}
+
 @keyframes bounce {
   0% {
     transform: translateY(0);
@@ -253,3 +257,13 @@ button {
     transform: translateY(-15px); /* Move dots upwards */
   }
 }
+
+@keyframes slide-details {
+  0% {
+    transform: translateZ(0)
+  }
+  100% {
+    transform: translateZ(100%); /* Move dots to the right */
+  }
+}
+

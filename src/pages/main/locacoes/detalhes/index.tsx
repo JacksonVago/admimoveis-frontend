@@ -53,24 +53,12 @@ import { Textarea } from '@/components/ui/textarea'
 import { STATUS_LANCAMENTO_OPTIONS } from '@/constants/status-lancamentos'
 
 // Types
-interface GetLocacaoParams {
-  status?: string
-  dataInicial?: string
-  dataFinal?: string
-}
-
 export const getTipos = async (empresaId: number) => {
   return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
 }
 
-export const getLocacao = async (locacaoId: number, { status, dataInicial, dataFinal }: GetLocacaoParams) => {
-  return await api.get<Locacao>(`/locacoes/findbyid/${locacaoId}`, {
-    params: {
-      status,
-      dataInicial,
-      dataFinal
-    }
-  })
+export const getLocacao = async (locacaoId: number) => {
+  return await api.get<Locacao>('locacoes/findbyid/' + locacaoId);
 }
 
 const fetchDocumentFiles = async (documents: Locacao['documentos']) => {
@@ -144,14 +132,14 @@ export const DetalhesLocacaoForm = ({
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
   //const params = useParams();
 
-    //Globals
-    const glb_params = useGlobalParams();
-  
+  //Globals
+  const glb_params = useGlobalParams();
+
   const { data: locacao } = useQuery({
     queryKey: ['locacao', id],
     queryFn: async () => {
       //const { data } = await api.get<Locacao>(`/locacoes/findbyid/${id}`)
-      const { data } = await getLocacao(id!, { status: undefined, dataInicial: undefined, dataFinal: undefined });
+      const { data } = await getLocacao(id!);
       return data
     },
     enabled: !!id
@@ -372,8 +360,14 @@ export default function DetalhesLocacao() {
   const { data: locacao } = useQuery({
     queryKey: ['locacao', id],
     queryFn: async () => {
-      const { data } = await api.get<Locacao>(`/locacoes/findbyid/${id}`)
-      return data
+      try {
+      const  data = await api.get<Locacao>(`/locacoes/findbyid/${id}`)
+      return data.data;
+      }
+      catch (error) {
+        console.error(error);
+        throw error;
+      }
     },
     enabled: !!id
   })
@@ -915,7 +909,7 @@ export default function DetalhesLocacao() {
               fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
             }}
 
-        >{`${locacao?.imovel?.endereco.logradouro} ${locacao?.imovel?.endereco.numero} - ${locacao?.imovel?.description}`}</span>
+        >{`${(locacao?.locatarios ? locacao?.locatarios[0]?.pessoa?.nome : '')} - ${locacao?.imovel?.endereco.complemento} ${locacao?.imovel?.condominio.name}`}</span>
         {activeTab === 'personal-info' && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -1505,7 +1499,7 @@ export default function DetalhesLocacao() {
 
         {/* Boletos */}
         <TabsContent value="boletos" className="space-y-4 font-[Poppins-regular]">
-          <div className="flex items-center justify-between">
+          {/*<div className="flex items-center justify-between">
             <div className=
               {(isPortrait || isTablet || isBigScreen)
                 ? "grid grid-cols-3 gap-4 mb-2"
@@ -1536,22 +1530,16 @@ export default function DetalhesLocacao() {
 
               </div>
             </div>
-          </div>
+          </div>*/}
 
           {/* boletos Grid */}
           <div className="mx-auto w-full rounded-md">
             <Card className='font-[Poppins-regular]'>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <Label className="ml-1 mb-4 mt-8 font-bold">{(locacao?.locatarios ? locacao?.locatarios[0].pessoa?.nome + ' - ' : '') + getEnderecoFormatado(locacao?.imovel?.endereco)}</Label>
-                </CardTitle>
-              </CardHeader>
               <CardContent>
                 {(locacao?.boletos && locacao.boletos.length > 0) ? (
                   <div className=''>
 
-                    <Label className='ml-2' style={{ 'fontSize': '1rem' }}> Boletos </Label>
-                    <div className='rounded-md border'>
+                    <div className='mt-2'>
                       <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
                         <Label className={!isMobile ? 'border-b pb-5' : 'border-b pb-5 col-span-2'} style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
                         {!isMobile ? (<Label className='border-b pb-5' style={{ 'fontSize': '0.7rem' }}>Emissão</Label>) : (<></>)}

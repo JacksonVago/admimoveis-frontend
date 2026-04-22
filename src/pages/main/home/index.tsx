@@ -142,7 +142,7 @@ export const Home = () => {
       }
     }
 
-  }, []);
+  }, [locacoes, boletos]);
 
   /*const data = {
     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
@@ -303,7 +303,7 @@ export const Home = () => {
         </div>
 
         {openDetail && (
-          <div className=' mt-5 col-span-2'>
+          <div className='mt-2 col-span-2'>
 
             <Label className='ml-2' style={{ 'fontSize': '1rem' }}> Locações </Label>
             <div className={'rounded-md border-' + colorItem + '-500 border-2 mt-2 m-2 p-2 text-' + colorItem + '-500'}>

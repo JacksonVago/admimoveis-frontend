@@ -58,53 +58,6 @@ import { useMediaQuery } from 'react-responsive';
 import ListarImoveisLocacao from '../../imoveis/listaimoveislocacao'
 import { useAuth } from '@/hooks/auth/use-auth'
 
-// Mock data for demonstration
-/*const cliente = {
-  id: 'cli001',
-  nome: 'Ana Oliveira',
-  documento: '123.456.789-00',
-  profissao: 'Professora',
-  estadoCivil: 'CASADO',
-  email: 'ana.oliveira@email.com',
-  telefone: '(11) 98765-4321',
-  statu: PessoaStatus.ATIVA,
-  endereco: {
-    rua: 'Rua das Flores',
-    numero: '123',
-    complemento: 'Apto 45',
-    bairro: 'Jardim Primavera',
-    cidade: 'São Paulo',
-    estado: 'SP',
-    cep: '01234-567'
-  },
-  locacoes: [
-    {
-      id: 'rent001',
-      imovel: 'Apartamento Centro',
-      valorAluguel: 1500,
-      dataInicio: '2023-01-01',
-      dataFim: '2024-01-01',
-      status: 'Ativo'
-    },
-    {
-      id: 'rent002',
-      imovel: 'Casa de Praia',
-      valorAluguel: 2000,
-      dataInicio: '2023-06-01',
-      dataFim: null,
-      status: 'Ativo'
-    },
-    {
-      id: 'rent003',
-      imovel: 'Kitnet Universitária',
-      valorAluguel: 800,
-      dataInicio: '2022-03-01',
-      dataFim: '2023-02-28',
-      status: 'Encerrado'
-    }
-  ]
-}*/
-
 const fetchDocumentFiles = async (documents: Pessoa['documentos']) => {
   const documentFilesPromises =
     documents?.map(async (doc) => {
