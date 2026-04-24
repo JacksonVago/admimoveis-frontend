@@ -84,8 +84,13 @@ export const DetalhesLancamento = () => {
   const { data: locacao, isLoading } = useQuery({
     queryKey: ['locacao', id],
     queryFn: async () => {
+      try{
       const { data } = await api.get<Locacao>(`/locacoes/lancamentos/${id}?dataInicial=${dataInicial}&dataFinal=${dataFinal}`)
-      return data
+      return data;
+      }
+      catch(error) {
+        console.error('Error fetching locacao data:', error);
+      }
     },
     enabled: !!id
   })
@@ -383,6 +388,8 @@ export const DetalhesLancamento = () => {
     } else {
     }
   }
+
+  console.log(lancamentoMethods.formState.errors);
 
   //if (isLoading) return <PageLoader />
   if (isLoading) return <Loader />

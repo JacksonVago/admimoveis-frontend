@@ -64,7 +64,7 @@ interface GetBoletosParams {
 
 // API & Query Logic
 export const getBoletos = async (empresaId: number, { page, limit, search, status, exclude, dataInicial, dataFinal }: GetBoletosParams) => {
-  return await api.get<BasePaginationData<Boleto>>('pagamentos/' + empresaId.toString(), {
+  const result =await api.get<BasePaginationData<Boleto>>('pagamentos/' + empresaId.toString(), {
     params: {
       page,
       limit,
@@ -74,7 +74,9 @@ export const getBoletos = async (empresaId: number, { page, limit, search, statu
       dataInicial,
       dataFinal
     }
-  })
+  });
+  console.log('result', result);
+  return result;
 }
 
 export const useGetBoletosQueryOptions = (empresaId: number, {

@@ -3,7 +3,7 @@ import { useGlobalParams } from '@/globals/GlobalParams';
 import { Locacao } from '@/interfaces/locacao';
 import api from '@/services/axios/api';
 import { usdFormatter } from '@/utils/format-money';
-import { queryOptions, useQuery } from '@tanstack/react-query';
+import { queryOptions, useMutation, useQuery } from '@tanstack/react-query';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useEffect, useState } from 'react';
@@ -11,22 +11,28 @@ import { useMediaQuery } from 'react-responsive';
 import { Boleto } from '@/interfaces/boleto';
 import { BoletoStatus } from '@/enums/locacao/enums-locacao';
 import moment from 'moment';
+import { Barcode } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/auth/use-auth';
+import { queryClient } from '@/services/react-query/query-client';
+import { toast } from '@/hooks/use-toast';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface BoletoGroup {
-    status: string;
-    qtde: number;
-    total: number;
-    boletos: Boleto[];
-  };
+  status: string;
+  qtde: number;
+  total: number;
+  boletos: Boleto[];
+};
 
 interface LocacaoGroup {
-    dia: number;
-    qtde: number;
-    total: number;
-    locacoes: Locacao[];
-  };
+  dia: number;
+  qtde: number;
+  total: number;
+  locacoes: Locacao[];
+};
 
 // API & Query Logic
 export const getBoletos = async (empresaId: number, status: BoletoStatus) => {
@@ -55,7 +61,8 @@ export const useGetLocacoesQueryOptions = (empresaId: number, diVencimento: numb
 
 
 export const Home = () => {
-
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const isMobile = useMediaQuery({ query: '(max-width: 420px)' })
   const glb_params = useGlobalParams();
   const [dadosRec, setDadosRec] = useState<LocacaoGroup[]>([]);
@@ -65,10 +72,11 @@ export const Home = () => {
   const [openDetailBol, setOpenDetailBol] = useState<boolean>(false);
   const [detailBol, setDetailBol] = useState<Boleto[]>([]);
   const [colorItem, setColorItem] = useState<string>();
+  const [chkArr, setChkArr] = useState<{ id: number, checked: boolean }[]>([]);
 
   //Consulta locações
   const { data: loc } = useQuery(
-    useGetLocacoesQueryOptions(Number(glb_params.id_empresa), new Date().getDate())
+    useGetLocacoesQueryOptions(Number(glb_params.id_empresa), new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate())
   );
   const locacoes = loc?.data;
 
@@ -79,7 +87,16 @@ export const Home = () => {
 
   const boletos = dataBoletos?.data;
 
-
+  const gerarBoleto = useMutation({
+    mutationFn: async (locacao: Locacao) => {
+      return await api.post('/lancamentos/gerar-boleto', locacao)
+    },
+    onSuccess: () => {
+      ['lancamentos'].forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: [key] })
+      });
+    }
+  });
 
   useEffect(() => {
     glb_params.updTitle_form('DASHBOARD');
@@ -87,6 +104,7 @@ export const Home = () => {
 
     if (locacoes) {
 
+      let arr_chk: { id: number, checked: boolean }[] = [];
       let arr_agrupado: LocacaoGroup[] = [];
       let now = new Date();
       let hoje = now.getDate();
@@ -95,41 +113,44 @@ export const Home = () => {
       for (let i = hoje; i <= lastDay; i += 5) {
         if (i + 5 > lastDay) {
           arr_agrupado.push(locacoes.filter(locacao => locacao.diaVencimento > i && locacao.diaVencimento <= lastDay)
-          .reduce(
-            (acc: LocacaoGroup, locacao) => {
-            acc.qtde += 1;
-            acc.total += locacao.valorAluguel;
-            acc.locacoes.push(locacao);
-            return acc;
-          }, 
-          { dia: lastDay, qtde: 0, total: 0, locacoes: [] as Locacao[] }));
+            .reduce(
+              (acc: LocacaoGroup, locacao) => {
+                acc.qtde += 1;
+                acc.total += locacao.valorAluguel;
+                acc.locacoes.push(locacao);
+                arr_chk.push({ id: locacao.id, checked: false });
+                return acc;
+              },
+              { dia: lastDay, qtde: 0, total: 0, locacoes: [] as Locacao[] }));
         }
         else {
           arr_agrupado.push(locacoes.filter(locacao => locacao.diaVencimento > i && locacao.diaVencimento <= i + 5)
-          .reduce((acc: LocacaoGroup, locacao) => {
-            acc.qtde += 1;
-            acc.total += locacao.valorAluguel;
-            acc.locacoes.push(locacao);
-            return acc;
-          }, { dia: i + 5, qtde: 0, total: 0, locacoes: [] as Locacao[] }));
+            .reduce((acc: LocacaoGroup, locacao) => {
+              acc.qtde += 1;
+              acc.total += locacao.valorAluguel;
+              acc.locacoes.push(locacao);
+              arr_chk.push({ id: locacao.id, checked: false });
+              return acc;
+            }, { dia: i + 5, qtde: 0, total: 0, locacoes: [] as Locacao[] }));
         }
       }
 
       setDadosRec(arr_agrupado);
+      setChkArr(arr_chk);
 
       //Dados boletos
       if (boletos) {
         let arr_agrupado_boletos: BoletoGroup[] = [];
 
         arr_agrupado_boletos.push(boletos.filter(boleto => new Date(boleto.dataVencimento) >= now)
-        .reduce(
-          (acc: BoletoGroup, boleto) => {
-          acc.qtde += 1;
-          acc.total += boleto.valorOriginal;
-          acc.boletos.push(boleto);
-          return acc;
-        }, 
-        { status: 'Pendente', qtde: 0, total: 0, boletos: [] as Boleto[] }));
+          .reduce(
+            (acc: BoletoGroup, boleto) => {
+              acc.qtde += 1;
+              acc.total += boleto.valorOriginal;
+              acc.boletos.push(boleto);
+              return acc;
+            },
+            { status: 'Pendente', qtde: 0, total: 0, boletos: [] as Boleto[] }));
 
         arr_agrupado_boletos.push(boletos.filter(boleto => new Date(boleto.dataVencimento) < now).reduce((acc: BoletoGroup, boleto) => {
           acc.qtde += 1;
@@ -266,7 +287,7 @@ export const Home = () => {
         setColorItem(chart.data.datasets[datasetIndex].backgroundColor[index]);
 
         //Mostrar detalhes dos aluguéis à receber para o período correspondente
-        console.log('Boletos: ',dadosBol[index].boletos);
+        console.log('Boletos: ', dadosBol[index].boletos);
         setDetailBol(dadosBol[index].boletos);
         setOpenDetailBol(true);
       }
@@ -281,6 +302,66 @@ export const Home = () => {
       }
     }
   }
+
+
+  const handleCheckAllboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let arr_chk: { id: number, checked: boolean }[] = [];
+
+    if (e.target.checked) {
+
+      chkArr.forEach(item => {
+        arr_chk.push({ id: item.id, checked: true });
+      });
+      setChkArr(arr_chk);
+    }
+    else {
+      chkArr.forEach(item => {
+        arr_chk.push({ id: item.id, checked: false });
+      });
+      setChkArr(arr_chk);
+    }
+    setChkArr(arr_chk);
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let arr_chk: { id: number, checked: boolean }[] = [];
+
+    chkArr.forEach(item => {
+      if (item.id === Number(e.target.id.replace('chk_', ''))) {
+        arr_chk.push({ id: item.id, checked: e.target.checked });
+      }
+      else {
+        arr_chk.push({ id: item.id, checked: item.checked });
+      }
+    });
+
+    setChkArr(arr_chk);
+  };
+
+  const handleGerarBoleto = async () => {
+    try {
+      let int_cont = 0;
+      chkArr.forEach(item => {
+        if (item.checked) {
+          const locacao = detail.find(loc => loc.id === item.id);
+          if (locacao) {
+            gerarBoleto.mutateAsync(locacao);
+            int_cont++;
+          }
+        }
+      });
+
+      if (int_cont > 0) {
+        toast({
+          title: 'Geração de Boleto',
+          description: `Boleto(s) gerado(s) com sucesso`
+        });
+      }
+
+    } catch (error) {
+      toast({ title: 'Erro ao gerar boleto.', variant: 'destructive' });
+    }
+  };
 
   return (
     <div>
@@ -305,23 +386,94 @@ export const Home = () => {
         {openDetail && (
           <div className='mt-2 col-span-2'>
 
-            <Label className='ml-2' style={{ 'fontSize': '1rem' }}> Locações </Label>
+            <div className='flex items-center justify-between mr-2'>
+              <Label className='ml-2' style={{ 'fontSize': '1rem' }}> Locações </Label>
+              <div className='ml-2 mb-2  hover:cursor-pointer hover:text-blue-500 flex items-center justify-between gap-2'>
+                <div className='grid grid-cols-2 gap-10'>
+                  {((isAdmin ||
+                    user?.permissions.includes("ALL") ||
+                    user?.permissions.includes("CREATE_PAGAMENTO"))) &&
+                    (
+                      <>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button className='hover:cursor-pointer hover:text-blue-500' variant="ghost" size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                //setSelectedTipo(tipo)
+                              }
+                              }
+                            >
+                              <div className='flex items-center gap-2 hover:cursor-pointer hover:text-blue-500' >
+                                <Barcode size={20} />
+                                <Label className='hover:cursor-pointer hover:text-blue-500'> Gerar Boletos </Label>
+                              </div>
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                'Isso irá confirmar os lançamentos para geração do boleto.'
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleGerarBoleto()}>
+                                'Sim, confirmar boleto.'
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </>
+                    )}
+                </div>
+              </div>
+            </div>
             <div className={'rounded-md border-' + colorItem + '-500 border-2 mt-2 m-2 p-2 text-' + colorItem + '-500'}>
-              <div className='grid grid-cols-4 m-2 font-[Poppins-bold] gap-4' >
-                <Label className={!isMobile ? 'border-b pb-5 col-span-2' : 'border-b pb-5'} style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
-                <Label className='border-b  pb-5' style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
-                <Label className='flex justify-end border-b pb-5' style={{ 'fontSize': '0.7rem' }}>Valor</Label>
+              <div className='grid grid-cols-12 m-2 font-[Poppins-bold] gap-4' >
+                <input type="checkbox" className='w-4 h-4' onChange={(e) => handleCheckAllboxChange(e)}></input>
+                <Label className={!isMobile ? 'border-b pb-5 col-span-5' : 'border-b pb-5 col-span-5'} style={{ 'fontSize': '0.7rem' }}>Destinatário</Label>
+                <Label className='border-b  pb-5  col-span-2' style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
+                <Label className='border-b  pb-5  col-span-2' style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
+                <Label className='flex justify-end border-b pb-5  col-span-2' style={{ 'fontSize': '0.7rem' }}>Valor</Label>
               </div>
 
-              <div className='grid grid-cols-4 m-2 gap-4' >
+              <div className='grid grid-cols-12 m-2' >
                 {detail.map((locacao) => (
                   <>
-                    <Label className={!isMobile ? 'flex items-center mb-1  col-span-2' : 'flex items-center mb-1'} style={{ 'fontSize': '0.7rem' }}>
+                    <input id={`chk_${locacao.id}`} type="checkbox" checked={chkArr.some(item => item.id === locacao.id && item.checked)} onChange={(e) => handleCheckboxChange(e)} className='w-4 h-4'></input>
+                    <Label className={!isMobile ? 'flex items-center mb-1  col-span-5' : 'flex items-center mb-1 col-span-5'} style={{ 'fontSize': '0.7rem' }}>
                       {locacao.locatarios ? locacao.locatarios[0].pessoa?.nome + ' - ' +
                         locacao.imovel?.endereco.complemento + ' - ' + locacao.imovel?.condominio.name : ''}
                     </Label>
-                    <Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{locacao.diaVencimento}</Label>
-                    <Label className='flex justify-end items-center' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(locacao.valorAluguel)}</Label>
+                    <Label className={!isMobile ? 'flex items-center col-span-2' : 'flex items-center col-span-2'} style={{ 'fontSize': '0.7rem' }}>
+                      Aluguel
+                    </Label>
+                    <Label className='flex items-center  col-span-2' style={{ 'fontSize': '0.7rem' }}>{locacao.diaVencimento}</Label>
+                    <Label className='flex justify-end items-center  col-span-2' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(locacao.valorAluguel)}</Label>
+                    {locacao.lancamentos ? locacao.lancamentos.map(lancamento => (
+                      <>
+                        <div className='col-span-1'></div>
+                        <Label className={!isMobile ? 'flex items-center col-span-5' : 'flex items-center col-span-5'} style={{ 'fontSize': '0.7rem' }}>
+                        </Label>
+                        <Label className={!isMobile ? 'flex items-center col-span-2' : 'flex items-center col-span-2'} style={{ 'fontSize': '0.7rem' }}>
+                          {lancamento.lancamentotipo.name}
+                        </Label>
+                        <Label className='flex items-center  col-span-2' style={{ 'fontSize': '0.7rem' }}>{locacao.diaVencimento}</Label>
+                        <Label className='flex justify-end items-center  col-span-2' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
+                      </>
+                    )) : <></>}
+                    <div className='col-span-1 mt-2 mb-2'></div>
+                    <Label className={!isMobile ? 'flex items-center col-span-5 mt-2 mb-2' : 'flex items-center col-span-5 mt-2 mb-2'} style={{ 'fontSize': '0.7rem' }}>
+                    </Label>
+                    <Label className={!isMobile ? 'flex items-center col-span-2 font-bold mt-2 mb-2 border-b' : 'flex items-center font-bold col-span-2 mb-2 mt-2 border-b'} style={{ 'fontSize': '0.7rem' }}>
+                      Total
+                    </Label>
+                    <Label className='flex items-center  col-span-2 mt-2 mb-2 border-b' style={{ 'fontSize': '0.7rem' }}></Label>
+                    <Label className='flex justify-end items-center font-bold col-span-2 mt-2 mb-2 border-b' style={{ 'fontSize': '0.7rem' }}>
+                      {usdFormatter.format(locacao.valorAluguel + (locacao.lancamentos ? locacao.lancamentos.reduce((acc, lancamento) => acc + lancamento.valorLancamento, 0) : 0))}
+                    </Label>
                   </>
                 ))}
               </div>
@@ -347,7 +499,7 @@ export const Home = () => {
                       {(boleto.locatario ? boleto.locatario.pessoa?.nome : '') + ' - ' +
                         (boleto.locacao ? boleto.locacao?.imovel?.endereco.complemento + ' - ' + boleto.locacao?.imovel?.condominio.name : '')}
                     </Label>
-                    <Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment(boleto.dataVencimento).format('DD/MM/YYYY')}</Label>
+                    <Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(boleto.dataVencimento).format('DD/MM/YYYY')}</Label>
                     <Label className='flex justify-end items-center' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(boleto.valorOriginal)}</Label>
                   </>
                 ))}
