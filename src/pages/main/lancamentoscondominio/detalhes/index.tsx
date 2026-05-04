@@ -54,6 +54,7 @@ import { Loader } from '@/components/ui/loader'
 import { LancamentoCondominio } from '@/interfaces/lancamentocondominio'
 import { Bloco } from '@/interfaces/bloco'
 import { useState } from 'react'
+import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
 
 export const getTipos = async (empresaId:number) => {
   return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
@@ -320,6 +321,75 @@ export const DetalhesLancamentoCondominio = () => {
     lancamentoMethods.setValue('valorLancamento', Number(tipo?.valorFixo));
   }
 
+  const handlerValidaLinhaDig = (value: string) => {
+    if (value) {
+      // Remove espaços e traços
+      const linhaDigitavelDig = value.replace(/\s/g, '').replace(/-/g, '');
+      const linhaDigitavel = linhaDigitavelDig.substring(0,11) + linhaDigitavelDig.substring(12,23) + linhaDigitavelDig.substring(24,35) + linhaDigitavelDig.substring(36,47);
+      console.log(linhaDigitavel);
+      // Verifica se a linha digitável tem 44 ou 48 dígitos
+      if (linhaDigitavel.length === 44 || linhaDigitavel.length === 48) {
+        // Verifica se todos os caracteres são dígitos
+        if (/^\d+$/.test(linhaDigitavel)) {
+          // Aqui você pode implementar a lógica de validação do dígito verificador, se necessário
+          var dbl_valor = 0;
+          var int_dig = 0;
+          var int_modulo = (linhaDigitavel.substring(2,1) === '6' ? 11 : 10)
+          var str_vencimento = '';
+
+          //Validar digitos
+          //Bloco 1
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(0,11), int_modulo);
+          if (int_dig === parseInt(linhaDigitavelDig.substring(12, 1))) {
+            return true;
+          }
+
+          //Bloco 2
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(12,11), int_modulo);
+          if (int_dig === parseInt(linhaDigitavelDig.substring(23, 1))) {
+            return true;
+          }
+
+          //Bloco 3
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(24,11), int_modulo);
+          if (int_dig === parseInt(linhaDigitavelDig.substring(35, 1))) {
+            return true;
+          }
+
+          //Bloco 4
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(36,11), int_modulo);
+          if (int_dig === parseInt(linhaDigitavelDig.substring(47, 1))) {
+            return true;
+          }
+
+          if (linhaDigitavel.length == 44) {
+            console.log(linhaDigitavel.substring(4, 13));
+            console.log(linhaDigitavel.substring(13, 15));
+            dbl_valor = parseFloat(linhaDigitavel.substring(4, 13) + '.' + linhaDigitavel.substring(13, 15));
+          }
+
+          if (linhaDigitavel.length == 48) {
+            console.log(linhaDigitavel.substring(4, 9));
+            console.log(linhaDigitavel.substring(13, 2));
+            dbl_valor = parseFloat(linhaDigitavel.substring(4, 13) + '.' + linhaDigitavel.substring(13, 15));
+          }
+
+          lancamentoMethods.setValue('valorLancamento', dbl_valor);
+
+          //Vencimento
+          str_vencimento = linhaDigitavel.substring(19, 27);
+          console.log(str_vencimento);
+          lancamentoMethods.setValue('vencimentoLancamento', moment.utc(str_vencimento, 'YYYYMMDD').format("YYYY-MM-DD"));
+
+
+        } else {
+        }
+      } else {
+      }
+    } else {
+    }
+  }
+
   console.log(lancamentoMethods.formState.errors);
   //if (isLoading) return <PageLoader />
   if (isLoading) return <Loader />
@@ -403,6 +473,7 @@ export const DetalhesLancamentoCondominio = () => {
                         disabled={disabled}
                         placeholder="Código de barras "
                         {...lancamentoMethods.register('linhaDigitavel')}
+                        onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
                       />
                       {lancamentoMethods.formState?.errors?.linhaDigitavel?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{lancamentoMethods.formState?.errors?.linhaDigitavel?.message}</p>}
                       </Label>

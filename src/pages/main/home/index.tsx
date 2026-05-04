@@ -49,7 +49,9 @@ export const useGetBoletosQueryOptions = (empresaId: number, status: BoletoStatu
 }
 
 export const getLocacoes = async (empresaId: number, diVencimento: number) => {
+  console.log('path: ','locacoes/' + empresaId.toString() + "/" + diVencimento.toString());
   return await api.get<Locacao[]>('locacoes/' + empresaId.toString() + "/" + diVencimento.toString());
+  //return await api.get<Locacao[]>('locacoes/' + empresaId.toString() + "/25");
 }
 
 export const useGetLocacoesQueryOptions = (empresaId: number, diVencimento: number) => {
@@ -71,7 +73,7 @@ export const Home = () => {
   const [openDetail, setOpenDetail] = useState<boolean>(false);
   const [openDetailBol, setOpenDetailBol] = useState<boolean>(false);
   const [detailBol, setDetailBol] = useState<Boleto[]>([]);
-  const [colorItem, setColorItem] = useState<string>();
+  const [titulo, setTitulo] = useState<string>();
   const [chkArr, setChkArr] = useState<{ id: number, checked: boolean }[]>([]);
 
   //Consulta locações
@@ -79,6 +81,7 @@ export const Home = () => {
     useGetLocacoesQueryOptions(Number(glb_params.id_empresa), new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate())
   );
   const locacoes = loc?.data;
+  console.log('Locações: ', locacoes);
 
   //Consulta boletos
   const { data: dataBoletos } = useQuery(
@@ -103,25 +106,40 @@ export const Home = () => {
     glb_params.updPastaOrig("");
 
     if (locacoes) {
-
+      console.log('Processando locações para agrupamento...');
       let arr_chk: { id: number, checked: boolean }[] = [];
       let arr_agrupado: LocacaoGroup[] = [];
       let now = new Date();
       let hoje = now.getDate();
       let lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-
+      console.log('Hoje: ', hoje);
+      console.log('LastDay: ', lastDay);
       for (let i = hoje; i <= lastDay; i += 5) {
         if (i + 5 > lastDay) {
-          arr_agrupado.push(locacoes.filter(locacao => locacao.diaVencimento > i && locacao.diaVencimento <= lastDay)
-            .reduce(
-              (acc: LocacaoGroup, locacao) => {
-                acc.qtde += 1;
-                acc.total += locacao.valorAluguel;
-                acc.locacoes.push(locacao);
-                arr_chk.push({ id: locacao.id, checked: false });
-                return acc;
-              },
-              { dia: lastDay, qtde: 0, total: 0, locacoes: [] as Locacao[] }));
+          if (i < lastDay) {
+            arr_agrupado.push(locacoes.filter(locacao => locacao.diaVencimento > i && locacao.diaVencimento <= lastDay)
+              .reduce(
+                (acc: LocacaoGroup, locacao) => {
+                  acc.qtde += 1;
+                  acc.total += locacao.valorAluguel;
+                  acc.locacoes.push(locacao);
+                  arr_chk.push({ id: locacao.id, checked: false });
+                  return acc;
+                },
+                { dia: lastDay, qtde: 0, total: 0, locacoes: [] as Locacao[] }));
+          }
+          else {
+            arr_agrupado.push(locacoes.filter(locacao => locacao.diaVencimento >= i && locacao.diaVencimento <= lastDay)
+              .reduce(
+                (acc: LocacaoGroup, locacao) => {
+                  acc.qtde += 1;
+                  acc.total += locacao.valorAluguel;
+                  acc.locacoes.push(locacao);
+                  arr_chk.push({ id: locacao.id, checked: false });
+                  return acc;
+                },
+                { dia: lastDay, qtde: 0, total: 0, locacoes: [] as Locacao[] }));
+          }
         }
         else {
           arr_agrupado.push(locacoes.filter(locacao => locacao.diaVencimento > i && locacao.diaVencimento <= i + 5)
@@ -135,6 +153,7 @@ export const Home = () => {
         }
       }
 
+      console.log('Agrupamento locações: ', arr_agrupado);
       setDadosRec(arr_agrupado);
       setChkArr(arr_chk);
 
@@ -150,7 +169,7 @@ export const Home = () => {
               acc.boletos.push(boleto);
               return acc;
             },
-            { status: 'Pendente', qtde: 0, total: 0, boletos: [] as Boleto[] }));
+            { status: 'À vencer', qtde: 0, total: 0, boletos: [] as Boleto[] }));
 
         arr_agrupado_boletos.push(boletos.filter(boleto => new Date(boleto.dataVencimento) < now).reduce((acc: BoletoGroup, boleto) => {
           acc.qtde += 1;
@@ -192,43 +211,50 @@ export const Home = () => {
     ],
   };*/
 
-  const data = {
+  const dataLocacoes = {
     labels: dadosRec.map(item => 'Até dia ' + item.dia.toString()),
     datasets: [
       {
         label: 'aluguéis atrasados',
         data: dadosRec.map(item => item.total),
         backgroundColor: [
-          'purple',
-          'indigo',
-          'blue',
-          'red',
-          'green',
+          '#6350f2',
+          '#4267ed',
+          '#42a0ed',
+          '#42dced',
+          '#42edb7',
+          '#42ed7b',
+          '#56ed42'
         ],
         //dataVisibility: [12, 2, 3, 5, 5],
       },
     ],
   };
 
-  const dataAtrasado = {
+  const dataReceber = {
     labels: dadosBol.map(item => item.status),
     datasets: [
       {
-        label: 'Boletos pendentes',
+        label: 'Boletos à receber',
         data: dadosBol.map(item => item.total),
         backgroundColor: [
           '#e09353',
-          '#d16b3f',
-          '#bf4434',
-          '#ba2d2d',
-          '#ba2d6f',
+          '#e0bf53',
+          '#d9e053',
+          '#90e053',
+          '#53e074',
+          '#53e0cd',
+          '#5372e0'
         ],
+        //circumference: 180,
+        //rotation:270,
+        //offset: activeSegment === 0 ? 20 : 0, // Example for highlighting index 0
         //dataVisibility: dados.map(item => item.qtde),
       },
     ],
   };
 
-  const optionsReceber: any = {
+  const optionsLocacoes: any = {
     plugins: {
       legend: {
         position: 'right', // Moves legend to the right side
@@ -241,14 +267,13 @@ export const Home = () => {
         setOpenDetail(true);
         console.log(event);
         const firstElement = activeElements[0];
-        const datasetIndex = firstElement.datasetIndex;
         const index = firstElement.index;
 
         // Retrieve label and value of the clicked element
         //const label = chart.data.labels[index];
         //const value = chart.data.datasets[datasetIndex].data[index];
-        setColorItem(chart.data.datasets[datasetIndex].backgroundColor[index]);
-
+        //setColorItem(chart.data.datasets[datasetIndex].backgroundColor[index]);
+        setTitulo('Locações - ' + chart.data.labels[index]);
         //Mostrar detalhes dos aluguéis à receber para o período correspondente                
         setDetail(dadosRec[index].locacoes);
         setOpenDetail(true);
@@ -265,12 +290,13 @@ export const Home = () => {
     }
   }
 
-  const optionsPagamentos: any = {
+  const optionsBoletos: any = {
     plugins: {
       legend: {
         position: 'right', // Moves legend to the right side
         align: 'center',    // Vertically centers the list in the legend area
       },
+      //events:['click'],
     },
     onClick: (event: any, activeElements: any, chart: any) => {
       if (activeElements.length > 0) {
@@ -278,18 +304,18 @@ export const Home = () => {
         setOpenDetailBol(false);
         console.log(event);
         const firstElement = activeElements[0];
-        const datasetIndex = firstElement.datasetIndex;
         const index = firstElement.index;
-
         // Retrieve label and value of the clicked element
         //const label = chart.data.labels[index];
         //const value = chart.data.datasets[datasetIndex].data[index];
-        setColorItem(chart.data.datasets[datasetIndex].backgroundColor[index]);
-
+        //setColorItem(chart.data.datasets[datasetIndex].backgroundColor[index]);
+        //ssssetTitulo(chart.data.labels[index]);
+        setTitulo('Boletos - ' + chart.data.labels[index]);
         //Mostrar detalhes dos aluguéis à receber para o período correspondente
-        console.log('Boletos: ', dadosBol[index].boletos);
         setDetailBol(dadosBol[index].boletos);
         setOpenDetailBol(true);
+        chart.render();
+        chart.draw();
       }
     },
     onHover: (event: any, activeElements: any) => {
@@ -363,33 +389,88 @@ export const Home = () => {
     }
   };
 
+  const chartCenterLabel = {
+    id: 'chartCenterLabel',
+    //afterDraw(chart:any, args:any, plugins:any) {
+    beforeDatasetsDraw(chart: any) {
+      const { ctx, data } = chart;
+      if (chart.getDatasetMeta(0).data.length > 0) {
+        const centerX = chart.getDatasetMeta(0).data[0].x;
+        const centerY = chart.getDatasetMeta(0).data[0].y;
+
+        //Text
+        ctx.save();
+        ctx.font = 'bold 10px Poppins-Bold';
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(usdFormatter.format(data.datasets[0].data.reduce((a: any, b: any) => a + b, 0)), centerX, centerY);
+        //ctx.fillText(`Teste `, centerX, centerY);
+        //console.log(`${data.labels[activeSegment]} ${data.datasets[0].data[activeSegment]} `);
+      }
+    }
+  };
+
+  const chartCenterLabelLocacao = {
+    id: 'chartCenterLabel',
+    //afterDraw(chart:any, args:any, plugins:any) {
+    beforeDatasetsDraw(chart: any) {
+      const { ctx, data } = chart;
+      if (chart.getDatasetMeta(0).data.length > 0) {
+        const centerX = chart.getDatasetMeta(0).data[0].x;
+        const centerY = chart.getDatasetMeta(0).data[0].y;
+
+        //Text
+        ctx.save();
+        ctx.font = 'bold 10px Poppins-Bold';
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(usdFormatter.format(data.datasets[0].data.reduce((a: any, b: any) => a + b, 0)), centerX, centerY);
+        //ctx.fillText(`Teste `, centerX, centerY);
+        //console.log(`${data.labels[activeSegment]} ${data.datasets[0].data[activeSegment]} `);
+      }
+    }
+  };
+
+  /*const config = {
+    type: 'doughnut',
+    dataBoletos,
+    optionsBoletos,
+  };
+
+  const myChart = new Chart(
+    document.getElementById('myChart'),
+    config
+  );*/
   return (
     <div>
       <div className='grid grid-cols-2 mt-5 gap-4 p-5'>
         <div>
-          <Label className='flex justify-center font-[Poppins-bold]'>Próximos Recebimentos</Label>
+          <Label className='flex justify-center font-[Poppins-bold]'>Locações à Vencer</Label>
           <div className='border-2 rounded-lg mt-2'>
-            <div className='mt-5 p-5 w-80'>
-              <Doughnut data={data} options={optionsReceber} />
+            <div className='pl-5 w-80'>
+              <Doughnut data={dataLocacoes} options={optionsLocacoes} plugins={[chartCenterLabelLocacao]} />
             </div>
           </div>
         </div>
         <div>
-          <Label className='flex justify-center font-[Poppins-bold]'>Pagamentos</Label>
+          <Label className='flex justify-center font-[Poppins-bold]'>Boletos à Receber</Label>
           <div className='border-2 rounded-lg mt-2 '>
-            <div className='mt-5 p-5  w-80'>
-              <Doughnut data={dataAtrasado} options={optionsPagamentos} />
+            <div className='pl-5  w-80'>
+              <Doughnut data={dataReceber} options={optionsBoletos} plugins={[chartCenterLabel]} />
+              {/*<canvas id="myChart"></canvas>*/}
             </div>
           </div>
         </div>
 
         {openDetail && (
-          <div className='mt-2 col-span-2'>
+          <div className='col-span-2'>
 
-            <div className='flex items-center justify-between mr-2'>
-              <Label className='ml-2' style={{ 'fontSize': '1rem' }}> Locações </Label>
+            <div className='flex items-center justify-between mr-2 h-7'>
+              <Label className='ml-2' style={{ 'fontSize': '1rem' }}>{titulo}</Label>
               <div className='ml-2 mb-2  hover:cursor-pointer hover:text-blue-500 flex items-center justify-between gap-2'>
-                <div className='grid grid-cols-2 gap-10'>
+                <div className='grid grid-cols-2'>
                   {((isAdmin ||
                     user?.permissions.includes("ALL") ||
                     user?.permissions.includes("CREATE_PAGAMENTO"))) &&
@@ -397,7 +478,7 @@ export const Home = () => {
                       <>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button className='hover:cursor-pointer hover:text-blue-500' variant="ghost" size="icon"
+                            <Button className='hover:cursor-pointer hover:text-blue-500 h-7' variant="ghost" size="icon"
                               onClick={(e) => {
                                 e.stopPropagation()
                                 //setSelectedTipo(tipo)
@@ -430,8 +511,8 @@ export const Home = () => {
                 </div>
               </div>
             </div>
-            <div className={'rounded-md border-' + colorItem + '-500 border-2 mt-2 m-2 p-2 text-' + colorItem + '-500'}>
-              <div className='grid grid-cols-12 m-2 font-[Poppins-bold] gap-4' >
+            <div className={'rounded-md border-2 mt-2 m-2 p-2'}>
+              <div className='grid grid-cols-12 m-2 font-[Poppins-bold]' >
                 <input type="checkbox" className='w-4 h-4' onChange={(e) => handleCheckAllboxChange(e)}></input>
                 <Label className={!isMobile ? 'border-b pb-5 col-span-5' : 'border-b pb-5 col-span-5'} style={{ 'fontSize': '0.7rem' }}>Destinatário</Label>
                 <Label className='border-b  pb-5  col-span-2' style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
@@ -478,14 +559,20 @@ export const Home = () => {
                 ))}
               </div>
             </div>
+            <div className='flex justify-between mr-2 mt-2 mb-2 gap-2 items-center'>
+              <Label className='ml-2 font-[Poppins-bold]' style={{ 'fontSize': '0.8rem' }}>Total :</Label>
+              <Label className='ml-2 font-[Poppins-bold]' style={{ 'fontSize': '0.8rem' }}>
+                {usdFormatter.format(detail.reduce((acc, locacao) => acc + locacao.valorAluguel + (locacao.lancamentos ? locacao.lancamentos.reduce((accLanc, lancamento) => accLanc + lancamento.valorLancamento, 0) : 0), 0))}
+              </Label>
+            </div>
           </div>
         )}
 
         {openDetailBol && (
           <div className=' mt-5 col-span-2'>
 
-            <Label className='ml-2' style={{ 'fontSize': '1rem' }}> Pagamentos </Label>
-            <div className={'rounded-md border-' + colorItem + '-500 border-2 mt-2 m-2 p-2 text-' + colorItem + '-500'}>
+            <Label className='ml-2' style={{ 'fontSize': '1rem' }}>{titulo}</Label>
+            <div className={'rounded-md mt-2 m-2 p-2'}>
               <div className='grid grid-cols-4 m-2 font-[Poppins-bold] gap-4' >
                 <Label className={!isMobile ? 'border-b pb-5 col-span-2' : 'border-b pb-5'} style={{ 'fontSize': '0.7rem' }}>Favorecido</Label>
                 <Label className='border-b  pb-5' style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
@@ -505,8 +592,15 @@ export const Home = () => {
                 ))}
               </div>
             </div>
+            <div className='flex justify-between mr-2 mt-2 mb-2 gap-2 items-center'>
+              <Label className='ml-2 font-[Poppins-bold]' style={{ 'fontSize': '1rem' }}>Total :</Label>
+              <Label className='ml-2 font-[Poppins-bold]' style={{ 'fontSize': '1rem' }}>
+                {usdFormatter.format(detailBol.reduce((acc, boleto) => acc + boleto.valorOriginal, 0))}
+              </Label>
+            </div>
           </div>
         )}
       </div>
     </div>)
 }
+

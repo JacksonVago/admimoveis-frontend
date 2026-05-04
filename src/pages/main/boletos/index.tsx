@@ -39,6 +39,7 @@ import { Textarea } from '@/components/ui/textarea'
 import ListarLocacoes from '../locacoes'
 import { Locacao } from '@/interfaces/locacao'
 import axios from 'axios'
+import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
 
 const createBoleto = async (data: FormData): Promise<Boleto | any> => {
 
@@ -64,7 +65,7 @@ interface GetBoletosParams {
 
 // API & Query Logic
 export const getBoletos = async (empresaId: number, { page, limit, search, status, exclude, dataInicial, dataFinal }: GetBoletosParams) => {
-  const result =await api.get<BasePaginationData<Boleto>>('pagamentos/' + empresaId.toString(), {
+  const result = await api.get<BasePaginationData<Boleto>>('pagamentos/' + empresaId.toString(), {
     params: {
       page,
       limit,
@@ -99,7 +100,7 @@ export const useGetBoletosQueryOptions = (empresaId: number, {
 } = {}) => {
   return queryOptions({
     queryKey: ['boletos', empresaId, { search, page, limit, status, exclude, dataInicial, dataFinal }, queryKeys],
-    queryFn: () => getBoletos(empresaId,{ search, page, limit, status, exclude, dataInicial, dataFinal })
+    queryFn: () => getBoletos(empresaId, { search, page, limit, status, exclude, dataInicial, dataFinal })
   })
 }
 
@@ -155,7 +156,7 @@ export default function ListarBoletos({
   })
 
   const { data, isLoading } = useQuery(
-    useGetBoletosQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,{
+    useGetBoletosQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {
       page,
       limit,
       search,
@@ -351,6 +352,10 @@ export default function ListarBoletos({
     formData.append('valorOriginal', (data.valorOriginal ? data.valorOriginal.toString() : "0"));
     formData.append('valorPago', (data.valorPago ? data.valorPago.toString() : "0"));
     formData.append('observacao', data.observacao ? data.observacao : "");
+    if (data?.linhaDigitavel) {
+      formData.append('linhaDigitavel', data.linhaDigitavel)
+    }
+
     if (data.empresaId) {
       formData.append('empresaId', data.empresaId.toString())
     }
@@ -426,6 +431,77 @@ export default function ListarBoletos({
     setIsCreateDialogOpen(!isCreateDialogOpen);
 
   }
+
+  const handlerValidaLinhaDig = (value: string) => {
+    if (value) {
+      // Remove espaços e traços
+      const linhaDigitavelDig = value.replace(/\s/g, '').replace(/-/g, '');
+      const linhaDigitavel = linhaDigitavelDig.substring(0, 11) + linhaDigitavelDig.substring(12, 23) + linhaDigitavelDig.substring(24, 35) + linhaDigitavelDig.substring(36, 47);
+      console.log(linhaDigitavel);
+      // Verifica se a linha digitável tem 44 ou 48 dígitos
+      if (linhaDigitavel.length === 44 || linhaDigitavel.length === 48) {
+        // Verifica se todos os caracteres são dígitos
+        if (/^\d+$/.test(linhaDigitavel)) {
+          // Aqui você pode implementar a lógica de validação do dígito verificador, se necessário
+          var dbl_valor = 0;
+          var int_dig = 0;
+          var int_modulo = (linhaDigitavel.substring(2, 1) === '6' ? 11 : 10)
+          var str_vencimento = '';
+
+          //Validar digitos
+          //Bloco 1
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(0, 11), int_modulo);
+          if (int_dig === parseInt(linhaDigitavelDig.substring(12, 1))) {
+            return true;
+          }
+
+          //Bloco 2
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(12, 11), int_modulo);
+          if (int_dig === parseInt(linhaDigitavelDig.substring(23, 1))) {
+            return true;
+          }
+
+          //Bloco 3
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(24, 11), int_modulo);
+          if (int_dig === parseInt(linhaDigitavelDig.substring(35, 1))) {
+            return true;
+          }
+
+          //Bloco 4
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(36, 11), int_modulo);
+          if (int_dig === parseInt(linhaDigitavelDig.substring(47, 1))) {
+            return true;
+          }
+
+          if (linhaDigitavel.length == 44) {
+            console.log(linhaDigitavel.substring(4, 13));
+            console.log(linhaDigitavel.substring(13, 15));
+            dbl_valor = parseFloat(linhaDigitavel.substring(4, 13) + '.' + linhaDigitavel.substring(13, 15));
+          }
+
+          if (linhaDigitavel.length == 48) {
+            console.log(linhaDigitavel.substring(4, 9));
+            console.log(linhaDigitavel.substring(13, 2));
+            dbl_valor = parseFloat(linhaDigitavel.substring(4, 13) + '.' + linhaDigitavel.substring(13, 15));
+          }
+
+          boletoMethods.setValue('valorOriginal', dbl_valor);
+
+          //Vencimento
+          str_vencimento = linhaDigitavel.substring(19, 27);
+          console.log(str_vencimento);
+          boletoMethods.setValue('dataVencimento', moment.utc(str_vencimento, 'YYYYMMDD').format("YYYY-MM-DD"));
+
+
+        } else {
+        }
+      } else {
+      }
+    } else {
+    }
+  }
+
+
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}
@@ -446,8 +522,8 @@ export default function ListarBoletos({
           user?.permissions.includes("CREATE_PAGAMENTO")
         ) && (
             <Button size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'
-             onClick={() => { handlerNewBoleto(); }}>
-              <Plus className="mr-2 h-4 w-4" /> Criar Boleto
+              onClick={() => { handlerNewBoleto(); }}>
+              <Plus className="mr-2" /> Criar Boleto
             </Button>
           )}
         <Dialog
@@ -461,7 +537,7 @@ export default function ListarBoletos({
               <DialogTitle>Criar novo Boleto</DialogTitle>
               <DialogDescription>Preencha os dados do novo Boleto abaixo.</DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
               <FormProvider {...boletoMethods}>
                 <DocumentUpload disabled={false} downloadDocuments={true} />
               </FormProvider>
@@ -494,7 +570,7 @@ export default function ListarBoletos({
                         </>
                       ) : (
                         <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
-                          <Button type='button'
+                          <Button type='button' size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'
                             onClick={() => {
                               setSelLocacao(true);
                             }}
@@ -526,6 +602,20 @@ export default function ListarBoletos({
 
                   {!selLocacao && (
                     <>
+                      <div className='mt-2 col-span-2'>
+                        <div className="grid grid-cols-1 gap-4 mt-2">
+                          <Label htmlFor="description">Código de Barras
+                            <Input className='mt-2'
+                              type='text'
+                              placeholder="Código de barras "
+                              {...boletoMethods.register('linhaDigitavel')}
+                              onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
+                            />
+                            {boletoMethods.formState?.errors?.linhaDigitavel?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{boletoMethods.formState?.errors?.linhaDigitavel?.message}</p>}
+                          </Label>
+                        </div>
+                      </div>
+
                       <div>
                         <Label htmlFor="cotaImovel">Data de Emissão</Label>
                         <Input id="dataEmissao" type="date" placeholder="0.00"
@@ -608,7 +698,7 @@ export default function ListarBoletos({
                   )}
                 </div>
                 <DialogFooter>
-                  <Button type='submit' className='hover:cursor-pointer hover:bg-gray-600'>Criar Boleto</Button>
+                  <Button size="sm" type='submit' className='hover:cursor-pointer hover:bg-gray-600'>Criar Boleto</Button>
                 </DialogFooter>
               </form>
             </div>

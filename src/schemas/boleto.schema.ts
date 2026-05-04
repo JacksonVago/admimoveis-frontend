@@ -21,6 +21,7 @@ export const boletoSchema = z.object({
   valorOriginal: z.coerce.number().min(1, 'Valor do boleto é obrigatório'),
   valorPago: z.coerce.number().optional(),
   observacao: z.string().optional(),
+  linhaDigitavel: z.string().optional(),
   status: z.enum(Object.values(BoletoStatus) as [string, ...string[]]),
   locatarioId: z.coerce.number().min(1, 'Locatário é obrigatório'),
   locacaoId: z.coerce.number().min(1, 'Locação é obrigatório'),

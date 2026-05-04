@@ -198,6 +198,10 @@ export default function ListarLocacoes({
   }
 
   console.log(locacoes);
+
+  
+
+
   return (
     <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}

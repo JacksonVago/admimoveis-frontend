@@ -52,6 +52,7 @@ import { usdFormatter } from '@/utils/format-money'
 import { STATUS_BOLETO_OPTIONS } from '@/constants/status-boletos'
 import { DocumentUpload } from '../../imoveis/criarImovel/components/document-upload'
 import { ROUTE } from '@/enums/routes.enum'
+import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
 
 export const getTipos = async () => {
   return await api.get<TipoLancamento[]>('tipolancamento')
@@ -177,6 +178,15 @@ export const DetalhesBoleto = () => {
         form.append('valorPago', data.valorPago.toString())
       }
 
+      if (data?.observacao) {
+        form.append('observacao', data.observacao)
+      }
+
+      if (data?.linhaDigitavel) {
+        form.append('linhaDigitavel', data.linhaDigitavel)
+      }
+
+
       form.append('status', BoletoStatus.PAGO);
       form.append('dataPagamento', moment(new Date()).format("YYYY-MM-DD"));
 
@@ -299,7 +309,76 @@ export const DetalhesBoleto = () => {
     }*/
 
   const handlerBackNav = () => {
-      navigate(`${ROUTE.PAGAMENTOS}/?page=1&dataInicial=${glb_params.data_inicial}&dataFinal=${glb_params.data_final}`)
+    navigate(`${ROUTE.PAGAMENTOS}/?page=1&dataInicial=${glb_params.data_inicial}&dataFinal=${glb_params.data_final}`)
+  }
+
+  const handlerValidaLinhaDig = (value: string) => {
+    if (value) {
+      // Remove espaços e traços
+      const linhaDigitavelDig = value.replace(/\s/g, '').replace(/-/g, '');
+      const linhaDigitavel = linhaDigitavelDig.substring(0, 11) + linhaDigitavelDig.substring(12, 23) + linhaDigitavelDig.substring(24, 35) + linhaDigitavelDig.substring(36, 47);
+      console.log(linhaDigitavel);
+      // Verifica se a linha digitável tem 44 ou 48 dígitos
+      if (linhaDigitavel.length === 44 || linhaDigitavel.length === 48) {
+        // Verifica se todos os caracteres são dígitos
+        if (/^\d+$/.test(linhaDigitavel)) {
+          // Aqui você pode implementar a lógica de validação do dígito verificador, se necessário
+          var dbl_valor = 0;
+          var int_dig = 0;
+          var int_modulo = (linhaDigitavel.substring(2, 1) === '6' ? 11 : 10)
+          var str_vencimento = '';
+
+          //Validar digitos
+          //Bloco 1
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(0, 11), int_modulo);
+          if (int_dig === parseInt(linhaDigitavelDig.substring(12, 1))) {
+            return true;
+          }
+
+          //Bloco 2
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(12, 11), int_modulo);
+          if (int_dig === parseInt(linhaDigitavelDig.substring(23, 1))) {
+            return true;
+          }
+
+          //Bloco 3
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(24, 11), int_modulo);
+          if (int_dig === parseInt(linhaDigitavelDig.substring(35, 1))) {
+            return true;
+          }
+
+          //Bloco 4
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(36, 11), int_modulo);
+          if (int_dig === parseInt(linhaDigitavelDig.substring(47, 1))) {
+            return true;
+          }
+
+          if (linhaDigitavel.length == 44) {
+            console.log(linhaDigitavel.substring(4, 13));
+            console.log(linhaDigitavel.substring(13, 15));
+            dbl_valor = parseFloat(linhaDigitavel.substring(4, 13) + '.' + linhaDigitavel.substring(13, 15));
+          }
+
+          if (linhaDigitavel.length == 48) {
+            console.log(linhaDigitavel.substring(4, 9));
+            console.log(linhaDigitavel.substring(13, 2));
+            dbl_valor = parseFloat(linhaDigitavel.substring(4, 13) + '.' + linhaDigitavel.substring(13, 15));
+          }
+
+          boletoMethods.setValue('valorOriginal', dbl_valor);
+
+          //Vencimento
+          str_vencimento = linhaDigitavel.substring(19, 27);
+          console.log(str_vencimento);
+          boletoMethods.setValue('dataVencimento', moment.utc(str_vencimento, 'YYYYMMDD').format("YYYY-MM-DD"));
+
+
+        } else {
+        }
+      } else {
+      }
+    } else {
+    }
   }
 
   return (
@@ -325,6 +404,7 @@ export const DetalhesBoleto = () => {
                     {boleto?.locacao?.imovel?.condominio ? boleto.locacao.imovel.condominio.name : ''}
                   </Label>
                 </div>
+
                 <div className='grid grid-cols-3'>
                   <div className='flex flex-direction-row'>
                     <Label className="font-bold mt-2">Emissão : &nbsp;</Label>
@@ -478,6 +558,22 @@ export const DetalhesBoleto = () => {
                     <DocumentUpload disabled={disabled} downloadDocuments={disabled} />
                   </FormProvider>
                   <form onSubmit={boletoMethods.handleSubmit(onSubmitBoletoData)}>
+
+                    <div className='mt-2'>
+                      <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-2" : "grid grid-cols-1 gap-4 mt-2")}>
+                        <Label htmlFor="description">Código de Barras
+                          <Input
+                            type='text'
+                            disabled={disabled}
+                            placeholder="Código de barras "
+                            {...boletoMethods.register('linhaDigitavel')}
+                            onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
+                          />
+                          {boletoMethods.formState?.errors?.linhaDigitavel?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{boletoMethods.formState?.errors?.linhaDigitavel?.message}</p>}
+                        </Label>
+                      </div>
+                    </div>
+
                     <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-2" : "grid grid-cols-1 gap-4 mt-2")}>
                       <Label className="text-base">
                         Data Vencimento

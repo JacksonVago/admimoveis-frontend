@@ -51,6 +51,7 @@ import { LancamentoLocacao } from '@/interfaces/lancamentos'
 import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
 import { Textarea } from '@/components/ui/textarea'
 import { STATUS_LANCAMENTO_OPTIONS } from '@/constants/status-lancamentos'
+import { PageLoader } from '@/pages/assistant/page-loader'
 
 // Types
 export const getTipos = async (empresaId: number) => {
@@ -357,7 +358,7 @@ export default function DetalhesLocacao() {
   const disabled = isEditing
 
 
-  const { data: locacao } = useQuery({
+  const { data: locacao, isLoading } = useQuery({
     queryKey: ['locacao', id],
     queryFn: async () => {
       try {
@@ -899,6 +900,7 @@ export default function DetalhesLocacao() {
     currency: 'BRL',
   });
 
+  if (isLoading) return <PageLoader />
 
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
