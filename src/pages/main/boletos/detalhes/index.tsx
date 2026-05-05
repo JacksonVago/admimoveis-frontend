@@ -158,10 +158,6 @@ export const DetalhesBoleto = () => {
     try {
       const form = new FormData()
 
-      if (data?.dataPagamento) {
-        form.append('dataPagamento', data.dataPagamento)
-      }
-
       if (data?.dataEmissao) {
         form.append('dataEmissao', data.dataEmissao)
       }

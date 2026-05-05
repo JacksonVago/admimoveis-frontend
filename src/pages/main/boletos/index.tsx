@@ -333,7 +333,6 @@ export default function ListarBoletos({
 
     const formData = new FormData();
 
-    console.log('data', data);
     if (locacao.fields.length === 0) {
       boletoMethods.setValue('locacaoId', 0);
       return false;
@@ -348,7 +347,9 @@ export default function ListarBoletos({
     formData.append('status', data.status);
     formData.append('dataEmissao', moment(data.dataEmissao).format('YYYY-MM-DD'));
     formData.append('dataVencimento', moment(data.dataVencimento).format('YYYY-MM-DD'));
-    formData.append('dataPagamento', (data.dataPagamento ? moment(data.dataPagamento).format('YYYY-MM-DD') : ""));
+    if (data.dataPagamento && data.dataPagamento !== 'Invalid date') {
+      formData.append('dataPagamento', moment(data.dataPagamento).format('YYYY-MM-DD'));
+    }
     formData.append('valorOriginal', (data.valorOriginal ? data.valorOriginal.toString() : "0"));
     formData.append('valorPago', (data.valorPago ? data.valorPago.toString() : "0"));
     formData.append('observacao', data.observacao ? data.observacao : "");

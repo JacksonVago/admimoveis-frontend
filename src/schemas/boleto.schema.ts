@@ -13,7 +13,7 @@ export const boletoSchema = z.object({
   dataPagamento: z.string().transform((val) => {
     const data: string = val;
     return moment(data.substring(0, 10)).format("YYYY-MM-DD");
-  }),
+  }).optional(),
   dataVencimento: z.string().transform((val) => {
     const data: string = val;
     return moment.utc(data.substring(0, 10)).format("YYYY-MM-DD");
