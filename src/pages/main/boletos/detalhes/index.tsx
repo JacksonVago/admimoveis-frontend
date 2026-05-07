@@ -52,7 +52,7 @@ import { usdFormatter } from '@/utils/format-money'
 import { STATUS_BOLETO_OPTIONS } from '@/constants/status-boletos'
 import { DocumentUpload } from '../../imoveis/criarImovel/components/document-upload'
 import { ROUTE } from '@/enums/routes.enum'
-import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
+//import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
 
 export const getTipos = async () => {
   return await api.get<TipoLancamento[]>('tipolancamento')
@@ -331,7 +331,7 @@ export const DetalhesBoleto = () => {
     navigate(`${ROUTE.PAGAMENTOS}/?page=1&dataInicial=${glb_params.data_inicial}&dataFinal=${glb_params.data_final}`)
   }
 
-  const handlerValidaLinhaDig = (value: string) => {
+  /*const handlerValidaLinhaDig = (value: string) => {
     if (value) {
       // Remove espaços e traços
       const linhaDigitavelDig = value.replace(/\s/g, '').replace(/-/g, '');
@@ -398,7 +398,7 @@ export const DetalhesBoleto = () => {
       }
     } else {
     }
-  }
+  }*/
 
   console.log(boletoMethods.formState.errors);
 
