@@ -1,6 +1,8 @@
 import { BoletoBancario } from "./boletobancario";
 import { GenericAnexo } from "./generic-anexo";
+import { Imovel } from "./imovel";
 import { LancamentoCondominio } from "./lancamentocondominio";
+import { LancamentoImovel } from "./lancamentoimovel";
 import { LancamentoLocacao } from "./lancamentos";
 import { Locacao } from "./locacao";
 import { Locatario } from "./locatario";
@@ -11,8 +13,13 @@ export interface Boleto {
     updatedAt:string;
   
     locacao?:Locacao;
-    locacaoId:number;
+    locacaoId?:number;
   
+    imovel?:Imovel;
+    imovelId?:number;
+  
+    empresaId?:number;
+
     status:string;
     dataEmissao:string;
     dataVencimento:string;
@@ -27,6 +34,7 @@ export interface Boleto {
     locatario?:Locatario;
     boletosBancarios?: BoletoBancario[]
     lanctoCondominio?: LancamentoCondominio[]
+    lancamentoImovels?: LancamentoImovel[]
 
   }
   

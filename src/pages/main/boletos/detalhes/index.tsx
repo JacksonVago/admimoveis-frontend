@@ -257,7 +257,7 @@ export const DetalhesBoleto = () => {
       locacaoId: boleto?.locacaoId,
       dataEmissao: moment.utc(boleto?.dataEmissao).format("YYYY-MM-DD"),
       dataPagamento: moment.utc(boleto?.dataPagamento).format("YYYY-MM-DD"),
-      vencimentoPagamento: moment.utc(boleto?.dataVencimento).format("YYYY-MM-DD"),
+      dataVencimento: moment.utc(boleto?.dataVencimento).format("YYYY-MM-DD"),
       valorOriginal: boleto?.valorOriginal || 0,
       valorPago: boleto?.valorPago || 0,
       locatarioId: boleto?.locatario?.id || 0,
@@ -266,7 +266,8 @@ export const DetalhesBoleto = () => {
     }),
     [boleto, documentFiles]
   )
-
+  
+  
   React.useEffect(() => {
     glb_params.updTitle_form('Boletos');
     if (localStorage) boletoMethods.reset(defaultValues)
@@ -279,6 +280,8 @@ export const DetalhesBoleto = () => {
     defaultValues,
     mode: 'onBlur'
   })
+
+  console.log('defaultValues:', boletoMethods.getValues());
 
   React.useEffect(() => {
     if (boleto) {
@@ -392,14 +395,27 @@ export const DetalhesBoleto = () => {
                   <Label className="font-bold">Boleto : &nbsp;</Label>
                   <Label className="font-normal">{boleto?.id}</Label>
                 </div>
-                <div className='flex flex-direction-row'>
-                  <Label className="font-bold mt-2">Locação : &nbsp;</Label>
-                  <Label className="font-normal mt-2">
-                    {boleto?.locatario ? boleto.locatario.pessoa?.nome : ''} -
-                    {boleto?.locacao?.imovel?.endereco.complemento} -
-                    {boleto?.locacao?.imovel?.condominio ? boleto.locacao.imovel.condominio.name : ''}
-                  </Label>
-                </div>
+                
+                  {(boleto?.locacao !== null ? (
+                    <div className='flex flex-direction-row'>                  
+                    <Label className="font-bold mt-2">Locação : &nbsp;</Label>
+                    <Label className="font-normal mt-2">
+                      {boleto?.locatario ? boleto.locatario.pessoa?.nome : ''} -
+                      {boleto?.locacao?.imovel?.endereco.complemento} -
+                      {boleto?.locacao?.imovel?.condominio ? boleto.locacao.imovel.condominio.name : ''}
+                    </Label>
+                    </div>
+                  ) : (
+                    <div className='flex flex-direction-row'>                 
+                    <Label className="font-bold mt-2">Imóvel : &nbsp;</Label> 
+                    <Label className="font-normal mt-2">
+                      {boleto?.imovel && boleto.imovel.proprietarios && boleto.imovel.proprietarios.length > 0 ? boleto.imovel.proprietarios[0]?.pessoa?.nome : ''} -
+                      {boleto?.imovel?.endereco.complemento} -
+                      {boleto?.imovel?.condominio ? boleto.imovel.condominio.name : ''}
+                    </Label>
+                    </div>
+                  ))}
+                
 
                 <div className='grid grid-cols-3'>
                   <div className='flex flex-direction-row'>
@@ -412,7 +428,7 @@ export const DetalhesBoleto = () => {
                   </div>
                   <div className='flex flex-direction-row'>
                     <Label className="font-bold mt-2">Pagamento : &nbsp;</Label>
-                    <Label className="font-normal mt-2">{moment.utc(boleto?.dataPagamento).format("DD/MM/YYYY")}</Label>
+                    <Label className="font-normal mt-2">{boleto?.dataPagamento ? moment.utc(boleto?.dataPagamento).format("DD/MM/YYYY") : ''}</Label>
                   </div>
                 </div>
 
@@ -438,7 +454,8 @@ export const DetalhesBoleto = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {(boleto?.lanctoLocacao && boleto.lanctoLocacao.length > 0) ? (
+            {(boleto?.locacao !== null ?
+            (boleto?.lanctoLocacao && boleto.lanctoLocacao.length > 0) ? (
               <div className=''>
 
                 <Label className='ml-2' style={{ 'fontSize': '1rem' }}> Lançamentos </Label>
@@ -526,7 +543,92 @@ export const DetalhesBoleto = () => {
               <p className="text-center text-muted-foreground">
                 Nenhum lançamento para esse pagamento nesse período.
               </p>
-            )}
+            )
+            :
+            (boleto?.lancamentoImovels && boleto.lancamentoImovels.length > 0) ? (
+              <div className=''>
+
+                <Label className='ml-2' style={{ 'fontSize': '1rem' }}> Lançamentos </Label>
+                <div className='rounded-md border'>
+                  <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
+                    <Label className={!isMobile ? 'border-b pb-5' : 'border-b pb-5 col-span-2'} style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
+                    {!isMobile ? (<Label className='border-b pb-5' style={{ 'fontSize': '0.7rem' }}>Emissão</Label>) : (<></>)}
+                    <Label className='border-b  pb-5' style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
+                    <Label className='flex justify-end border-b pb-5' style={{ 'fontSize': '0.7rem' }}>Valor</Label>
+                    <Label className='border-b pb-5' style={{ 'fontSize': '0.7rem' }}></Label>
+                  </div>
+
+                  <div className='grid grid-cols-5 m-2' >
+                    {boleto.lancamentoImovels?.map((lancamento) => (
+                      <>
+                        <Label className={!isMobile ? 'flex items-center mb-1' : 'flex items-center col-span-2 mb-1'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
+                        {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>) : (<></>)}
+                        <Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
+                        <Label className='flex justify-end items-center' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
+                        <div className='flex justify-center'>
+                          {lancamento.status === LancamentoStatus.ABERTO && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  //handleEditPagamento(lancamento);
+                                  //setSelectedTipo(tipo)
+                                  //setIsEditDialogOpen(true)
+                                }}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="ghost" size="icon" onClick={(e) => {
+                                    e.stopPropagation()
+                                    //setSelectedTipo(tipo)
+                                  }
+                                  } title='Excluir Lançamento'>
+                                    <Trash2 className="h-4 w-4" />
+
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Isso excluir o lançamento da locação
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => { handleDeletePagamento(lancamento.id) }}>
+                                      Sim, excluir o lançamento.
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </>
+                          )}
+                        </div>
+                      </>
+                    ))}
+                  </div>
+                </div>
+
+                <div className='grid grid-cols-5 m-2' >
+                  <Label className={!isMobile ? 'flex items-center mb-1 font-bold' : 'flex items-center col-span-2 mb-1 font-bold'} style={{ 'fontSize': '0.7rem' }}>Valor do Pagamento</Label>
+                  {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}></Label>) : (<></>)}
+                  <Label className='flex items-center font-bold' style={{ 'fontSize': '0.7rem' }}>{moment.utc(boleto.dataVencimento).format('DD/MM/YYYY')}</Label>
+                  <Label className='flex justify-end items-center font-bold' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(boleto.valorOriginal)}</Label>
+                </div>
+              </div>
+
+            ) : (
+              <p className="text-center text-muted-foreground">
+                Nenhum lançamento para esse pagamento nesse período.
+              </p>
+            ))
+          }
           </CardContent>
           <CardFooter>
             {boleto?.status !== BoletoStatus.PAGO && (

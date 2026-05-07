@@ -53,7 +53,7 @@ export function NavMain({
               <SidebarMenuButton className={isMobile ? "py-5" : "py-3"} asChild tooltip={item.title} onClick={()=>{handlerNavItemClick(item.url)}}>
                 <Link to={item.url}>
                   <item.icon />
-                  <span style={{ "fontSize": isMobile ? ".80rem" : "0.80rem" }}>{item.title}</span>
+                  <span style={{ "fontSize": isMobile ? "0.70rem" : "0.70rem" }}>{item.title}</span>
                 </Link>
               </SidebarMenuButton>
               {item.items?.length ? (

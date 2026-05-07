@@ -795,13 +795,30 @@ export default function ListarBoletos({
                 {boletos.map((boleto) => (
                   <Card key={boleto.id} className="">
                     <CardHeader className="flex flex-row justify-between">
-
                       <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
-                        <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
-                          {boleto.locatario ? boleto.locatario.pessoa?.nome : ''} -
-                          {boleto.locacao?.imovel?.endereco.complemento} -
-                          {boleto.locacao?.imovel?.condominio ? boleto.locacao.imovel.condominio.name : ''}
-                        </p>
+                        <div className='grid grid-cols-2'>
+                          {(boleto.locacao !== null ? (
+                            <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                              {boleto.locatario ? boleto.locatario.pessoa?.nome : ''} -
+                              {boleto.locacao?.imovel?.endereco.complemento} -
+                              {boleto.locacao?.imovel?.condominio ? boleto.locacao.imovel.condominio.name : ''}
+                            </p>)
+                            :
+                            (<p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                              {boleto.imovel && boleto.imovel.proprietarios && boleto.imovel.proprietarios.length > 0 ? boleto.imovel.proprietarios[0]?.pessoa?.nome : ''} -
+                              {boleto.imovel?.endereco.complemento} -
+                              {boleto.imovel?.condominio ? boleto.imovel.condominio.name : ''}
+                            </p>)
+                          )}
+
+                          <div className='flex justify-end'>
+                            <Badge
+                              variant="secondary"
+                              className='mt-2 bg-blue-50 text-blue-800'>
+                              {boleto.locacao !== null ? 'LOCAÇÃO' : 'IMÓVEL'}
+                            </Badge>
+                          </div>
+                        </div>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -827,61 +844,119 @@ export default function ListarBoletos({
                       <Label className="font-bold flex justify-start mt-2">
                         Situação :  {boleto.status}
                       </Label>
-                      {(boleto.lanctoLocacao && boleto.lanctoLocacao?.length > 0) ? (
-                        <>
-                          <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
-                          <div className='rounded-md border'>
-                            <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
-                              <Label className='col-span-2' style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
-                              {!isMobile ? (
-                                <Label style={{ 'fontSize': '0.7rem' }}>Emissão</Label>)
-                                : (<></>)
-                              }
-                              <Label style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
-                              <Label className={!isMobile ? 'flex justify-end' : 'flex justify-end col-span-2'} style={{ 'fontSize': '0.7rem' }}>Valor</Label>
+                      {(boleto.locacao !== null ?
+                        (boleto.lanctoLocacao && boleto.lanctoLocacao?.length > 0) ? (
+                          <>
+                            <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
+                            <div className='rounded-md border'>
+                              <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
+                                <Label className='col-span-2' style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
+                                {!isMobile ? (
+                                  <Label style={{ 'fontSize': '0.7rem' }}>Emissão</Label>)
+                                  : (<></>)
+                                }
+                                <Label style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
+                                <Label className={!isMobile ? 'flex justify-end' : 'flex justify-end col-span-2'} style={{ 'fontSize': '0.7rem' }}>Valor</Label>
+                              </div>
+
+                              <div className='grid grid-cols-5 m-2 gap-1' >
+                                {boleto.lanctoLocacao?.map((lancamento) => (
+                                  <>
+                                    <Label className={boleto.status === BoletoStatus.PENDENTE ? 'col-span-2 text-green-600' : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
+                                    {!isMobile ? (<Label className={boleto.status === BoletoStatus.PENDENTE ? 'text-green-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
+                                      : (<></>)
+                                    }
+                                    <Label className={boleto.status === BoletoStatus.PENDENTE ? (!isMobile ? 'text-green-600' : 'text-green-600 col-span-2') : (!isMobile ? '' : 'col-span-2')} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
+                                    <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
+                                  </>
+                                ))}
+                              </div>
+                            </div>
+                            <div className='grid grid-cols-2 font-[Poppins-bold] mt-5 '>
+                              <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-start text-green-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total </Label>
+                              <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
+                                {usdFormatter.format((boleto.locacao ? boleto.locacao.valorAluguel : 0) +
+                                  boleto.lanctoLocacao.reduce((total, lancamento) => {
+                                    return total + lancamento.valorLancamento;
+                                  }, 0))}
+                              </Label>
+                            </div>
+                            <div className='flex justify-end'>
+                              <Badge
+                                variant="secondary"
+                                className={cn('mt-2 text-xs', {
+                                  'bg-green-50 text-green-800': boleto.status === BoletoStatus.PENDENTE,
+                                  'bg-red-50 text-red-800': boleto.status === BoletoStatus.ATRASADO,
+                                  'bg-blue-50 text-blue-800': boleto.status === BoletoStatus.PAGO
+                                })}
+                              >
+                                {boleto.status}
+                              </Badge>
                             </div>
 
-                            <div className='grid grid-cols-5 m-2 gap-1' >
-                              {boleto.lanctoLocacao?.map((lancamento) => (
-                                <>
-                                  <Label className={boleto.status === BoletoStatus.PENDENTE ? 'col-span-2 text-green-600' : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
-                                  {!isMobile ? (<Label className={boleto.status === BoletoStatus.PENDENTE ? 'text-green-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
-                                    : (<></>)
-                                  }
-                                  <Label className={boleto.status === BoletoStatus.PENDENTE ? (!isMobile ? 'text-green-600' : 'text-green-600 col-span-2') : (!isMobile ? '' : 'col-span-2')} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
-                                  <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
-                                </>
-                              ))}
-                            </div>
-                          </div>
-                          <div className='grid grid-cols-2 font-[Poppins-bold] mt-5 '>
-                            <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-start text-green-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total </Label>
-                            <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
-                              {usdFormatter.format((boleto.locacao ? boleto.locacao.valorAluguel : 0) +
-                                boleto.lanctoLocacao.reduce((total, lancamento) => {
-                                  return total + lancamento.valorLancamento;
-                                }, 0))}
-                            </Label>
-                          </div>
-                          <div className='flex justify-end'>
-                            <Badge
-                              variant="secondary"
-                              className={cn('mt-2 text-xs', {
-                                'bg-green-50 text-green-800': boleto.status === BoletoStatus.PENDENTE,
-                                'bg-red-50 text-red-800': boleto.status === BoletoStatus.ATRASADO,
-                                'bg-blue-50 text-blue-800': boleto.status === BoletoStatus.PAGO
-                              })}
-                            >
-                              {boleto.status}
-                            </Badge>
-                          </div>
-
-                        </>
-                      )
-                        : (<p className="text-center text-muted-foreground mt-5">
-                          Não há lançamentos para esse boleto
-                        </p>
+                          </>
                         )
+                          : (<p className="text-center text-muted-foreground mt-5">
+                            Não há lançamentos para esse boleto
+                          </p>
+                          )
+                        :
+                        (boleto.lancamentoImovels && boleto.lancamentoImovels?.length > 0) ? (
+                          <>
+                            <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
+                            <div className='rounded-md border'>
+                              <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
+                                <Label className='col-span-2' style={{ 'fontSize': '0.7rem' }}>Descrição</Label>
+                                {!isMobile ? (
+                                  <Label style={{ 'fontSize': '0.7rem' }}>Emissão</Label>)
+                                  : (<></>)
+                                }
+                                <Label style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
+                                <Label className={!isMobile ? 'flex justify-end' : 'flex justify-end col-span-2'} style={{ 'fontSize': '0.7rem' }}>Valor</Label>
+                              </div>
+
+                              <div className='grid grid-cols-5 m-2 gap-1' >
+                                {boleto.lancamentoImovels?.map((lancamento) => (
+                                  <>
+                                    <Label className={boleto.status === BoletoStatus.PENDENTE ? 'col-span-2 text-green-600' : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
+                                    {!isMobile ? (<Label className={boleto.status === BoletoStatus.PENDENTE ? 'text-green-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
+                                      : (<></>)
+                                    }
+                                    <Label className={boleto.status === BoletoStatus.PENDENTE ? (!isMobile ? 'text-green-600' : 'text-green-600 col-span-2') : (!isMobile ? '' : 'col-span-2')} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
+                                    <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
+                                  </>
+                                ))}
+                              </div>
+                            </div>
+                            <div className='grid grid-cols-2 font-[Poppins-bold] mt-5 '>
+                              <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-start text-green-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total </Label>
+                              <Label className={boleto.status === BoletoStatus.PENDENTE ? 'flex justify-end text-green-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
+                                {usdFormatter.format(
+                                  boleto.lancamentoImovels.reduce((total, lancamento) => {
+                                    return total + lancamento.valorLancamento;
+                                  }, 0))}
+                              </Label>
+                            </div>
+                            <div className='flex justify-end'>
+                              <Badge
+                                variant="secondary"
+                                className={cn('mt-2 text-xs', {
+                                  'bg-green-50 text-green-800': boleto.status === BoletoStatus.PENDENTE,
+                                  'bg-red-50 text-red-800': boleto.status === BoletoStatus.ATRASADO,
+                                  'bg-blue-50 text-blue-800': boleto.status === BoletoStatus.PAGO
+                                })}
+                              >
+                                {boleto.status}
+                              </Badge>
+                            </div>
+
+                          </>
+                        )
+                          : (<p className="text-center text-muted-foreground mt-5">
+                            Não há lançamentos para esse boleto
+                          </p>
+                          )
+                      )
                       }
                     </CardContent>
                     <CardFooter className="flex justify-between">
@@ -932,7 +1007,7 @@ export default function ListarBoletos({
                 <table className="w-full table-fixed">
                   <thead className="sticky top-0">
                     <tr>
-                      <th className="border-b p-2 text-left">Locação</th>
+                      <th className="border-b p-2 text-left">Locação/Imóvel</th>
                       <th className="border-b p-2 text-left">Vencimento</th>
                       <th className="border-b p-2 text-left">Valor</th>
                       <th className="border-b p-2 text-left">Situacao</th>
@@ -945,11 +1020,20 @@ export default function ListarBoletos({
                     <tbody>
                       {boletos?.map((boleto) => (
                         <tr key={boleto.id} className="hover:bg-gray-300">
-                          <td className={boleto.status === BoletoStatus.ATRASADO ? "border-b p-2 text-red-600" : "border-b p-2"}>
-                            {boleto.locatario ? boleto.locatario.pessoa?.nome : ''} -
-                            {boleto.locacao?.imovel?.endereco.complemento} -
-                            {boleto.locacao?.imovel?.condominio ? boleto.locacao.imovel.condominio.name : ''}
-                          </td>
+                          {(boleto.locacao !== null ? (
+                            <td className={boleto.status === BoletoStatus.ATRASADO ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                              {boleto.locatario ? boleto.locatario.pessoa?.nome : ''} -
+                              {boleto.locacao?.imovel?.endereco.complemento} -
+                              {boleto.locacao?.imovel?.condominio ? boleto.locacao.imovel.condominio.name : ''}
+                            </td>
+                          )
+                            :
+                            (<td className={boleto.status === BoletoStatus.ATRASADO ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                              {boleto.imovel && boleto.imovel.proprietarios && boleto.imovel.proprietarios.length > 0 ? boleto.imovel.proprietarios[0]?.pessoa?.nome : ''} -
+                              {boleto.imovel?.endereco.complemento} -
+                              {boleto.imovel?.condominio ? boleto.imovel.condominio.name : ''}
+                            </td>)
+                          )}
                           <td className={boleto.status === BoletoStatus.ATRASADO ? "border-b p-2 text-red-600" : "border-b p-2"}>
                             <div>
                               {moment.utc(boleto.dataVencimento).format("DD/MM/YYYY")}

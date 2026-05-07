@@ -25,11 +25,6 @@ export enum ROUTE {
   CONDOMINIOS_CRIAR = '/condominios/criar',
   CONDOMINIOS_DETALHES = '/condominios/:id',
 
-  // Lancamentos Condomínios routes
-  LANCAMENTOS_CONDOMINIOS = '/lancamentosCondominios',
-  LANCAMENTOS_CONDOMINIOS_CRIAR = '/lancamentosCondominios/criar',
-  LANCAMENTOS_CONDOMINIOS_DETALHES = '/lancamentosCondominios/:id',
-
   // Blocos routes
   BLOCOS = '/blocos',
   BLOCOS_CRIAR = '/blocos/criar',
@@ -44,6 +39,16 @@ export enum ROUTE {
   LOCACOES = '/locacoes',
   LOCACOES_CRIAR = '/locacoes/criar',
   LOCACOES_DETALHES = '/locacoes/:id',
+
+  // Lancamentos Condomínios routes
+  LANCAMENTOS_CONDOMINIOS = '/lancamentosCondominios',
+  LANCAMENTOS_CONDOMINIOS_CRIAR = '/lancamentosCondominios/criar',
+  LANCAMENTOS_CONDOMINIOS_DETALHES = '/lancamentosCondominios/:id',
+
+  // Lancamentos Imóveis routes
+  LANCAMENTOS_IMOVEIS = '/lancamentosImoveis',
+  LANCAMENTOS_IMOVEIS_CRIAR = '/lancamentosImoveis/criar',
+  LANCAMENTOS_IMOVEIS_DETALHES = '/lancamentosImoveis/:id',
 
   // Lancamentos Locações routes
   LANCAMENTOS = '/lancamentos',

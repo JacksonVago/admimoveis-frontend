@@ -7,6 +7,7 @@ import { TipoImovel } from './tipoimovel'
 import { Empresa } from './empresa'
 import { Condominio } from './condominio'
 import { Bloco } from './bloco'
+import { LancamentoImovel } from './lancamentoimovel'
 
 export interface Imovel {
   id: number;
@@ -42,6 +43,7 @@ export interface Imovel {
   locacoes?: Locacao[];
   proprietarios?: Proprietario[];
   imovelPhotos?: ImovelPhotos[];
+  lancamentos?: LancamentoImovel[];
 }
 
 export interface ImovelPhotos {

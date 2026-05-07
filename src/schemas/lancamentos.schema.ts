@@ -44,3 +44,25 @@ export const lancCondominioSchema = z.object({
 });
 
 export type LancamentoCondominioSchema = z.infer<typeof lancCondominioSchema>
+
+export const lancamentoImovelSchema = z.object({
+  id: z.coerce.number(),
+  dataLancamento: z.string().transform((val) => {
+    const data: string = val;
+    return moment(data.substring(0, 10)).format("YYYY-MM-DD");
+  }),
+  vencimentoLancamento: z.string().transform((val) => {
+    const data: string = val;
+    return moment(data.substring(0, 10)).format("YYYY-MM-DD");
+  }),
+  valorLancamento: z.coerce.number().min(1, 'Valor do lançamento é obrigatório'),
+  parcela: z.coerce.number().optional(),
+  linhaDigitavel: z.string().optional(),
+  observacao: z.string().optional(),
+  status: z.enum(Object.values(LancamentoStatus) as [string, ...string[]]),
+  tipoId: z.coerce.number().optional(),
+  imovelId: z.coerce.number().min(1, 'Imóvel é obrigatório'),
+});
+
+export type LancamentoImovelSchema = z.infer<typeof lancamentoImovelSchema>
+

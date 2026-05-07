@@ -50,6 +50,8 @@ import ListarLancamentosCondominios from '@/pages/main/lancamentoscondominio'
 import { DetalhesLancamentoCondominio } from '@/pages/main/lancamentoscondominio/detalhes'
 import { CircleArrowLeft } from 'lucide-react'
 import { Home } from '@/pages/main/home'
+import ListarLancamentosImoveis from '@/pages/main/lancamentosimoveis'
+import { DetalhesLancamentoImovel } from '@/pages/main/lancamentosimoveis/detalhes'
 
 export interface ProtectedRouteProps {
   permission: Permission
@@ -278,6 +280,24 @@ export const RoutesComponent = () => {
             element={
               <ProtectedRoute permission="VIEW_LOCACOES">
                 <DetalhesLocacao />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Lançamentos Imóveis */}
+          <Route
+            path={ROUTE.LANCAMENTOS_IMOVEIS}
+            element={
+              <ProtectedRoute permission="VIEW_LANCAMENTOS_IMOVEIS">
+                <ListarLancamentosImoveis exclude='' limitView={3} onSelectLancamento={undefined} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.LANCAMENTOS_IMOVEIS_DETALHES}
+            element={
+              <ProtectedRoute permission="VIEW_LANCAMENTOS_IMOVEIS">
+                <DetalhesLancamentoImovel />
               </ProtectedRoute>
             }
           />

@@ -74,6 +74,10 @@ export type Permission =
   | 'UPDATE_MORADOR'
   | 'DELETE_MORADOR'
   | 'VIEW_MORADORES'
+  | 'CREATE_LANCAMENTO_IMOVEL'
+  | 'UPDATE_LANCAMENTO_IMOVEL'
+  | 'DELETE_LANCAMENTO_IMOVEL'
+  | 'VIEW_LANCAMENTOS_IMOVEIS'
 
 
 export const userPermissions: {
@@ -138,7 +142,10 @@ export const userPermissions: {
   UPDATE_MORADOR: 'Atualizar morador',
   DELETE_MORADOR: 'Deletar morador',
   VIEW_MORADORES: 'Visualizar moradores',
-
+  CREATE_LANCAMENTO_IMOVEL: 'Criar lançamento imóvel',
+  UPDATE_LANCAMENTO_IMOVEL: 'Atualizar lançamento imóvel',
+  DELETE_LANCAMENTO_IMOVEL: 'Deletar lançamento imóvel',
+  VIEW_LANCAMENTOS_IMOVEIS: 'Visualizar lançamentos imóveis'
 }
 
 export enum UserRole {

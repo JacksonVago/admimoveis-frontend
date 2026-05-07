@@ -62,7 +62,12 @@ const data = {
       icon: KeyRound
     },
     {
-      title: 'Lancamentos',
+      title: 'Lancamentos Imóveis',
+      url: ROUTE.LANCAMENTOS_IMOVEIS,
+      icon: Banknote
+    },
+    {
+      title: 'Lancamentos Locações',
       url: ROUTE.LANCAMENTOS,
       icon: Banknote
     },
@@ -138,6 +143,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         return true
       }
       if (item.url === ROUTE.LANCAMENTOS_CONDOMINIOS && user?.permissions.includes('VIEW_LANCAMENTOS_CONDOMINIOS')) {
+        return true
+      }
+      if (item.url === ROUTE.LANCAMENTOS_IMOVEIS && user?.permissions.includes('VIEW_LANCAMENTOS_IMOVEIS')) {
         return true
       }
       return false

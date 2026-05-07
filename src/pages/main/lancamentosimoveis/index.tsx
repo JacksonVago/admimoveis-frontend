@@ -20,7 +20,6 @@ import { useGlobalParams } from '@/globals/GlobalParams'
 import { generatePaginationLinks } from '@/components/ui/generate-pages'
 import { LancamentoStatus } from '@/enums/locacao/enums-locacao'
 import { getEnderecoFormatado, getEnderecoFormatMaps } from '@/helpers/get-endereco-formatado'
-import { Locacao, LocacaoStatus } from '@/interfaces/locacao'
 import { Endereco } from '@/interfaces/endereco'
 import { Label } from '@/components/ui/label'
 import moment from 'moment'
@@ -30,7 +29,17 @@ import { usdFormatter } from '@/utils/format-money'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
-import { LancamentoLocacao } from '@/interfaces/lancamentos'
+import { Imovel } from '@/interfaces/imovel'
+import { LancamentoImovel } from '@/interfaces/lancamentoimovel'
+import { Proprietario } from '@/interfaces/proprietario'
+
+interface boletoImovel {
+  empresaId: number;
+  imovelId: number;
+  dataVencimento: Date;
+  lancamentos: LancamentoImovel[];
+  proprietarios: Proprietario[]
+}
 
 // Types
 interface GetLancamentosParams {
@@ -45,7 +54,7 @@ interface GetLancamentosParams {
 
 // API & Query Logic
 export const getLancamentos = async (empresaId: number, { page, limit, search, status, exclude, dataInicial, dataFinal }: GetLancamentosParams) => {
-  return await api.get<BasePaginationData<Locacao>>('lancamentos/' + empresaId.toString(), {
+  return await api.get<BasePaginationData<Imovel>>('lancamentosimoveis/' + empresaId.toString(), {
     params: {
       page,
       limit,
@@ -82,14 +91,14 @@ export const useGetLancamentosQueryOptions = (empresaId: number, {
   })
 }
 //lancamentos
-export default function ListarLancamentos({
+export default function ListarLancamentosImoveis({
   limitView,
   exclude,
   onSelectLancamento
 }: {
   limitView: number
   exclude: string
-  onSelectLancamento: ((lancamento: LancamentoLocacao) => void) | undefined
+  onSelectLancamento: ((lancamento: LancamentoImovel) => void) | undefined
 }) {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
@@ -127,14 +136,14 @@ export default function ListarLancamentos({
     })
   )
 
-  const locacoes = data?.data?.data || []
+  const imoveis = data?.data?.data || []
   const totalPages = data?.data?.totalPages
 
-  console.log(locacoes);
+  console.log(imoveis);
 
   const gerarBoleto = useMutation({
-    mutationFn: async (locacao: Locacao) => {
-      return await api.post('/lancamentos/gerar-boleto', locacao)
+    mutationFn: async (boleto: boletoImovel) => {
+      return await api.post('/lancamentosimoveis/gerar-boleto', boleto)
     },
     onSuccess: () => {
       ['lancamentos'].forEach((key) => {
@@ -156,7 +165,7 @@ export default function ListarLancamentos({
 
   useEffect(() => {
     if (!onSelectLancamento) {
-      glb_params.updTitle_form('Lançamentos de Locações');
+      glb_params.updTitle_form('Lançamentos de Imóveis');
     }
     if (totalPages && page > totalPages) {
       navigate({
@@ -193,10 +202,10 @@ export default function ListarLancamentos({
   }
 
   const handleClickVerDetalhes = (id: number) => {
-    navigate(`${ROUTE.LANCAMENTOS}/${id}?dataInicial=${dataInicial}&dataFinal=${dataFinal}`)
+    navigate(`${ROUTE.LANCAMENTOS_IMOVEIS}/${id}?dataInicial=${dataInicial}&dataFinal=${dataFinal}`)
   }
   // UI Logic
-  const hasSearchResults = Boolean(!isLoading && search && locacoes?.length === 0)
+  const hasSearchResults = Boolean(!isLoading && search && imoveis?.length === 0)
 
   const googleMaps = "https://www.google.com/maps/place/";
   const handlerClickMaps = (endereco: Endereco | undefined) => {
@@ -206,9 +215,16 @@ export default function ListarLancamentos({
     }
   }
 
-  const handleGerarBoleto = async (locacao: Locacao) => {
+  const handleGerarBoleto = async (imovel: Imovel) => {
     try {
-      gerarBoleto.mutateAsync(locacao);
+      const boletoImovel: boletoImovel = {
+        empresaId: glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,
+        imovelId: imovel.id,
+        dataVencimento: imovel.lancamentos && imovel.lancamentos.length > 0 ? new Date(imovel.lancamentos[0].vencimentoLancamento) : new Date(),
+        lancamentos: imovel.lancamentos ? imovel.lancamentos : [],
+        proprietarios: imovel.proprietarios ? imovel.proprietarios : []
+      }
+      gerarBoleto.mutateAsync(boletoImovel);
     } catch (error) {
       toast({ title: 'Erro ao gerar boleto.', variant: 'destructive' });
     }
@@ -220,7 +236,7 @@ export default function ListarLancamentos({
       {/* <div className="grid grid-cols-2 flex flex-col justify-end items-start gap-4 sm:flex-row sm:items-center"> */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {glb_params.origin_url.indexOf('lista') > -1 && (
-          <h1 className="text-2xl font-bold">Lançamentos de Locações</h1>
+          <h1 className="text-2xl font-bold">Lançamentos de Imóveis</h1>
         )}
       </div>
       <div className='grid grid-cols-3'>
@@ -296,27 +312,27 @@ export default function ListarLancamentos({
             showcard ?
               (
                 <>
-                  {locacoes.map((locacao) => (
-                    <Card key={locacao.id} className="">
+                  {imoveis.map((imovel) => (
+                    <Card key={imovel.id} className="">
                       <CardHeader className="flex flex-row justify-between">
                         <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
                           <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
                             <MapPin className="inline-block h-4 w-4 cursor-pointer"
-                              onClick={() => { handlerClickMaps(locacao.imovel?.endereco) }}
+                              onClick={() => { handlerClickMaps(imovel.endereco) }}
                               color='green'
                             />
-                            {(locacao.locatarios && locacao.locatarios.length > 0 && locacao.locatarios[0].pessoa) ? locacao.locatarios[0].pessoa.nome + ' - ' : ''}
-                            {getEnderecoFormatado(locacao.imovel?.endereco)}
-                            {locacao.imovel?.endereco?.complemento ? ' - ' + locacao.imovel.endereco.complemento : ''}
+                            {(imovel.proprietarios && imovel.proprietarios.length > 0 && imovel.proprietarios[0].pessoa) ? imovel.proprietarios[0].pessoa.nome + ' - ' : ''}
+                            {getEnderecoFormatado(imovel.endereco)} - 
+                            {imovel.endereco?.complemento ? ' ' + imovel.endereco.complemento : ''}
                           </p>
 
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <Label className="font-bold flex justify-end">
-                          Aluguel R$ {locacao.valorAluguel?.toLocaleString('pt-BR')}
+                          Aluguel R$ {imovel.valorAluguel?.toLocaleString('pt-BR')}
                         </Label>
-                        {(locacao.lancamentos && locacao.lancamentos?.length > 0) ? (
+                        {(imovel.lancamentos && imovel.lancamentos?.length > 0) ? (
                           <>
                             <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
                             <div className='rounded-md border'>
@@ -331,7 +347,7 @@ export default function ListarLancamentos({
                               </div>
 
                               <div className='grid grid-cols-5 m-2 gap-1' >
-                                {locacao.lancamentos?.map((lancamento) => (
+                                {imovel.lancamentos?.map((lancamento) => (
                                   <>
                                     <Label className={lancamento.status === LancamentoStatus.ABERTO ? 'col-span-2 text-red-600' : 'col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
                                     {!isMobile ? (<Label className={lancamento.status === LancamentoStatus.ABERTO ? 'text-red-600' : ''} style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>)
@@ -344,10 +360,11 @@ export default function ListarLancamentos({
                               </div>
                             </div>
                             <div className='grid grid-cols-2 font-[Poppins-bold] mt-5 '>
-                              <Label className={locacao.lancamentos && locacao.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-start text-red-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total</Label>
-                              <Label className={locacao.lancamentos && locacao.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-end text-red-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
-                                {usdFormatter.format(locacao.valorAluguel +
-                                  locacao.lancamentos.reduce((total, lancamento) => {
+                              <Label className={imovel.lancamentos && imovel.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-start text-red-600' : 'flex justify-start'} style={{ 'fontSize': '0.7rem' }}>Total</Label>
+                              <Label className={imovel.lancamentos && imovel.lancamentos[0].status === LancamentoStatus.ABERTO ? 'flex justify-end text-red-600' : 'flex justify-end'} style={{ 'fontSize': '0.7rem' }}>
+                                {usdFormatter.format(
+                                  (imovel.valorAluguel ? imovel.valorAluguel : 0) +
+                                  imovel.lancamentos.reduce((total, lancamento) => {
                                     return total + lancamento.valorLancamento;
                                   }, 0))}
                               </Label>
@@ -367,7 +384,7 @@ export default function ListarLancamentos({
                             user?.permissions.includes("UPDATE_LANCAMENTO"))) && (
 
                               <Button variant="secondary"
-                                onClick={() => handleClickVerDetalhes(locacao?.id)}
+                                onClick={() => handleClickVerDetalhes(imovel?.id)}
                                 size={"sm"}>
                                 <Pencil className='h4 w4' /> Lançamentos
                               </Button>
@@ -375,13 +392,7 @@ export default function ListarLancamentos({
                           {((isAdmin ||
                             user?.permissions.includes("ALL") ||
                             user?.permissions.includes("CREATE_PAGAMENTO")) &&
-                            (locacao.lancamentos && locacao.lancamentos?.length > 0 && locacao.lancamentos[0].status === LancamentoStatus.ABERTO)) && (
-                              /*<Button variant="secondary"
-                                onClick={() => handleGerarBoleto(locacao)}
-                                size={"sm"}>
-                                <Receipt className="h-4 w-4" />Gerar Boleto
-                              </Button>*/
-
+                            (imovel.lancamentos && imovel.lancamentos?.length > 0 && imovel.lancamentos[0].status === LancamentoStatus.ABERTO)) && (
                               <>
                                 <AlertDialog>
                                   <AlertDialogTrigger asChild>
@@ -402,7 +413,7 @@ export default function ListarLancamentos({
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                      <AlertDialogAction onClick={() => handleGerarBoleto(locacao)}>
+                                      <AlertDialogAction onClick={() => handleGerarBoleto(imovel)}>
                                         'Sim, confirmar boleto.'
                                       </AlertDialogAction>
                                     </AlertDialogFooter>
@@ -423,7 +434,7 @@ export default function ListarLancamentos({
                   <table className="w-full table-fixed">
                     <thead className="sticky top-0">
                       <tr>
-                        <th className="border-b p-2 text-left">Locacao</th>
+                        <th className="border-b p-2 text-left">Imóvel</th>
                         <th className="border-b p-2 text-left">Telefone</th>
                         <th className="border-b p-2 text-left">Documento</th>
                         <th className="border-b p-2 text-left">Email</th>
@@ -434,30 +445,30 @@ export default function ListarLancamentos({
                   <div className='h-[500px] flex-1 overflow-y-auto'>
                     <table className='w-full table-fixed'>
                       <tbody>
-                        {locacoes?.map((locacao) => (
-                          <tr key={locacao.id} className="hover:bg-gray-300">
-                            <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
-                              {(locacao.locatarios && locacao.locatarios.length > 0 ? (locacao.locatarios[0].pessoa ? locacao.locatarios[0].pessoa.nome : 'Sem locatário') : 'Sem locatário')
-                              + ' - ' + (locacao.imovel?.endereco ? getEnderecoFormatado(locacao.imovel.endereco) : 'Sem endereço')}
+                        {imoveis?.map((imovel) => (
+                          <tr key={imovel.id} className="hover:bg-gray-300">
+                            <td className="border-b p-2">
+                              {(imovel.proprietarios && imovel.proprietarios.length > 0 ? (imovel.proprietarios[0].pessoa ? imovel.proprietarios[0].pessoa.nome : 'Sem locatário') : 'Sem locatário')
+                              + ' - ' + (imovel.endereco ? getEnderecoFormatado(imovel.endereco) : 'Sem endereço')}
                             </td>
-                            <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
-                              {locacao.locatarios && locacao.locatarios.length > 0 ? (locacao.locatarios[0].pessoa ? locacao.locatarios[0].pessoa.telefone : 'Sem telefone') : 'Sem telefone'}
+                            <td className="border-b p-2">
+                              {imovel.proprietarios && imovel.proprietarios.length > 0 ? (imovel.proprietarios[0].pessoa ? imovel.proprietarios[0].pessoa.telefone : 'Sem telefone') : 'Sem telefone'}
                             </td>
-                            <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                            <td className="border-b p-2">
                               <div>
-                                {locacao.locatarios && locacao.locatarios.length > 0 ? (locacao.locatarios[0].pessoa ? locacao.locatarios[0].pessoa.documento : 'Sem documento') : 'Sem documento'}
+                                {imovel.proprietarios && imovel.proprietarios.length > 0 ? (imovel.proprietarios[0].pessoa ? imovel.proprietarios[0].pessoa.documento : 'Sem documento') : 'Sem documento'}
                               </div>
                             </td>
-                            <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                            <td className="border-b p-2">
                               <div>
-                                {locacao.locatarios && locacao.locatarios.length > 0 ? (locacao.locatarios[0].pessoa ? locacao.locatarios[0].pessoa.email : 'Sem email') : 'Sem email'}
+                                {imovel.proprietarios && imovel.proprietarios.length > 0 ? (imovel.proprietarios[0].pessoa ? imovel.proprietarios[0].pessoa.email : 'Sem email') : 'Sem email'}
                               </div>
                             </td>
                             <td className="border-b p-2">
                               <div className="flex justify-end gap-2">
                                 <Button
                                   size="sm"
-                                  onClick={() =>{handleClickVerDetalhes(locacao.id)}}
+                                  onClick={() =>{handleClickVerDetalhes(imovel.id)}}
                                   className='hover:cursor-pointer hover:bg-gray-700'
                                 >
                                   Ver detalhes
