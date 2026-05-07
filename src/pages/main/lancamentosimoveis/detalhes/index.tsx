@@ -369,7 +369,7 @@ export const DetalhesLancamentoImovel = () => {
         <Card className='font-[Poppins-regular]'>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <Label className="ml-1 mb-4 mt-8 font-bold">{(imovel?.proprietarios ? imovel?.proprietarios[0].pessoa?.nome + ' - ' : '') + getEnderecoFormatado(imovel?.endereco)}</Label>
+              <Label className="ml-1 mb-4 mt-8 font-bold">{(imovel?.proprietarios && imovel?.proprietarios.length > 0 ? imovel?.proprietarios[0].pessoa?.nome + ' - ' : '') + getEnderecoFormatado(imovel?.endereco)}</Label>
               <Dialog
                 open={isCreateDialogOpen}
                 onOpenChange={(value) => {

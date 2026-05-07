@@ -121,7 +121,7 @@ export const Home = () => {
               .reduce(
                 (acc: LocacaoGroup, locacao) => {
                   acc.qtde += 1;
-                  acc.total += locacao.valorAluguel;
+                  acc.total += locacao.valorAluguel + (locacao.lancamentos ? locacao.lancamentos.reduce((total, lancamento) => total + lancamento.valorLancamento, 0) : 0);
                   acc.locacoes.push(locacao);
                   arr_chk.push({ id: locacao.id, checked: false });
                   return acc;
@@ -133,7 +133,7 @@ export const Home = () => {
               .reduce(
                 (acc: LocacaoGroup, locacao) => {
                   acc.qtde += 1;
-                  acc.total += locacao.valorAluguel;
+                  acc.total += locacao.valorAluguel + (locacao.lancamentos ? locacao.lancamentos.reduce((total, lancamento) => total + lancamento.valorLancamento, 0) : 0);
                   acc.locacoes.push(locacao);
                   arr_chk.push({ id: locacao.id, checked: false });
                   return acc;

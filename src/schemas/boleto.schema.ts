@@ -59,7 +59,7 @@ export const boletoSchema = z.object({
       }
     )
   ).optional(),
-  empresaId: z.number().min(1, 'Empresa é obrigatória'),
+  empresaId: z.coerce.number().min(1, 'Empresa é obrigatória'),
 });
 
 export type BoletoSchema = z.infer<typeof boletoSchema>
