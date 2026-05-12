@@ -475,6 +475,7 @@ export default function DetalhesLocacao() {
     defaultValues: defaultValuesLan,
     mode: 'all'
   });
+  
   const moradorLocacao = useForm<MoradorLocacaoSchema>({
     resolver: zodResolver(moradorLocacaoSchema),
   });

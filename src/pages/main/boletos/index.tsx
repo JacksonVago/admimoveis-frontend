@@ -342,8 +342,12 @@ export default function ListarBoletos({
       boletoMethods.setValue('locatarioId', locacao.fields[0].locatarioId);
     }
 
-    formData.append('locacaoId', data.locacaoId.toString());
-    formData.append('locatarioId', data.locatarioId.toString());
+    if (data.locacaoId) {
+      formData.append('locacaoId', data.locacaoId.toString());
+    }
+    if (data.locatarioId) {
+      formData.append('locatarioId', data.locatarioId.toString());
+    }
     formData.append('status', data.status);
     formData.append('dataEmissao', moment(data.dataEmissao).format('YYYY-MM-DD'));
     formData.append('dataVencimento', moment(data.dataVencimento).format('YYYY-MM-DD'));

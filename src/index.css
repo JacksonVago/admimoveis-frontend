@@ -267,3 +267,18 @@ button {
   }
 }
 
+/*scrool tabs*/
+
+.react-tabs__tab-list {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+}
+
+/* Optional: Hide scrollbar for a cleaner look */
+.react-tabs__tab-list::-webkit-scrollbar {
+  display: none;
+}

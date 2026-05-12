@@ -318,7 +318,9 @@ export const DetalhesLancamentoCondominio = () => {
 
   const handleChangeTipo = (value: string) => {
     let tipo = tipolancamento?.data.find(tipo => tipo.id === Number(value));
-    lancamentoMethods.setValue('valorLancamento', Number(tipo?.valorFixo));
+    if (lancamentoMethods.getValues('linhaDigitavel')?.length === 0) {
+      lancamentoMethods.setValue('valorLancamento', Number(tipo?.valorFixo));
+    }
   }
 
   const handlerValidaLinhaDig = (value: string) => {

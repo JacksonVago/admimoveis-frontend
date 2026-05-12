@@ -103,7 +103,7 @@ export default function ListarLancamentosImoveis({
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
 
-  const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
+  const isBigScreen = useMediaQuery({ query: '(min-width: 1424px)' })
   const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
   const isMobile = useMediaQuery({ query: '(max-width: 420px)' })
@@ -293,7 +293,15 @@ export default function ListarLancamentosImoveis({
       </div>
 
       {/* lancamentos Grid */}
-      <div className={limit === 1 ? "grid gap-6 grid-cols-1" : "grid gap-6 sm:grid-cols-1 lg:grid-cols-3"}>
+      {/*<div className={limit === 1 ? "grid gap-6 grid-cols-1" : "grid gap-6 sm:grid-cols-1 lg:grid-cols-3"}>*/}
+      <div className=
+        {(isBigScreen
+          ? "grid grid-cols-3 gap-6"
+          : isPortrait
+            ? "grid grid-cols-2 gap-6"
+            : "grid grid-cols-1 gap-6"
+        )}>
+
         {/* Search Results & No Results Message */}
         {hasSearchResults && (
           <p className="text-center text-muted-foreground">
@@ -322,7 +330,7 @@ export default function ListarLancamentosImoveis({
                               color='green'
                             />
                             {(imovel.proprietarios && imovel.proprietarios.length > 0 && imovel.proprietarios[0].pessoa) ? imovel.proprietarios[0].pessoa.nome + ' - ' : ''}
-                            {getEnderecoFormatado(imovel.endereco)} - 
+                            {getEnderecoFormatado(imovel.endereco)} -
                             {imovel.endereco?.complemento ? ' ' + imovel.endereco.complemento : ''}
                           </p>
 
@@ -449,7 +457,7 @@ export default function ListarLancamentosImoveis({
                           <tr key={imovel.id} className="hover:bg-gray-300">
                             <td className="border-b p-2">
                               {(imovel.proprietarios && imovel.proprietarios.length > 0 ? (imovel.proprietarios[0].pessoa ? imovel.proprietarios[0].pessoa.nome : 'Sem locatário') : 'Sem locatário')
-                              + ' - ' + (imovel.endereco ? getEnderecoFormatado(imovel.endereco) : 'Sem endereço')}
+                                + ' - ' + (imovel.endereco ? getEnderecoFormatado(imovel.endereco) : 'Sem endereço')}
                             </td>
                             <td className="border-b p-2">
                               {imovel.proprietarios && imovel.proprietarios.length > 0 ? (imovel.proprietarios[0].pessoa ? imovel.proprietarios[0].pessoa.telefone : 'Sem telefone') : 'Sem telefone'}
@@ -468,7 +476,7 @@ export default function ListarLancamentosImoveis({
                               <div className="flex justify-end gap-2">
                                 <Button
                                   size="sm"
-                                  onClick={() =>{handleClickVerDetalhes(imovel.id)}}
+                                  onClick={() => { handleClickVerDetalhes(imovel.id) }}
                                   className='hover:cursor-pointer hover:bg-gray-700'
                                 >
                                   Ver detalhes

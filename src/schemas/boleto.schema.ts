@@ -23,8 +23,9 @@ export const boletoSchema = z.object({
   observacao: z.string().optional(),
   linhaDigitavel: z.string().optional(),
   status: z.enum(Object.values(BoletoStatus) as [string, ...string[]]),
-  locatarioId: z.coerce.number().min(1, 'Locatário é obrigatório'),
-  locacaoId: z.coerce.number().min(1, 'Locação é obrigatório'),
+  locatarioId: z.coerce.number().optional(),
+  locacaoId: z.coerce.number().optional(),
+  imovelId: z.coerce.number().optional(),
   documentos: z
     .array(
       z.object({

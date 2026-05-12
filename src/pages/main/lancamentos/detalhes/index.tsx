@@ -84,11 +84,11 @@ export const DetalhesLancamento = () => {
   const { data: locacao, isLoading } = useQuery({
     queryKey: ['locacao', id],
     queryFn: async () => {
-      try{
-      const { data } = await api.get<Locacao>(`/locacoes/lancamentos/${id}?dataInicial=${dataInicial}&dataFinal=${dataFinal}`)
-      return data;
+      try {
+        const { data } = await api.get<Locacao>(`/locacoes/lancamentos/${id}?dataInicial=${dataInicial}&dataFinal=${dataFinal}`)
+        return data;
       }
-      catch(error) {
+      catch (error) {
         console.error('Error fetching locacao data:', error);
       }
     },
@@ -317,14 +317,16 @@ export const DetalhesLancamento = () => {
 
   const handleChangeTipo = (value: string) => {
     let tipo = tipolancamento?.data.find(tipo => tipo.id === Number(value));
-    lancamentoMethods.setValue('valorLancamento', Number(tipo?.valorFixo));
+    if (lancamentoMethods.getValues('linhaDigitavel')?.length === 0) {
+      lancamentoMethods.setValue('valorLancamento', Number(tipo?.valorFixo));
+    }
   }
 
   const handlerValidaLinhaDig = (value: string) => {
     if (value) {
       // Remove espaços e traços
       const linhaDigitavelDig = value.replace(/\s/g, '').replace(/-/g, '');
-      const linhaDigitavel = linhaDigitavelDig.substring(0,11) + linhaDigitavelDig.substring(12,23) + linhaDigitavelDig.substring(24,35) + linhaDigitavelDig.substring(36,47);
+      const linhaDigitavel = linhaDigitavelDig.substring(0, 11) + linhaDigitavelDig.substring(12, 23) + linhaDigitavelDig.substring(24, 35) + linhaDigitavelDig.substring(36, 47);
       console.log(linhaDigitavel);
       // Verifica se a linha digitável tem 44 ou 48 dígitos
       if (linhaDigitavel.length === 44 || linhaDigitavel.length === 48) {
@@ -333,30 +335,30 @@ export const DetalhesLancamento = () => {
           // Aqui você pode implementar a lógica de validação do dígito verificador, se necessário
           var dbl_valor = 0;
           var int_dig = 0;
-          var int_modulo = (linhaDigitavel.substring(2,1) === '6' ? 11 : 10)
+          var int_modulo = (linhaDigitavel.substring(2, 1) === '6' ? 11 : 10)
           var str_vencimento = '';
 
           //Validar digitos
           //Bloco 1
-          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(0,11), int_modulo);
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(0, 11), int_modulo);
           if (int_dig === parseInt(linhaDigitavelDig.substring(12, 1))) {
             return true;
           }
 
           //Bloco 2
-          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(12,11), int_modulo);
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(12, 11), int_modulo);
           if (int_dig === parseInt(linhaDigitavelDig.substring(23, 1))) {
             return true;
           }
 
           //Bloco 3
-          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(24,11), int_modulo);
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(24, 11), int_modulo);
           if (int_dig === parseInt(linhaDigitavelDig.substring(35, 1))) {
             return true;
           }
 
           //Bloco 4
-          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(36,11), int_modulo);
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(36, 11), int_modulo);
           if (int_dig === parseInt(linhaDigitavelDig.substring(47, 1))) {
             return true;
           }

@@ -274,11 +274,12 @@ export const DetalhesBoleto = () => {
     () => ({
       id: 0,
       locacaoId: boleto?.locacaoId,
+      imovelId: boleto?.imovelId,
       dataEmissao: moment.utc(boleto?.dataEmissao).format("YYYY-MM-DD"),
       dataPagamento: moment.utc(boleto?.dataPagamento).format("YYYY-MM-DD"),
       dataVencimento: moment.utc(boleto?.dataVencimento).format("YYYY-MM-DD"),
       valorOriginal: boleto?.valorOriginal || 0,
-      valorPago: boleto?.valorPago || 0,
+      valorPago: boleto?.valorPago || boleto?.valorOriginal || 0,
       locatarioId: boleto?.locatario?.id || 0,
       status: boleto?.status || BoletoStatus.PENDENTE,
       documentos: documentFiles?.filter((doc) => doc !== null),
@@ -734,6 +735,21 @@ export const DetalhesBoleto = () => {
                       </Label>
                     </div>
 
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-3" : "grid grid-cols-1 gap-4 mt-3")}>
+                      <Label className="text-base">
+                        Valor Pago
+                        <Input
+                          type="number"
+                          step={'any'}
+                          className="mt-1"
+                          disabled={disabled}
+                          placeholder="Valor pago"
+                          {...boletoMethods.register('valorPago')}
+                        />
+                        {boletoMethods.formState?.errors?.valorPago?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.valorPago?.message}</p>}
+                      </Label>
+                    </div>
+
                     <div className='mt-2 mr-5'>
                       <Label className='text-base font-[Poppins-Regular]'>
                         Situação do Pagamento
@@ -744,7 +760,7 @@ export const DetalhesBoleto = () => {
                             disabled={disabled}
                             render={({ field }) => (
                               <Select
-                                disabled={true}
+                                disabled={disabled}
                                 onValueChange={(value) => field.onChange(value)}
                                 value={String(field.value)}
                               >
