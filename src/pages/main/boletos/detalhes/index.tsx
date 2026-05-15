@@ -156,6 +156,7 @@ export const DetalhesBoleto = () => {
 
   const onSubmitBoletoData = async (data: BoletoSchema) => {
     try {
+      
       const form = new FormData()
 
       if (data?.dataEmissao) {
@@ -214,6 +215,7 @@ export const DetalhesBoleto = () => {
       }
 
       form.append('id', data.id ? data.id.toString() : '')
+      form.append('empresaId', data.empresaId ? data.empresaId.toString() : '')
 
       const newDocuments = data?.documentos?.filter((doc: any) => !doc.id)
       newDocuments?.forEach((doc: any) => {

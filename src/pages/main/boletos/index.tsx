@@ -290,6 +290,17 @@ export default function ListarBoletos({
     glb_params.updData_final(dataFinal);
     navigate(`${ROUTE.PAGAMENTOS}/${id}`)
   }
+
+  const handleClickVerComprovante = (boleto: Boleto) => {
+    if (boleto.documentos && boleto.documentos.length > 0) {
+      const documento = boleto.documentos[0]; // Assuming you want to view the first document
+      const url = import.meta.env.VITE_AZURE_BLOB_CONTAINER + documento.url;
+      window.open(url, '_blank');
+    } else {
+      toast({ title: 'Nenhum comprovante disponível.', variant: 'destructive' });
+    }
+  }
+
   // UI Logic
   const hasSearchResults = Boolean(!isLoading && search && boletos?.length === 0)
 
@@ -998,6 +1009,14 @@ export default function ListarBoletos({
                                 <Receipt className="h-4 w-4" />Emitir Boleto
                               </Button>
                             </>
+                          )}
+                          {(boleto.documentos && boleto.documentos.length > 0) && (
+                            <Button variant="secondary"
+                              className='hover:cursor-pointer hover:bg-gray-200'
+                              onClick={() => handleClickVerComprovante(boleto)}
+                              size={"sm"}>
+                              Comprovante
+                            </Button>
                           )}
                       </div>
                     </CardFooter>

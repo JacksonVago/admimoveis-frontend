@@ -16,12 +16,15 @@ import { Empresa } from '@/interfaces/empresa'
 import { empresaSchema, EmpresaSchema } from '@/schemas/empresa.schema'
 import { EmpresaFormContent, EmpresaFormRoot } from '../components/empresa-form'
 import axios from 'axios'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useState } from 'react'
 
 export const DetalhesEmpresaForm = () => {
 
 
   const [isEditingPersonalInfo, setIsEditingPersonalInfo] = React.useState(false)
   const disabled = isEditingPersonalInfo
+  const [activeTab, setActiveTab] = useState('personal-info')
 
   //const navigate = useNavigate();
   const dataParams = useParams<{ id: string }>();
@@ -206,12 +209,12 @@ export const DetalhesEmpresaForm = () => {
         form.append('tipoId', data.tipoId.toString());
       }
       if (data?.logo) {
-        const root = import.meta.env.VITE_AZURE_BLOB_CONTAINER; 
+        const root = import.meta.env.VITE_AZURE_BLOB_CONTAINER;
         console.log(root);
         console.log(import.meta.env);
         form.append('logo', root + 'admimoveis/' + (glb_params.id_empresa ? glb_params.id_empresa : '0') + '/empresas/' + newDocs[0].file?.name.replace(' ', '_'));
       }
-      
+
       newDocs?.forEach((doc: any) => {
         if (doc?.file) {
           form.append('documentos[]', doc.file)
@@ -275,6 +278,12 @@ export const DetalhesEmpresaForm = () => {
       cep: enderecoData?.cep,
       estado: enderecoData?.estado,
       tipoId: empresa?.tipoLancamento,
+      smtpHost: empresa?.smtpHost,
+      portSmtp: empresa?.portSmtp,
+      secureSmtp: empresa?.secureSmtp ? true : false,
+      userSmtp: empresa?.userSmtp,
+      pwdSmtp: empresa?.pwdSmtp,
+      boletos: empresa?.emiteBoleto === "S" ? true : false
     }),
     [empresa]
   )
@@ -301,43 +310,67 @@ export const DetalhesEmpresaForm = () => {
   }, [id, empresa])
 
 
+  const handlerChangeFolder = (folder: string) => {
+    glb_params.updOrigin_url("configuracoes");
+    glb_params.updId_orig((id! ? id : 0).toString());
+    glb_params.updPastaOrig(folder);
+    setActiveTab(folder);
+  }
+
+  console.log(empresa);
+  console.log(defaultValues);
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-end">
-          {/*<h2 className="mb-4 mt-8 text-xl font-bold">Configurações</h2>*/}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
-            className='bg-gray-100 hover:cursor-pointer'
-          >
-            <Edit className="mr-2 h-4 w-4" />
-            {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
-          </Button>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <EmpresaFormRoot
-          createEmpresaMethods={empresaMethods}
-          onSubmitEmpresaData={onSubmitEmpresaData}
-        >
-          <EmpresaFormContent createEmpresaMethods={empresaMethods} disabled={!disabled} />
-          <div className="mt-4">
-            {disabled && (
+    <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
+      <TabsList>
+        <TabsTrigger value="personal-info" className='hover:cursor-pointer hover:bg-gray-200'>Dados da Empresa</TabsTrigger>
+        <TabsTrigger value="alertas" className='hover:cursor-pointer hover:bg-gray-200'>Alertas</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="personal-info" className="space-y-4 font-[Poppins-regular]">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-end">
+              {/*<h2 className="mb-4 mt-8 text-xl font-bold">Configurações</h2>*/}
               <Button
-                disabled={
-                  !empresaMethods.formState.isDirty || !empresaMethods.formState.isValid
-                }
-                className='hover:cursor-pointer'
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
+                className='bg-gray-100 hover:cursor-pointer'
               >
-                Salvar Alterações
+                <Edit className="mr-2 h-4 w-4" />
+                {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
               </Button>
-            )}
-          </div>
-        </EmpresaFormRoot>
-      </CardContent>
-    </Card>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EmpresaFormRoot
+              createEmpresaMethods={empresaMethods}
+              onSubmitEmpresaData={onSubmitEmpresaData}
+            >
+              <EmpresaFormContent createEmpresaMethods={empresaMethods} disabled={!disabled} />
+              <div className="mt-4">
+                {disabled && (
+                  <Button
+                    disabled={
+                      !empresaMethods.formState.isDirty || !empresaMethods.formState.isValid
+                    }
+                    className='hover:cursor-pointer'
+                  >
+                    Salvar Alterações
+                  </Button>
+                )}
+              </div>
+            </EmpresaFormRoot>
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      {/* Alertas */}
+      <TabsContent value="alertas" className="space-y-4 font-[Poppins-regular]">
+
+      </TabsContent>
+    </Tabs>
   )
 }
 

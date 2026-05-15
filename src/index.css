@@ -190,7 +190,7 @@ button {
 	&:focus {
 		box-shadow: 0 0 0 2px black;
 	}
-	&[data-state="checked"] {
+	&.SwitchRoot[data-state="checked"] {
 		background-color: #a2c9f6;
 	}
 }
@@ -207,7 +207,40 @@ button {
 	transition: transform 100ms;
 	transform: translateX(2px);
 	will-change: transform;
-	&[data-state="checked"] {
+	&.SwitchThumb[data-state="checked"] {
+		transform: translateX(19px);
+	}
+}
+
+.SwitchRootSecure {
+	width: 42px;
+	height: 10px;
+	background-color: #ced2d8;
+	border-radius: 9999px;
+	position: relative;
+	box-shadow: 0 2px 10px var(--black-a7);
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	&:focus {
+		box-shadow: 0 0 0 2px black;
+	}
+	&.SwitchRootSecure[data-state="checked"] {
+		background-color: #a2c9f6;
+	}
+}
+
+.SwitchThumbSecure {
+  position: absolute;
+  top: -6px;
+	display: block;
+	width: 21px;
+	height: 21px;
+	background-color: #559cf0;
+	border-radius: 9999px;
+	box-shadow: 0 2px 2px var(--black-a7);
+	transition: transform 100ms;
+	transform: translateX(2px);
+	will-change: transform;
+	&.SwitchThumbSecure[data-state="checked"] {
 		transform: translateX(19px);
 	}
 }

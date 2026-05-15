@@ -24,6 +24,12 @@ export interface Empresa {
   porcentagemJurosAtraso: number
 
   logo?: string
+  smtpHost?:string
+  portSmtp?:number
+  secureSmtp:boolean
+  userSmtp?:string
+  pwdSmtp?:string
+
   enderecoId: number
   endereco: Endereco
   createdAt: Date

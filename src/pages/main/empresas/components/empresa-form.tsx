@@ -51,6 +51,7 @@ export const EmpresaFormContent = ({
   //Globals
   const glb_params = useGlobalParams();
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [chkSecure, setChkSecure] = useState(createEmpresaMethods.getValues("secureSmtp") === true ? true : false);
 
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,6 +99,11 @@ export const EmpresaFormContent = ({
     } catch (error) {
       console.error('Error downloading file:', error);
     }
+  };
+
+  const handlerChkSecureSmtp = (checked: boolean) => {
+    createEmpresaMethods.setValue("secureSmtp", checked);
+    setChkSecure(checked);
   };
 
   return (
@@ -341,94 +347,205 @@ export const EmpresaFormContent = ({
           </Label>
         </div>
 
+        {/* Alertas */}
         <div className="flex justify-center font-[Poppins-ExtraLight]">
-          <Label className='font-bold text-lg'>ALERTAS</Label>
+          <Label className='font-bold text-lg'>CONFIGURAÇÃO DOS ALERTAS</Label>
         </div>
+
         <div className="grid grid-cols-2 gap-4">
-          <Label className="text-base">
-            Reajuste de Locação
-            <Input
-              className="mt-2"
-              type="number"
-              disabled={disabled}
-              placeholder="Dias"
-              {...createEmpresaMethods.register('avisosReajusteLocacao')}
-            />
-            {createEmpresaMethods.formState.errors.avisosReajusteLocacao?.message &&
-              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createEmpresaMethods.formState.errors.avisosReajusteLocacao.message}
-              </p>)}
-          </Label>
-          <Label className="text-base">
-            Renovação de Contrato
-            <Input
-              className="mt-2"
-              type="number"
-              disabled={disabled}
-              placeholder="Dias"
-              {...createEmpresaMethods.register('avisosRenovacaoContrato')}
-            />
-            {createEmpresaMethods.formState.errors.avisosRenovacaoContrato?.message &&
-              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createEmpresaMethods.formState.errors.avisosRenovacaoContrato.message}
-              </p>)}
-          </Label>
-          <Label className="text-base">
-            Seguro Fiança
-            <Input
-              className="mt-2"
-              type="number"
-              disabled={disabled}
-              placeholder="Dias"
-              {...createEmpresaMethods.register('avisosSeguroFianca')}
-            />
-            {createEmpresaMethods.formState.errors.avisosSeguroFianca?.message &&
-              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createEmpresaMethods.formState.errors.avisosSeguroFianca.message}
-              </p>)}
-          </Label>
-          <Label className="text-base">
-            Seguro Incêndio
-            <Input
-              className="mt-2"
-              type="number"
-              disabled={disabled}
-              placeholder="Dias"
-              {...createEmpresaMethods.register('avisosSeguroIncendio')}
-            />
-            {createEmpresaMethods.formState.errors.avisosSeguroIncendio?.message &&
-              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createEmpresaMethods.formState.errors.avisosSeguroIncendio.message}
-              </p>)}
-          </Label>
-          <Label className="text-base">
-            Titulo de Capitalização
-            <Input
-              className="mt-2"
-              type="number"
-              disabled={disabled}
-              placeholder="Dias"
-              {...createEmpresaMethods.register('avisosTituloCapitalizacao')}
-            />
-            {createEmpresaMethods.formState.errors.avisosTituloCapitalizacao?.message &&
-              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createEmpresaMethods.formState.errors.avisosTituloCapitalizacao.message}
-              </p>)}
-          </Label>
-          <Label className="text-base">
-            Depósito Calcão
-            <Input
-              className="mt-2"
-              type="number"
-              disabled={disabled}
-              placeholder="Dias"
-              {...createEmpresaMethods.register('avisosDepositoCalcao')}
-            />
-            {createEmpresaMethods.formState.errors.avisosDepositoCalcao?.message &&
-              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
-                {createEmpresaMethods.formState.errors.avisosDepositoCalcao.message}
-              </p>)}
-          </Label>
+
+          <fieldset className="rounded-lg border-2 border-indigo-500 p-6">
+            <legend className="ml-4 px-2 text-indigo-600 font-bold">Dias de Aviso</legend>
+
+            <div className="mt-2">
+              <Label className="text-base">
+                Reajuste de Locação
+                <Input
+                  className="mt-2"
+                  type="number"
+                  disabled={disabled}
+                  placeholder="Dias"
+                  {...createEmpresaMethods.register('avisosReajusteLocacao')}
+                />
+                {createEmpresaMethods.formState.errors.avisosReajusteLocacao?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.avisosReajusteLocacao.message}
+                  </p>)}
+              </Label>
+            </div>
+
+            <div className="mt-2">
+              <Label className="text-base">
+                Renovação de Contrato
+                <Input
+                  className="mt-2"
+                  type="number"
+                  disabled={disabled}
+                  placeholder="Dias"
+                  {...createEmpresaMethods.register('avisosRenovacaoContrato')}
+                />
+                {createEmpresaMethods.formState.errors.avisosRenovacaoContrato?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.avisosRenovacaoContrato.message}
+                  </p>)}
+              </Label>
+            </div>
+
+            <div className="mt-2">
+              <Label className="text-base">
+                Seguro Fiança
+                <Input
+                  className="mt-2"
+                  type="number"
+                  disabled={disabled}
+                  placeholder="Dias"
+                  {...createEmpresaMethods.register('avisosSeguroFianca')}
+                />
+                {createEmpresaMethods.formState.errors.avisosSeguroFianca?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.avisosSeguroFianca.message}
+                  </p>)}
+              </Label>
+            </div>
+
+            <div className="mt-2">
+              <Label className="text-base">
+                Seguro Incêndio
+                <Input
+                  className="mt-2"
+                  type="number"
+                  disabled={disabled}
+                  placeholder="Dias"
+                  {...createEmpresaMethods.register('avisosSeguroIncendio')}
+                />
+                {createEmpresaMethods.formState.errors.avisosSeguroIncendio?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.avisosSeguroIncendio.message}
+                  </p>)}
+              </Label>
+            </div>
+
+            <div className="mt-2">
+              <Label className="text-base">
+                Titulo de Capitalização
+                <Input
+                  className="mt-2"
+                  type="number"
+                  disabled={disabled}
+                  placeholder="Dias"
+                  {...createEmpresaMethods.register('avisosTituloCapitalizacao')}
+                />
+                {createEmpresaMethods.formState.errors.avisosTituloCapitalizacao?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.avisosTituloCapitalizacao.message}
+                  </p>)}
+              </Label>
+            </div>
+
+            <div className="mt-2">
+              <Label className="text-base">
+                Depósito Calcão
+                <Input
+                  className="mt-2"
+                  type="number"
+                  disabled={disabled}
+                  placeholder="Dias"
+                  {...createEmpresaMethods.register('avisosDepositoCalcao')}
+                />
+                {createEmpresaMethods.formState.errors.avisosDepositoCalcao?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.avisosDepositoCalcao.message}
+                  </p>)}
+              </Label>
+            </div>
+          </fieldset>
+
+          <fieldset className="rounded-lg border-2 border-indigo-500 p-6">
+            <legend className="ml-4 px-2 text-indigo-600 font-bold">Dados de conexão</legend>
+
+            <div className="mt-2">
+              <Label className="text-base">
+                Host SMTP
+                <Input
+                  className="mt-2"
+                  type="number"
+                  disabled={disabled}
+                  placeholder="Host SMTP"
+                  {...createEmpresaMethods.register('smtpHost')}
+                />
+                {createEmpresaMethods.formState.errors.smtpHost?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.smtpHost.message}
+                  </p>)}
+              </Label>
+            </div>
+
+            <div className="mt-2">
+              <Label className="text-base">
+                Porta SMTP
+                <Input
+                  className="mt-2"
+                  type="number"
+                  disabled={disabled}
+                  placeholder="Porta SMTP"
+                  {...createEmpresaMethods.register('portSmtp')}
+                />
+                {createEmpresaMethods.formState.errors.portSmtp?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.portSmtp.message}
+                  </p>)}
+              </Label>
+            </div>
+
+            <div className="mt-2">
+              <div style={{ display: "flex", alignItems: "center" }} className="mt-4">
+                <label
+                  className="Label"
+                  htmlFor="ssl"
+                  style={{ paddingRight: 15 }}
+                >
+                  SSL
+                </label>
+                <Switch className="SwitchRootSecure focus:outline-none" id="ssl"
+                  checked={chkSecure}
+                  onCheckedChange={handlerChkSecureSmtp}>
+                  <Thumb className="SwitchThumbSecure" />
+                </Switch>
+              </div>
+            </div>
+            <div className="mt-2">
+              <Label className="text-base">
+                Usuário SMTP
+                <Input
+                  className="mt-2"
+                  type="number"
+                  disabled={disabled}
+                  placeholder="Usuário SMTP"
+                  {...createEmpresaMethods.register('userSmtp')}
+                />
+                {createEmpresaMethods.formState.errors.userSmtp?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.userSmtp.message}
+                  </p>)}
+              </Label>
+            </div>
+            <div className="mt-2">
+              <Label className="text-base">
+                Senha SMTP
+                <Input
+                  className="mt-2"
+                  type="password"
+                  disabled={disabled}
+                  placeholder="Senha SMTP"
+                  {...createEmpresaMethods.register('pwdSmtp')}
+                />
+                {createEmpresaMethods.formState.errors.pwdSmtp?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.pwdSmtp.message}
+                  </p>)}
+              </Label>
+            </div>
+          </fieldset>
         </div>
 
         <div className="grid grid-cols-3 gap-4">
@@ -449,6 +566,7 @@ export const EmpresaFormContent = ({
           </Label>
 
         </div>
+
 
         {/*Logo */}
         <div className="mb-6 w-full space-y-4">
@@ -488,12 +606,12 @@ export const EmpresaFormContent = ({
         <div style={{ display: "flex", alignItems: "center" }}>
           <label
             className="Label"
-            htmlFor="airplane-mode"
+            htmlFor="boletos"
             style={{ paddingRight: 15 }}
           >
             Boletos
           </label>
-          <Switch className="SwitchRoot focus:outline-none" id="airplane-mode"
+          <Switch className="SwitchRoot focus:outline-none" id="boletos"
             checked={createEmpresaMethods.getValues("emiteBoleto") === "S" ? true : false}
             onCheckedChange={(checked) => { createEmpresaMethods.setValue("emiteBoleto", (checked ? "S" : "N")); setShowBoleto(!showBoleto); }}>
             <Thumb className="SwitchThumb" />

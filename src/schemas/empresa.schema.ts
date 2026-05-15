@@ -67,6 +67,13 @@ export const empresaSchema = z.object({
     .optional(),
   //tipoId: z.coerce.number().min(1, 'Tipo de lançamento é obrigatório'),
   logo: z.string().optional(),
+
+  smtpHost: z.string().optional(),
+  portSmtp: z.coerce.number().optional(),
+  secureSmtp: z.boolean().optional(),
+  userSmtp: z.string().optional(),
+  pwdSmtp: z.string().optional(),
+
   tipoId: z.coerce.number().optional(),
   documentos: z
     .array(
