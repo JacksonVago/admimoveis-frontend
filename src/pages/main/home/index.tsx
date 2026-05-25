@@ -112,6 +112,7 @@ export const Home = () => {
       let now = new Date();
       let hoje = now.getDate();
       let lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
       console.log('Hoje: ', hoje);
       console.log('LastDay: ', lastDay);
       for (let i = hoje; i <= lastDay; i += 5) {
@@ -445,7 +446,7 @@ export const Home = () => {
   );*/
   return (
     <div>
-      <div className='grid grid-cols-2 mt-5 gap-4 p-5'>
+      <div className={isMobile ? 'grid grid-cols-1 mt-5 gap-4 p-5' : 'grid grid-cols-2 mt-5 gap-4 p-5'}>
         <div>
           <Label className='flex justify-center font-[Poppins-bold]'>Locações à Vencer</Label>
           <div className='border-2 rounded-lg mt-2'>
@@ -465,7 +466,7 @@ export const Home = () => {
         </div>
 
         {openDetail && (
-          <div className='col-span-2'>
+          <div className={isMobile ? '' : 'col-span-2'}>
 
             <div className='flex items-center justify-between mr-2 h-7'>
               <Label className='ml-2' style={{ 'fontSize': '1rem' }}>{titulo}</Label>
@@ -569,7 +570,7 @@ export const Home = () => {
         )}
 
         {openDetailBol && (
-          <div className=' mt-5 col-span-2'>
+          <div className={isMobile ? 'mt-5 ' : ' mt-5 col-span-2'} >
 
             <Label className='ml-2' style={{ 'fontSize': '1rem' }}>{titulo}</Label>
             <div className={'rounded-md mt-2 m-2 p-2'}>

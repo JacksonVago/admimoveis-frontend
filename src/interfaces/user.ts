@@ -78,6 +78,18 @@ export type Permission =
   | 'UPDATE_LANCAMENTO_IMOVEL'
   | 'DELETE_LANCAMENTO_IMOVEL'
   | 'VIEW_LANCAMENTOS_IMOVEIS'
+  | 'CREATE_TIPO_ALERTA'
+  | 'UPDATE_TIPO_ALERTA'
+  | 'DELETE_TIPO_ALERTA'
+  | 'VIEW_TIPOS_ALERTA'
+  | 'CREATE_ALERTA'
+  | 'UPDATE_ALERTA'
+  | 'DELETE_ALERTA'
+  | 'VIEW_ALERTAS'
+  | 'CREATE_CONTA_CORRENTE'
+  | 'UPDATE_CONTA_CORRENTE'
+  | 'DELETE_CONTA_CORRENTE'
+  | 'VIEW_CONTAS_CORRENTE'
 
 
 export const userPermissions: {
@@ -145,7 +157,19 @@ export const userPermissions: {
   CREATE_LANCAMENTO_IMOVEL: 'Criar lançamento imóvel',
   UPDATE_LANCAMENTO_IMOVEL: 'Atualizar lançamento imóvel',
   DELETE_LANCAMENTO_IMOVEL: 'Deletar lançamento imóvel',
-  VIEW_LANCAMENTOS_IMOVEIS: 'Visualizar lançamentos imóveis'
+  VIEW_LANCAMENTOS_IMOVEIS: 'Visualizar lançamentos imóveis',
+  CREATE_TIPO_ALERTA: 'Criar tipo alerta',
+  UPDATE_TIPO_ALERTA: 'Atualizar tipo alerta',
+  DELETE_TIPO_ALERTA: 'Deletar tipo alerta',
+  VIEW_TIPOS_ALERTA: 'Visualizar tipos alertas',
+  CREATE_ALERTA: 'Criar alerta',
+  UPDATE_ALERTA: 'Atualizar alerta',
+  DELETE_ALERTA: 'Deletar alerta',
+  VIEW_ALERTAS: 'Visualizar alertas',
+  CREATE_CONTA_CORRENTE: 'Criar Conta corrente',
+  UPDATE_CONTA_CORRENTE: 'Atualizar Conta corrente',
+  DELETE_CONTA_CORRENTE: 'Deletar Conta corrente',
+  VIEW_CONTAS_CORRENTE: 'Visualizar Contas corrente',
 }
 
 export enum UserRole {

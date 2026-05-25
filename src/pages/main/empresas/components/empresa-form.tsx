@@ -16,11 +16,11 @@ import { Controller, UseFormReturn } from 'react-hook-form'
 import { EmpresaSchema } from '@/schemas/empresa.schema'
 import { formatCpfCnpj, formatPhone } from '@/utils/format-cpfcnpj'
 import { Switch, Thumb } from "@radix-ui/react-switch"
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TipoLancamento } from '@/interfaces/lancamentotipo'
 import { useQuery } from '@tanstack/react-query'
 import { useGlobalParams } from '@/globals/GlobalParams'
-import { Download, ImagePlus } from 'lucide-react'
+import { Download, Eye, EyeOffIcon, ImagePlus } from 'lucide-react'
 
 export const getTipos = async (empresaId: number) => {
   return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
@@ -52,7 +52,7 @@ export const EmpresaFormContent = ({
   const glb_params = useGlobalParams();
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [chkSecure, setChkSecure] = useState(createEmpresaMethods.getValues("secureSmtp") === true ? true : false);
-
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -70,10 +70,14 @@ export const EmpresaFormContent = ({
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true
-      })
+      });
 
     }
   }
+
+  useEffect(() => {
+    setShowPassword(false);
+  }, [])
 
   //Consulta Tipo imóvel
   const {
@@ -458,6 +462,23 @@ export const EmpresaFormContent = ({
                   </p>)}
               </Label>
             </div>
+
+            <div className="mt-2">
+              <Label className="text-base">
+                Vencimento Boleto
+                <Input
+                  className="mt-2"
+                  type="number"
+                  disabled={disabled}
+                  placeholder="Dias"
+                  {...createEmpresaMethods.register('avisosVencBoleto')}
+                />
+                {createEmpresaMethods.formState.errors.avisosVencBoleto?.message &&
+                  (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                    {createEmpresaMethods.formState.errors.avisosVencBoleto.message}
+                  </p>)}
+              </Label>
+            </div>
           </fieldset>
 
           <fieldset className="rounded-lg border-2 border-indigo-500 p-6">
@@ -468,7 +489,7 @@ export const EmpresaFormContent = ({
                 Host SMTP
                 <Input
                   className="mt-2"
-                  type="number"
+                  type="string"
                   disabled={disabled}
                   placeholder="Host SMTP"
                   {...createEmpresaMethods.register('smtpHost')}
@@ -518,7 +539,7 @@ export const EmpresaFormContent = ({
                 Usuário SMTP
                 <Input
                   className="mt-2"
-                  type="number"
+                  type="string"
                   disabled={disabled}
                   placeholder="Usuário SMTP"
                   {...createEmpresaMethods.register('userSmtp')}
@@ -534,7 +555,7 @@ export const EmpresaFormContent = ({
                 Senha SMTP
                 <Input
                   className="mt-2"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   disabled={disabled}
                   placeholder="Senha SMTP"
                   {...createEmpresaMethods.register('pwdSmtp')}
@@ -545,6 +566,10 @@ export const EmpresaFormContent = ({
                   </p>)}
               </Label>
             </div>
+            <div className='bg-white relative -top-8 left-[90%] p-0 w-[24px]' onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? <Eye color='black'></Eye> : <EyeOffIcon color='black'></EyeOffIcon>}
+            </div>
+
           </fieldset>
         </div>
 

@@ -20,6 +20,11 @@ export enum ROUTE {
   EMPRESA_DETALHES = '/empresas/:id',
   EMPRESA = '/empresas',
 
+  // Alertas routes
+  ALERTAS = '/alertas',
+  ALERTAS_CRIAR = '/alertas/criar',
+  ALERTAS_DETALHES = '/alertas/:id',
+
   // Condomínios routes
   CONDOMINIOS = '/condominios',
   CONDOMINIOS_CRIAR = '/condominios/criar',

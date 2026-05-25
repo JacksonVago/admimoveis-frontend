@@ -15,6 +15,7 @@ export interface Empresa {
   avisosSeguroIncendio: number
   avisosTituloCapitalizacao: number
   avisosDepositoCalcao: number
+  avisosVencBoleto: number
   porcentagemComissao: number
   emiteBoleto:string
   valorTaxaBoleto: number

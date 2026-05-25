@@ -48,6 +48,7 @@ export const empresaSchema = z.object({
   avisosSeguroIncendio: z.coerce.number().optional(),
   avisosTituloCapitalizacao: z.coerce.number().optional(),
   avisosDepositoCalcao: z.coerce.number().optional(),
+  avisosVencBoleto: z.coerce.number().optional(),
   porcentagemComissao: z.coerce.number(),
   emiteBoleto: z.string().optional(),
   valorTaxaBoleto: z.coerce.number().optional(),

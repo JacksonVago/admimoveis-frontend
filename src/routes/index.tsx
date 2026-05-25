@@ -52,6 +52,9 @@ import { CircleArrowLeft } from 'lucide-react'
 import { Home } from '@/pages/main/home'
 import ListarLancamentosImoveis from '@/pages/main/lancamentosimoveis'
 import { DetalhesLancamentoImovel } from '@/pages/main/lancamentosimoveis/detalhes'
+import { CriarAlerta } from '@/pages/main/alertas/criaralerta'
+import { DetalhesAlerta } from '@/pages/main/alertas/detalhes'
+import ListarAlertas from '@/pages/main/alertas/listaralertas'
 
 export interface ProtectedRouteProps {
   permission: Permission
@@ -155,6 +158,32 @@ export const RoutesComponent = () => {
             element={
               <ProtectedRoute permission="VIEW_EMPRESAS">
                 <DetalhesEmpresa />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Alertas */}
+          <Route
+            path={ROUTE.ALERTAS_CRIAR}
+            element={
+              <ProtectedRoute permission="CREATE_ALERTA">
+                <CriarAlerta />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.ALERTAS_DETALHES}
+            element={
+              <ProtectedRoute permission="VIEW_ALERTAS">
+                <DetalhesAlerta />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.ALERTAS}
+            element={
+              <ProtectedRoute permission="VIEW_ALERTAS">
+                <ListarAlertas limitView={3} exclude='' onSelectAlerta={undefined} />
               </ProtectedRoute>
             }
           />

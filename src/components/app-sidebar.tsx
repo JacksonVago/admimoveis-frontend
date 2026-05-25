@@ -1,6 +1,6 @@
 'use client'
 
-import { Banknote, Building, Building2, CircleDollarSign, Cog, House, KeyRound, Lock, LogOut, ReceiptText, Shapes, Users } from 'lucide-react'
+import { Banknote, Building, Building2, CircleDollarSign, Cog, House, KeyRound, Lock, LogOut, OctagonAlert, ReceiptText, Shapes, Users } from 'lucide-react'
 import * as React from 'react'
 //import logo  from '../assets/logo-molina.png';
 
@@ -25,6 +25,11 @@ const data = {
       title: 'Configurações',
       url: ROUTE.EMPRESA + "/0",
       icon: Cog
+    },
+    {
+      title: 'Alertas',
+      url: ROUTE.ALERTAS,
+      icon: OctagonAlert
     },
     {
       title: 'Clientes',

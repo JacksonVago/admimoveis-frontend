@@ -157,7 +157,6 @@ export const DetalhesEmpresaForm = () => {
         form.append('status', PessoaStatus.ATIVA)
       }
 
-      console.log(data?.avisosReajusteLocacao);
       if (data?.avisosReajusteLocacao) {
         form.append('avisosReajusteLocacao', data.avisosReajusteLocacao.toString())
       }
@@ -182,6 +181,10 @@ export const DetalhesEmpresaForm = () => {
         form.append('avisosDepositoCalcao', data.avisosDepositoCalcao.toString())
       }
 
+      if (data?.avisosVencBoleto) {
+        form.append('avisosVencBoleto', data.avisosVencBoleto.toString())
+      }
+      
       if (data?.porcentagemComissao) {
         form.append('porcentagemComissao', data.porcentagemComissao.toString())
       }
@@ -208,29 +211,43 @@ export const DetalhesEmpresaForm = () => {
       if (data?.tipoId) {
         form.append('tipoId', data.tipoId.toString());
       }
-      if (data?.logo) {
+      if (data?.logo && newDocs && newDocs.length > 0) {
+        console.log(data.logo);
         const root = import.meta.env.VITE_AZURE_BLOB_CONTAINER;
-        console.log(root);
-        console.log(import.meta.env);
         form.append('logo', root + 'admimoveis/' + (glb_params.id_empresa ? glb_params.id_empresa : '0') + '/empresas/' + newDocs[0].file?.name.replace(' ', '_'));
       }
 
-      newDocs?.forEach((doc: any) => {
-        if (doc?.file) {
-          form.append('documentos[]', doc.file)
-        }
-      });
+      if (data?.smtpHost) {
+        form.append('smtpHost', data.smtpHost);
+      }
+      if (data?.portSmtp) {
+        form.append('portSmtp', data.portSmtp.toString());
+      }
+      form.append('secureSmtp', data.secureSmtp ? 'true' : 'false');
+      if (data?.userSmtp) {
+        form.append('userSmtp', data.userSmtp);
+      }
+      if (data?.pwdSmtp) {
+        form.append('pwdSmtp', data.pwdSmtp);
+      }
+
+      const dataObject = Object.fromEntries(form.entries());
+      const jsonData = JSON.stringify(dataObject);
+      console.log(jsonData);
+
+      if (newDocs && newDocs.length > 0) {
+        newDocs?.forEach((doc: any) => {
+          if (doc?.file) {
+            form.append('documentos[]', doc.file)
+          }
+        });
+      }
 
 
       if (glb_params.id_empresa !== undefined && Number(glb_params.id_empresa) > 0) {
         await updateEmpresa.mutateAsync(form)
       }
       else {
-
-        const dataObject = Object.fromEntries(form.entries());
-        const jsonData = JSON.stringify(dataObject);
-        console.log(jsonData);
-
         await createEmpresa.mutateAsync(form)
       }
 
@@ -319,7 +336,7 @@ export const DetalhesEmpresaForm = () => {
 
   console.log(empresa);
   console.log(defaultValues);
-  
+
   return (
     <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
       <TabsList>

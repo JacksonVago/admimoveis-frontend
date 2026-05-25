@@ -1,0 +1,7 @@
+export enum FrequenciaEnvio{
+  DIAS_VENCIMENTO = 'DIAS_VENCIMENTO',
+  DIARIO = 'DIARIO',
+  SEMANAL = 'SEMANAL',
+  MENSAL = 'MENSAL',
+  ANUAL = 'ANUAL'
+}
