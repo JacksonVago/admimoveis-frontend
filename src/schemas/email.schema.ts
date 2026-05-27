@@ -4,7 +4,7 @@ import { TipoIntervaloEnvio } from '@/enums/alertas/TipoIntervaloEnvio'
 import moment from 'moment'
 import { z } from 'zod'
 
-export const alertaSchema = z.object({
+export const emailSchema = z.object({
     descricao: z.string(),
     ativo: z.boolean(),
     textoAlerta: z.string(),
@@ -43,4 +43,4 @@ export const alertaSchema = z.object({
 
 })
 
-export type AlertaSchema = z.infer<typeof alertaSchema>
+export type EmailSchema = z.infer<typeof emailSchema>

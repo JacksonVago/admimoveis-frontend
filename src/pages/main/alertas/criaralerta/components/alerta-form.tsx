@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { Controller, set, useForm, UseFormReturn } from 'react-hook-form'
+import { Controller, useFieldArray, UseFormReturn } from 'react-hook-form'
 import { Textarea } from '@/components/ui/textarea'
 import { useQuery } from '@tanstack/react-query'
 import { AlertaSchema } from '@/schemas/alerta.schema'
@@ -17,12 +17,9 @@ import { useGlobalParams } from '@/globals/GlobalParams'
 import { Switch, Thumb } from '@radix-ui/react-switch'
 import { FREQUENCIA_ENVIO_OPTIONS, TIPO_AGENDAMENTO_OPTIONS, TIPO_INTERVALO_OPTIONS } from '@/constants/alertas'
 import { useMediaQuery } from 'react-responsive'
-import { TipoAgendamento } from '@/enums/alertas/TipoAgendamento'
-import { useState } from 'react'
-import { Settings } from 'lucide-react'
+import { Settings, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { jobSchema, JobSchema } from '@/schemas/job.schema'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 
 export const AlertaFormRoot = ({
   children,
@@ -68,17 +65,13 @@ export const AlertaFormContent = ({
     queryFn: () => getTipos(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0),
   });
 
-  const defaultValues = {
-    empresaId: glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,
-    //condominios: [{ nome: bloco?.condominio.name, id: bloco?.condominio.id }],
-  }
+  
+  //Lista de campos
+  const camposAlerta = useFieldArray({
+    control: createAlertaMethods.control,
+    name: 'campos'
+  });
 
-
-  const emailMethods = useForm<JobSchema>({
-    resolver: zodResolver(jobSchema),
-    mode: 'onBlur',
-    defaultValues: defaultValues,
-  })
 
   const handlerChangeAgendamento = (value: string) => {
 
@@ -90,15 +83,18 @@ export const AlertaFormContent = ({
     }
   }
 
-  const handlerChangeAlerta = (value: string) => {    
+  const handlerChangeAlerta = (value: string) => {
     if (selCampos.length > 0) {
       selCampos.split(";").forEach((campo) => {
         createAlertaMethods.setValue("textoAlerta", createAlertaMethods.getValues("textoAlerta").toString().replace("<" + campos.find((c) => c.campo === campo)?.descricao + ">", ""));
       });
     }
-    setSelCampos("");
+    setSelCampos('');
     setCampos(getCampos(Number(value)));
-    console.log(campos);
+    if (camposAlerta.fields.length > 0) {
+      camposAlerta.remove();
+      setSelCampos('');
+    }
   }
 
   const getCampos = (alertaId: number) => {
@@ -106,25 +102,47 @@ export const AlertaFormContent = ({
 
     let descAlerta = tipoAlerta?.data.find((tipo) => tipo.id === alertaId)?.descricao;
 
-    console.log(descAlerta);
     setSelAlerta(alertaId);
 
     switch (descAlerta) {
       case "Aviso reajuste Locação":
         arr_campos = [
-          { check: false, campo: "nome", descricao: "Nome do cliente" },
-          { check: false, campo: "cpf", descricao: "CPF do cliente" },
-          { check: false, campo: "email", descricao: "Email do cliente" },
+          { check: false, campo: "nome", descricao: "Nome do locatário" },          
+          { check: false, campo: "diaVencimento", descricao: "Data de Vencimento" },
+          { check: false, campo: "valorAluguel", descricao: "Valor Aluguel" },
+          { check: false, campo: "imovel", descricao: "Imóvel" },
         ]
         break;
 
       case "Aviso renovação contrato":
         arr_campos = [
+          { check: false, campo: "nome", descricao: "Nome do locatário" },
           { check: false, campo: "dataInicio", descricao: "Data de Início" },
           { check: false, campo: "dataFim", descricao: "Data Final" },
           { check: false, campo: "valorAluguel", descricao: "Valor Aluguel" },
           { check: false, campo: "email", descricao: "Email" },
           { check: false, campo: "imovel", descricao: "Imóvel" },
+        ]
+        break;
+
+      case "Aviso seguro incêndio":
+        arr_campos = [
+          { check: false, campo: "nome", descricao: "Nome do locatário" },
+          { check: false, campo: "vigenciaInicio", descricao: "Data de Início" },
+          { check: false, campo: "vigenciaFim", descricao: "Data Final" },
+          { check: false, campo: "numeroApolice", descricao: "Número da apólice" },
+        ]
+        break;
+
+      case "Aviso vencimento boleto":
+        arr_campos = [
+          { check: false, campo: "dataEmissao", descricao: "Data de Emissão" },
+          { check: false, campo: "dataVencimento", descricao: "Data de Vencimento" },
+          { check: false, campo: "valorOriginal", descricao: "Valor Original" },
+          { check: false, campo: "email", descricao: "Email" },
+          { check: false, campo: "linkDocumento", descricao: "Link do Documento" },
+          { check: false, campo: "linhaDigitavelBol", descricao: "Linha Digitável Boleto" },
+          { check: false, campo: "linhaDigitavelLan", descricao: "Linha Digitável Lançamento" },
         ]
         break;
 
@@ -135,30 +153,40 @@ export const AlertaFormContent = ({
           { check: false, campo: "valorOriginal", descricao: "Valor Original" },
           { check: false, campo: "email", descricao: "Email" },
           { check: false, campo: "linkDocumento", descricao: "Link do Documento" },
-          { check: false, campo: "linhaDigitavel", descricao: "Linha Digitável" },
+          { check: false, campo: "linhaDigitavelBol", descricao: "Linha Digitável Boleto" },
+          { check: false, campo: "linhaDigitavelLan", descricao: "Linha Digitável Lançamento" },
         ]
         break;
 
       default:
         arr_campos = []
     }
-    console.log(arr_campos);
     return arr_campos.filter(x => !selCampos.includes(x.campo));
   };
 
   const handlerConfimaCampos = () => {
-    console.log(campos);
-    setSelCampos(campos.filter(x => x.check).map(x => x.campo).join(";"));
+    setSelCampos(selCampos + campos.filter(x => x.check).map(x => x.campo).join(";"));
     campos.filter(x => x.check).forEach((campo) => {
-      createAlertaMethods.setValue("textoAlerta",createAlertaMethods.getValues("textoAlerta") + "<" + campo.descricao + ">");
+      createAlertaMethods.setValue("textoAlerta", createAlertaMethods.getValues("textoAlerta") + "<" + campo.descricao + ">");
+      camposAlerta.append({
+        nome: campo.descricao,
+        campo: campo.campo
+      });
     });
-    console.log(createAlertaMethods.getValues("textoAlerta"));
+    setTitulo("Informações do Boleto");
   }
 
   const handlerOpenCampos = () => {
     setCampos(getCampos(selAlerta));
     setIsOpenConfig(true);
   }
+
+  const handlerRemoveCampo = (field: any, index: number) => {
+    createAlertaMethods.setValue("textoAlerta", createAlertaMethods.getValues("textoAlerta").toString().replace("<" + field.nome + ">", ""));
+    setSelCampos(selCampos.replace(field.campo + ";", "").replace(field.campo, ""));
+    camposAlerta.remove(index);
+  }
+
   return (
     <div className="space-y-4">
       <div className="space-y-4 font-[Poppins-Regular]">
@@ -240,13 +268,28 @@ export const AlertaFormContent = ({
             rows={10}
             {...createAlertaMethods.register('textoAlerta')}
           />
+
+          <div className={(isMobile ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-6 gap-4 flex items-center")}>
+            {camposAlerta.fields.map((field, index) => (
+              <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                <Label >{field.nome}</Label>
+                <button disabled={disabled}
+                  className='border bg-zinc-200 hover:bg-zinc-400'
+                  type="button"
+                  onClick={() => handlerRemoveCampo(field, index)}
+                >
+                  <X className='px-1'></X>
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
         {isOpenConfig && (
           <Dialog
             open={isOpenConfig}
             onOpenChange={(value) => {
-              setIsOpenConfig(value);              
+              setIsOpenConfig(value);
             }}
           >
             <DialogContent>
@@ -264,40 +307,40 @@ export const AlertaFormContent = ({
                     <tbody>
                       {(campos && campos.length > 0) ? (
                         campos.map((campo) => (
-                        <tr key={campo.campo} className="hover:bg-gray-300">
-                          <td className="border-b p-2">
-                            <Input
-                              type="checkbox"
-                              checked={campo.check}
-                              onChange={() => {
-                                const newCampos = [...campos];
-                                const index = newCampos.findIndex((c) => c.campo === campo.campo);
-                                newCampos[index].check = !newCampos[index].check;
-                                setCampos(newCampos);
-                              }}
-                            />
-                          </td>
-                          <td className="border-b p-2">
-                            {campo.descricao}
-                          </td>
-                        </tr>
-                      ))) : (<tr><td className="border-b p-2 text-center" colSpan={2}>Nenhum campo disponível para configuração</td></tr>)}
+                          <tr key={campo.campo} className="hover:bg-gray-300">
+                            <td className="border-b p-2">
+                              <Input
+                                type="checkbox"
+                                checked={campo.check}
+                                onChange={() => {
+                                  const newCampos = [...campos];
+                                  const index = newCampos.findIndex((c) => c.campo === campo.campo);
+                                  newCampos[index].check = !newCampos[index].check;
+                                  setCampos(newCampos);
+                                }}
+                              />
+                            </td>
+                            <td className="border-b p-2">
+                              {campo.descricao}
+                            </td>
+                          </tr>
+                        ))) : (<tr><td className="border-b p-2 text-center" colSpan={2}>Nenhum campo disponível para configuração</td></tr>)}
                     </tbody>
                   </table>
                 </div>
               </DialogHeader>
               <DialogFooter>
                 {(campos && campos.length > 0) ? (
-                <Button className='bg-blue-500'
-                  onClick={() => {
-                    handlerConfimaCampos();
-                    setIsOpenConfig(false);
-                  }}
-                >Confirmar</Button>) : (<Button className='bg-red-500'
-                  onClick={() => {
-                    setIsOpenConfig(false);
-                  }}
-                >Fechar</Button>)}
+                  <Button className='bg-blue-500'
+                    onClick={() => {
+                      handlerConfimaCampos();
+                      setIsOpenConfig(false);
+                    }}
+                  >Confirmar</Button>) : (<Button className='bg-red-500'
+                    onClick={() => {
+                      setIsOpenConfig(false);
+                    }}
+                  >Fechar</Button>)}
               </DialogFooter>
 
             </DialogContent>

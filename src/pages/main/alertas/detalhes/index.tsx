@@ -1,55 +1,25 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '@/components/ui/alert-dialog'
-
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Bath, Bed, Car, Edit, Pencil,  Plus, Trash2 } from 'lucide-react'
+import {  Edit} from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Controller,  useForm } from 'react-hook-form'
-import { useMediaQuery } from 'react-responsive'
 
-import { ROUTE } from '@/enums/routes.enum'
 import { PageLoader } from '@/pages/assistant/page-loader'
-import api from '@/services/axios/api'
 import { queryClient } from '@/services/react-query/query-client'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
-import { useNavigate, useParams } from 'react-router-dom'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
-import { LancamentoStatus } from '@/enums/locacao/enums-locacao'
-import { Textarea } from '@/components/ui/textarea'
+import {  useParams } from 'react-router-dom'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { useAuth } from '@/hooks/auth/use-auth'
-import React from 'react'
 import axios from 'axios'
-import { getEnderecoFormatado } from '@/helpers/get-endereco-formatado'
 import moment from 'moment'
 import { alertaSchema, AlertaSchema } from '@/schemas/alerta.schema'
 import { ConfiguracaoAlerta } from '@/interfaces/configuracaoalerta'
 import { getAlerta, updateAlerta } from '../requests'
 import { AlertaForm } from '../criaralerta/components/alerta-form'
+import { useForm } from 'react-hook-form'
 
 
 //Valores default do imóvel
@@ -77,16 +47,7 @@ export const getFormattedDefaultValues = (configAlerta: ConfiguracaoAlerta | und
 export const DetalhesAlerta = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
-  const isPortrait = useMediaQuery({ query: '(min-width: 1224px)' })
-  const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
-  const isMobile = useMediaQuery({ query: '(min-width: 400px)' })
-
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
-  const [isEditing, setIsEditing] = React.useState(false)
-  const [titulo, setTitulo] = React.useState("Criar novo lançamento")
-  const disabled = isEditing
-
-  const navigate = useNavigate()
+  
   const dataParams = useParams<{ id: string }>()
   const id = dataParams.id ? parseInt(dataParams.id) : undefined
 
@@ -123,6 +84,7 @@ export const DetalhesAlerta = () => {
     empresaId: alerta?.empresaId,
   }
 
+  console.log('defaultValues', defaultValues);
 
   //Altera alerta
   const updateMutation = useMutation({
@@ -195,7 +157,7 @@ export const DetalhesAlerta = () => {
     const form = new FormData()
 
     if (data.descricao) {
-      form.append('name', data.descricao)
+      form.append('descricao', data.descricao)
     }
 
     if (data.ativo) {

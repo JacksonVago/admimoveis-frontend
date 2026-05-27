@@ -12,7 +12,7 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { IdCard, List, Plus, Receipt, Search, Trash, X } from 'lucide-react'
+import { IdCard, List, Mail, Plus, Receipt, Search, Trash, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
@@ -40,6 +40,9 @@ import ListarLocacoes from '../locacoes'
 import { Locacao } from '@/interfaces/locacao'
 import axios from 'axios'
 import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
+import { jobSchema, JobSchema } from '@/schemas/job.schema'
+import { JobsStatus } from '@/enums/alertas/JobsStatus'
+import { getAlertasPag} from '../alertas/requests'
 
 const createBoleto = async (data: FormData): Promise<Boleto | any> => {
 
@@ -122,6 +125,7 @@ export default function ListarBoletos({
   const isMobile = useMediaQuery({ query: '(max-width: 420px)' })
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
   const [showcard, setShowCard] = useState((isMobile ? false : true));
+  const [selBoleto, setSelBoleto] = useState<Boleto>();
 
   const navigate = useNavigate();
 
@@ -138,7 +142,17 @@ export default function ListarBoletos({
   const [dataInicial, setdataInicial] = useState(searchParams.get('dataInicial') || moment.utc(new Date()).format("YYYY-MM-DD"));
   const [dataFinal, setdataFinal] = useState(searchParams.get('dataFinal') || moment.utc(new Date()).format("YYYY-MM-DD"));
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false)
   //const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+
+  //Consulta alertas configurados
+  const {
+    data: alertas
+  } = useQuery({
+    queryKey: ['alertas'],
+    queryFn: () => getAlertasPag(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {}),
+  });
+
 
   const boletoMethods = useForm<BoletoSchema>({
     resolver: zodResolver(boletoSchema),
@@ -154,6 +168,7 @@ export default function ListarBoletos({
     },
     mode: 'all'
   })
+
 
   const { data, isLoading } = useQuery(
     useGetBoletosQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {
@@ -208,6 +223,7 @@ export default function ListarBoletos({
 
   const confirmarBoleto = useMutation({
     mutationFn: async (boleto: Boleto) => {
+      console.log(boleto);
       return await api.put(`/pagamentos/statusPagamento/${boleto.id}`, boleto)
     },
     onSuccess: () => {
@@ -237,6 +253,20 @@ export default function ListarBoletos({
       });
     }
   });
+
+  const jobMethods = useForm<JobSchema>({
+    resolver: zodResolver(jobSchema),
+    defaultValues: {
+      empresaId: glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,
+      str_start_date: new Date().toISOString(),
+      str_end_date: new Date().toISOString(),
+      str_start_time: new Date().toISOString(),
+      str_end_time: new Date().toISOString(),
+      status: JobsStatus.WAITING_TO_START,
+      userId: user?.id
+    },
+    mode: 'all'
+  })
 
   // const hasTotalPages = !!totalPages
   // const canGoToNextPage = hasTotalPages && page < totalPages
@@ -320,6 +350,7 @@ export default function ListarBoletos({
   const handleConfirmarBoleto = async (boleto: Boleto) => {
     try {
       boleto.status = BoletoStatus.CONFIRMADO;
+      boleto.documentos = [];
       confirmarBoleto.mutateAsync(boleto);
     } catch (error) {
       toast({ title: 'Erro ao gerar boletos.', variant: 'destructive' });
@@ -517,6 +548,220 @@ export default function ListarBoletos({
     }
   }
 
+  const handlerEnviaEmail = (boleto: Boleto) => {
+    setSelBoleto(boleto);
+    if (boleto?.imovelId && boleto?.imovelId > 0) {
+      if (boleto.imovel?.proprietarios) {
+        jobMethods.setValue('str_email', boleto.imovel.proprietarios[0].pessoa ? boleto.imovel.proprietarios.map(loc => loc.pessoa ? loc.pessoa.email : "").join(";") : "");
+      }
+    }
+    else {
+      if (boleto?.locacaoId && boleto?.locacaoId > 0) {
+        if (boleto.locacao?.locatarios) {
+          jobMethods.setValue('str_email', boleto.locacao.locatarios[0].pessoa ? boleto.locacao.locatarios.map(loc => loc.pessoa ? loc.pessoa.email : "").join(";") : "");
+        }
+      }
+    }
+    setIsEmailDialogOpen(true);
+  }
+
+  const handleSubmitEmail = (data: JobSchema) => {
+    const formData = new FormData();
+
+    if (data.empresaId) {
+      formData.append('empresaId', data.empresaId.toString())
+    }
+    if (data.alertaId) {
+      formData.append('alertaId', data.alertaId.toString())
+    }
+    if (data.descAlerta) {
+      formData.append('descAlerta', data.descAlerta);
+    }
+
+    if (selBoleto?.imovelId && selBoleto?.imovelId > 0) {
+      if (selBoleto.imovel?.proprietarios) {
+        formData.append('pessoaId', selBoleto.imovel.proprietarios[0].pessoaId.toString());
+        formData.append('str_email', selBoleto.imovel.proprietarios[0].pessoa ? selBoleto.imovel.proprietarios.map(loc => loc.pessoa ? loc.pessoa.email : "").join(";") : "");
+      }
+    }
+    else {
+      if (selBoleto?.locacaoId && selBoleto?.locacaoId > 0) {
+        if (selBoleto.locacao?.locatarios) {
+          formData.append('pessoaId', selBoleto.locacao.locatarios[0].pessoaId.toString());
+          formData.append('str_email', selBoleto.locacao.locatarios[0].pessoa ? selBoleto.locacao.locatarios.map(loc => loc.pessoa ? loc.pessoa.email : "").join(";") : "");
+        }
+      }
+    }
+
+    if (data.imovelId) {
+      formData.append('imovelId', data.imovelId.toString());
+    }
+    if (data.locacaoId) {
+      formData.append('locacaoId', data.locacaoId.toString());
+    }
+
+    if (data.str_message) {
+      formData.append('str_message', data.str_message.toString());
+    }
+
+    if (locacao.fields.length === 0) {
+      boletoMethods.setValue('locacaoId', 0);
+      return false;
+    }
+    else {
+      boletoMethods.setValue('locacaoId', locacao.fields[0].id);
+      boletoMethods.setValue('locatarioId', locacao.fields[0].locatarioId);
+    }
+
+
+
+    /*const newDocuments = data?.documentos?.filter((doc) => !doc.id)
+    newDocuments?.forEach((doc) => {
+      formData.append('documentos', doc.file)
+    })*/
+
+
+    //createBoletoMutation.mutate({ data: formData });
+
+  }
+
+  console.log(alertas);
+  const handlerChangeAlerta = (value: string) => {
+    let alerta = alertas?.data.filter(x => x.id === Number(value));
+    jobMethods.setValue("descAlerta", alerta ? alerta[0].alerta.descricao : "");
+    let descAlerta = alerta ? alerta[0].alerta.descricao : "";
+    let textoAlerta = alerta ? alerta[0].textoAlerta : "";
+    let int_pos: number = 0;
+    let int_tam: number = 0;
+    let str_campo: string = "";
+
+    if (textoAlerta.length > 0) {
+      while (textoAlerta.indexOf('<', int_pos) > -1) {
+        int_pos = textoAlerta.indexOf('<', int_pos);
+        int_tam = textoAlerta.indexOf('>', int_pos);
+        str_campo = textoAlerta.substring(int_pos, int_tam + 1);
+
+
+        //Troca campo por dados do boleto
+        console.log(str_campo);
+        switch (descAlerta) {
+          case "Aviso reajuste Locação":
+            break;
+
+          case "Aviso renovação contrato":
+            break;
+
+          case "Aviso seguro incêndio":
+            break;
+
+          case "Aviso vencimento boleto":
+            if (selBoleto) {
+              switch (str_campo) {
+                case "<Data de Emissão>":
+                  textoAlerta = textoAlerta.replace(str_campo, moment.utc(selBoleto.dataEmissao).format("DD/MM/YYYY"));
+                  break;
+
+                case "<Data de Vencimento>":
+                  textoAlerta = textoAlerta.replace(str_campo, moment.utc(selBoleto.dataEmissao).format("DD/MM/YYYY"));
+                  break;
+
+                case "<Valor Original>":
+                  textoAlerta = textoAlerta.replace(str_campo, selBoleto.valorOriginal.toLocaleString('pt-BR'));
+                  break;
+
+                case "<Email>":
+                  textoAlerta = textoAlerta.replace(str_campo, moment.utc(selBoleto.locatario?.pessoa?.email).format("DD/MM/YYYY"));
+                  break;
+
+                case "<Link do Documento>":
+                  if (selBoleto.documentos && selBoleto.documentos.length > 0) {
+                    textoAlerta = textoAlerta.replace(str_campo, selBoleto.documentos.map(doc => doc.url ? import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url : "").join("\n"));
+                  }
+                  break;
+
+                case "<Linha Digitável Boleto>":
+                  textoAlerta = textoAlerta.replace(str_campo, selBoleto.linhaDigitavel);
+                  break;
+
+                case "<Linha Digitável Lançamento>":
+                  if (selBoleto.lancamentoImovels && selBoleto.lancamentoImovels.length > 0) {
+                    textoAlerta = textoAlerta.replace(str_campo, selBoleto.lancamentoImovels.map(lan => lan.linhaDigitavel ? lan.linhaDigitavel : "").join("\n"));
+                  }
+                  else {
+                    if (selBoleto.lanctoCondominio && selBoleto.lanctoCondominio.length > 0) {
+                      textoAlerta = textoAlerta.replace(str_campo, selBoleto.lanctoCondominio.map(lan => lan.linhaDigitavel ? lan.linhaDigitavel : "").join("\n"));
+                    }
+                    else {
+                      if (selBoleto.lanctoLocacao && selBoleto.lanctoLocacao.length > 0) {
+                        textoAlerta = textoAlerta.replace(str_campo, selBoleto.lanctoLocacao.map(lan => lan.linhaDigitavel ? lan.linhaDigitavel : "").join("\n"));
+                      }
+                      else {
+                        textoAlerta = textoAlerta.replace(str_campo, "");
+                      }
+                    }
+                  }
+                  break;
+              }
+            }
+            break;
+
+          case "Aviso boleto atrasado":
+            /*arr_campos = [
+              { check: false, campo: "dataEmissao", descricao: "Data de Emissão" },
+              { check: false, campo: "dataVencimento", descricao: "Data de Vencimento" },
+              { check: false, campo: "valorOriginal", descricao: "Valor Original" },
+              { check: false, campo: "email", descricao: "Email" },
+              { check: false, campo: "linkDocumento", descricao: "Link do Documento" },
+              { check: false, campo: "linhaDigitavelBol", descricao: "Linha Digitável Boleto" },
+              { check: false, campo: "linhaDigitavelLan", descricao: "Linha Digitável Lançamento" },
+            ]*/
+            break;
+
+          default:
+            break;
+        }
+
+        int_pos++;
+      }
+      jobMethods.setValue("str_message", textoAlerta);
+    }
+
+  }
+
+  const handlerSendMail = async () => {
+    try {
+      const result = await api.post<string>('/emails/send-email/' + selBoleto?.empresaId,
+        {
+          email: jobMethods.getValues("str_email"),
+          subject: jobMethods.getValues("descAlerta"),
+          text: jobMethods.getValues("str_message")
+        }, {
+        //headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      console.log(result);
+      toast({ title: 'Email enviado com sucesso.' });
+    }
+    catch (error) {
+      if (axios.isAxiosError(error)) {
+        // Check if there's a response and data within the error
+        if (error.response && error.response.data) {
+          console.error('Error message from server:', error.response.data);
+          toast({
+            title: 'Erro ao atualizar locacao',
+            description: error.response.data.message,
+          })
+
+          // You can also set this error message to a state to display it in your UI
+        } else {
+          console.error('Axios error without response data:', error.message);
+        }
+      } else {
+        console.error('Non-Axios error:', error);
+      }
+    }
+
+
+  }
 
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
@@ -1010,14 +1255,22 @@ export default function ListarBoletos({
                               </Button>
                             </>
                           )}
-                          {(boleto.documentos && boleto.documentos.length > 0) && (
-                            <Button variant="secondary"
-                              className='hover:cursor-pointer hover:bg-gray-200'
-                              onClick={() => handleClickVerComprovante(boleto)}
-                              size={"sm"}>
-                              Comprovante
-                            </Button>
-                          )}
+                        {(boleto.documentos && boleto.documentos.length > 0) && (
+                          <Button variant="secondary"
+                            className='hover:cursor-pointer hover:bg-gray-200'
+                            onClick={() => handleClickVerComprovante(boleto)}
+                            size={"sm"}>
+                            Comprovante
+                          </Button>
+                        )}
+                        {boleto.status === BoletoStatus.CONFIRMADO && (
+                          <Button variant="secondary"
+                            className='hover:cursor-pointer hover:bg-gray-200'
+                            onClick={() => handlerEnviaEmail(boleto)}
+                            size={"sm"}>
+                            <Mail></Mail>
+                          </Button>
+                        )}
                       </div>
                     </CardFooter>
                   </Card>
@@ -1088,6 +1341,95 @@ export default function ListarBoletos({
             )
 
           )}
+
+        {/**Dialog de email */}
+        <Dialog
+          open={isEmailDialogOpen}
+          onOpenChange={(value) => {
+            setIsEmailDialogOpen(value)
+          }}
+        >
+          <DialogContent>
+            <DialogHeader className='font-[Poppins-Regular]'>
+              <DialogTitle>Envio de e-mail</DialogTitle>
+              <DialogDescription>Preencha os dados para envio do alerta.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-2">
+              <form className="space-y-4 font-[Poppins-Regular]" onSubmit={jobMethods.handleSubmit(handleSubmitEmail)}>
+                <div className="grid grid-cols-1 items-center gap-4">
+                  <Label className='text-base font-[Poppins-Regular]'>
+                    Tipo de Alerta
+                    <div className='mt-2 border rounded-md pr-6'>
+                      <Controller
+                        name="alertaId"
+                        control={jobMethods.control}
+
+                        render={({ field }) => (
+                          <Select
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              handlerChangeAlerta(value);
+                            }}
+                            value={String(field.value)}
+                          >
+                            <SelectTrigger className='h-6'>
+                              <SelectValue placeholder="Tipo agendamento" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {alertas?.data.map((alerta) => (
+                                <SelectItem key={alerta.id} value={alerta.id.toString()}>
+                                  {alerta.descricao}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                      {jobMethods.formState.errors.alertaId?.message &&
+                        (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                          {jobMethods.formState.errors.alertaId.message}
+                        </p>)}
+                    </div>
+                  </Label>
+
+                  <Label className="text-base font-[Poppins-Regular]">
+                    Destinatário
+                    <Input
+                      type='text'
+                      className="mt-2"
+                      placeholder="Destinatário"
+                      {...jobMethods.register('str_email')}
+                    />
+                    {jobMethods.formState?.errors?.str_email?.message &&
+                      <p style={{ color: 'red', fontSize: '0.8rem' }}>
+                        *{jobMethods.formState?.errors?.str_email?.message}
+                      </p>}
+                  </Label>
+
+                  <Label className="text-base font-[Poppins-Regular]">
+                    Mensagem
+                    <Textarea
+                      rows={10}
+                      className="mt-2"
+                      placeholder="Mensagem de envio"
+                      {...jobMethods.register('str_message')}
+                    />
+                    {jobMethods.formState?.errors?.str_message?.message &&
+                      <p style={{ color: 'red', fontSize: '0.8rem' }}>
+                        *{jobMethods.formState?.errors?.str_message?.message}
+                      </p>}
+                  </Label>
+                </div>
+                <DialogFooter>
+                  <Button size="sm" type='submit' className='hover:cursor-pointer hover:bg-gray-600'
+                    onClick={() => handlerSendMail()}>
+                    Enviar email</Button>
+                </DialogFooter>
+              </form>
+            </div>
+          </DialogContent>
+        </Dialog>
+
       </div>
 
       {/* Pagination */}

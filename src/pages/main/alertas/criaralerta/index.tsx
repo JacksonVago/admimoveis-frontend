@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { ROUTE } from '@/enums/routes.enum'
-import { toast, useToast } from '@/hooks/use-toast'
+import { toast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -142,6 +142,8 @@ export const CriarAlerta = () => {
   }
 
   console.log('alerta dados', createAlertaMethods.formState.errors);
+  console.log('alerta dados', createAlertaMethods.formState.isDirty);
+  console.log('alerta dados', createAlertaMethods.formState.isValid);
 
   return (
     <div className="scale mx-auto flex max-w-screen-xl transform flex-col items-center px-4 transition-transform">

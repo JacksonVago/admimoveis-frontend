@@ -1,9 +1,7 @@
-import { Bloco } from '@/interfaces/bloco'
 import { ConfiguracaoAlerta } from '@/interfaces/configuracaoalerta'
 import { TipoAlerta } from '@/interfaces/tipoalerta'
 import api from '@/services/axios/api'
 import { isAxiosError } from 'axios'
-import { unknown } from 'zod'
 
 // Types
 export interface GetAlertasParams {
