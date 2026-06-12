@@ -55,6 +55,9 @@ import { DetalhesLancamentoImovel } from '@/pages/main/lancamentosimoveis/detalh
 import { CriarAlerta } from '@/pages/main/alertas/criaralerta'
 import { DetalhesAlerta } from '@/pages/main/alertas/detalhes'
 import ListarAlertas from '@/pages/main/alertas/listaralertas'
+import { CriarContaCorrente } from '@/pages/main/contascorrente/criarcontacorrente'
+import { DetalhesContaCorrente } from '@/pages/main/contascorrente/detalhes'
+import ListarContasCorrentes from '@/pages/main/contascorrente/listarcontascorrente'
 
 export interface ProtectedRouteProps {
   permission: Permission
@@ -184,6 +187,32 @@ export const RoutesComponent = () => {
             element={
               <ProtectedRoute permission="VIEW_ALERTAS">
                 <ListarAlertas limitView={3} exclude='' onSelectAlerta={undefined} />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Contas corrente */}
+          <Route
+            path={ROUTE.CONTA_CORRENTE_CRIAR}
+            element={
+              <ProtectedRoute permission="CREATE_CONTA_CORRENTE">
+                <CriarContaCorrente />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.CONTA_CORRENTE_DETALHES}
+            element={
+              <ProtectedRoute permission="VIEW_CONTAS_CORRENTE">
+                <DetalhesContaCorrente />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.CONTA_CORRENTE}
+            element={
+              <ProtectedRoute permission="VIEW_CONTAS_CORRENTE">
+                <ListarContasCorrentes limitView={3} exclude='' onSelectContaCorrente={undefined} />
               </ProtectedRoute>
             }
           />

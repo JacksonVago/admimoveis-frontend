@@ -9,7 +9,7 @@ export const TIPO_AGENDAMENTO_OPTIONS = [
 
 
 export const FREQUENCIA_ENVIO_OPTIONS = [
-  { value: FrequenciaEnvio.ANUAL, label: 'ANUAL' },  
+  //{ value: FrequenciaEnvio.ANUAL, label: 'ANUAL' },  
   { value: FrequenciaEnvio.MENSAL, label: 'MENSAL' },  
   { value: FrequenciaEnvio.SEMANAL, label: 'SEMANAL' },  
   { value: FrequenciaEnvio.DIAS_VENCIMENTO, label: 'DIAS_VENCIMENTO' },  

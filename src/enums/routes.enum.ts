@@ -95,6 +95,11 @@ export enum ROUTE {
   PAGAMENTOS_CRIAR = '/pagamentos/criar',
   PAGAMENTOS_DETALHES = '/pagamentos/:id',
 
+  //Conta Corrente routes
+  CONTA_CORRENTE = '/conta-corrente',
+  CONTA_CORRENTE_CRIAR = '/conta-corrente/criar',
+  CONTA_CORRENTE_DETALHES = '/conta-corrente/:id',
+
   //Repasse routes
   REPASSES = '/repasses',
 

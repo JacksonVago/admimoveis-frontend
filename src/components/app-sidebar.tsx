@@ -1,6 +1,6 @@
 'use client'
 
-import { Banknote, Building, Building2, CircleDollarSign, Cog, House, KeyRound, Lock, LogOut, OctagonAlert, ReceiptText, Shapes, Users } from 'lucide-react'
+import { Banknote, Building, Building2, CircleDollarSign, Cog, House, KeyRound, Landmark, Lock, LogOut, OctagonAlert, ReceiptText, Shapes, Users } from 'lucide-react'
 import * as React from 'react'
 //import logo  from '../assets/logo-molina.png';
 
@@ -30,6 +30,11 @@ const data = {
       title: 'Alertas',
       url: ROUTE.ALERTAS,
       icon: OctagonAlert
+    },
+    {
+      title: 'Conta Corrente',
+      url: ROUTE.CONTA_CORRENTE,
+      icon: Landmark
     },
     {
       title: 'Clientes',
@@ -151,6 +156,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         return true
       }
       if (item.url === ROUTE.LANCAMENTOS_IMOVEIS && user?.permissions.includes('VIEW_LANCAMENTOS_IMOVEIS')) {
+        return true
+      }
+      if (item.url === ROUTE.CONTA_CORRENTE && user?.permissions.includes('VIEW_CONTAS_CORRENTE')) {
         return true
       }
       return false
