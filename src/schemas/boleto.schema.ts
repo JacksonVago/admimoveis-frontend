@@ -60,6 +60,14 @@ export const boletoSchema = z.object({
       }
     )
   ).optional(),
+  imovel: z.array(
+    z.object(
+      {
+        nome: z.string(),
+        id: z.number(),
+      }
+    )
+  ).optional(),
   empresaId: z.coerce.number().min(1, 'Empresa é obrigatória'),
 });
 

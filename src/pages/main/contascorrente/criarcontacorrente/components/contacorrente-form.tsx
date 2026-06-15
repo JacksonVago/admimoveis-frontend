@@ -11,12 +11,10 @@ import {
 import { Controller, UseFormReturn } from 'react-hook-form'
 import { useQuery } from '@tanstack/react-query'
 import { getBanco, getCarteiraCobranca, getEspecieCobranca, getInstrucaoCobranca, getInstrucaoRecebimentos } from '../../requests'
-import { useGlobalParams } from '@/globals/GlobalParams'
 import { useMediaQuery } from 'react-responsive'
 import { Eye, EyeOffIcon } from 'lucide-react'
 import { useState } from 'react'
 import { ContaCorrenteSchema } from '@/schemas/contacorrente.schema'
-import { PESSOA_STATUS } from '@/pages/main/clientes/constants/pessoa-status'
 import { STATUS_PESSOA_OPTIONS } from '@/constants/pessoas'
 import { Switch, Thumb } from '@radix-ui/react-switch'
 import { FORMA_ENVIO_OPTIONS } from '@/constants/forma-envio'
@@ -42,7 +40,6 @@ export const ContaCorrenteFormContent = ({
 }) => {
 
   const isMobile = useMediaQuery({ query: '(max-width: 420px)' })
-  const glb_params = useGlobalParams();
   const [pagParcial, setPagParcial] = useState(false);
   const [selBanco, setSelBanco] = useState<number>(0);
   const [showPassword, setShowPassword] = useState(false);

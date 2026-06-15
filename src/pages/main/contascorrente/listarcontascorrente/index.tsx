@@ -86,9 +86,9 @@ export default function ListarContasCorrentes({
   console.log(data);
   console.log(data?.data);
   console.log(data?.data.data);
-  const contascorrentes = data?.data.data || []
-  //const totalPages = data?.data?.totalPages
-  const totalPages = 0
+  const contascorrentes = data?.data?.data || [];
+  const totalPages = data?.data?.totalPages
+
   //always that we go to out of the total pages, we will go to the first page
   useEffect(() => {
     if (onSelectContaCorrente === undefined) {
@@ -132,10 +132,10 @@ export default function ListarContasCorrentes({
     navigate(ROUTE.CONTA_CORRENTE_CRIAR)
   }
   // UI Logic
-  //const hasSearchResults = Boolean(!isLoading && search && alertas?.length === 0)
+  const hasSearchResults = Boolean(!isLoading && search && contascorrentes?.length === 0)
 
   const handleClickVerDetalhes = (id: string) => {
-    navigate(`${ROUTE.CONTA_CORRENTE_DETALHES}/${id}`)
+    navigate(`${ROUTE.CONTA_CORRENTE}/${id}`)
   }
 
   
@@ -187,10 +187,9 @@ export default function ListarContasCorrentes({
       {/* Contas Grid */}
       <div className={(isBigScreen ? "grid gap-4 grid-cols-3" : isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
         {/* Search Results & No Results Message */}
-        {/*hasSearchResults && (
-          <p className="text-center text-muted-foreground">Nenhum alerta encontrado</p>
-        )*/}
-        <p className="text-center text-muted-foreground">Nenhum alerta encontrado</p>
+        {hasSearchResults && (
+          <p className="text-center text-muted-foreground">Conta corente não encontrada</p>
+        )}
         {/* Contas Cards */}
 
         {isLoading ? (
@@ -211,10 +210,10 @@ export default function ListarContasCorrentes({
                       <CardContent>
                         <p className='font-[Poppins-bold]'>{conta.banco.nome}</p>
                         <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
-                          {conta.agencia}
+                          Agencia: {conta.agencia}
                         </p>
                         <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
-                          {conta.conta + '-' + conta.digito}
+                          Conta: {conta.conta + '-' + conta.digito}
                         </p>
                       </CardContent>
                       <CardFooter className="flex justify-between">

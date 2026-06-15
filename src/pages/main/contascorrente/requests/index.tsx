@@ -1,11 +1,9 @@
 import { Banco } from '@/interfaces/banco'
 import { CarteiraCobranca } from '@/interfaces/carteiracobranca'
-import { ConfiguracaoAlerta } from '@/interfaces/configuracaoalerta'
 import { ContaCorrente } from '@/interfaces/contacorrente'
 import { EspecieCobranca } from '@/interfaces/especiecobranca'
 import { InstrucaoCobranca } from '@/interfaces/instrucaocobranca'
 import { InstrucaoRecebimentos } from '@/interfaces/instrucaorecebimentos'
-import { TipoAlerta } from '@/interfaces/tipoalerta'
 import api from '@/services/axios/api'
 import { isAxiosError } from 'axios'
 

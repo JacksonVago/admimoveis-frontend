@@ -42,7 +42,9 @@ import axios from 'axios'
 import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
 import { jobSchema, JobSchema } from '@/schemas/job.schema'
 import { JobsStatus } from '@/enums/alertas/JobsStatus'
-import { getAlertasPag} from '../alertas/requests'
+import { getAlertasPag } from '../alertas/requests'
+import { Imovel } from '@/interfaces/imovel'
+import ListarImoveisLocacao from '../imoveis/listaimoveislocacao'
 
 const createBoleto = async (data: FormData): Promise<Boleto | any> => {
 
@@ -133,6 +135,7 @@ export default function ListarBoletos({
   const glb_params = useGlobalParams();
 
   const [selLocacao, setSelLocacao] = useState<boolean>(false);
+  const [selImovel, setSelImovel] = useState<boolean>(false);
   const [searchParams, setSearchTerm] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
   //const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
@@ -164,6 +167,7 @@ export default function ListarBoletos({
       valorPago: 0,
       locacaoId: 0,
       locatarioId: 0,
+      imovelId: 0,
       empresaId: glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,
     },
     mode: 'all'
@@ -295,6 +299,12 @@ export default function ListarBoletos({
     name: 'locacao'
   });
 
+  //Lista de imoveis
+  const imovel = useFieldArray({
+    control: boletoMethods.control,
+    name: 'imovel'
+  });
+
   // Event Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const search = e.target.value
@@ -377,7 +387,14 @@ export default function ListarBoletos({
 
     if (locacao.fields.length === 0) {
       boletoMethods.setValue('locacaoId', 0);
-      return false;
+
+      if (imovel.fields.length === 0) {
+        boletoMethods.setValue('imovelId', 0);
+        return false;
+      }
+      else {
+        boletoMethods.setValue('imovelId', imovel.fields[0].id);
+      }
     }
     else {
       boletoMethods.setValue('locacaoId', locacao.fields[0].id);
@@ -386,6 +403,11 @@ export default function ListarBoletos({
 
     if (data.locacaoId) {
       formData.append('locacaoId', data.locacaoId.toString());
+    }
+    else {
+      if (data.imovelId) {
+        formData.append('imovelId', data.imovelId.toString());
+      }
     }
     if (data.locatarioId) {
       formData.append('locatarioId', data.locatarioId.toString());
@@ -469,11 +491,43 @@ export default function ListarBoletos({
     setSelLocacao(false);
   }
 
+  //Retorno ao selecionar a imovel
+  const handleSelectedImovel = (imovelSel: Imovel | undefined) => {
+
+    console.log(imovelSel);
+    if (imovelSel) {
+      if (imovel.fields.length === 0) {
+        imovel.append({
+          nome: imovelSel ? (imovelSel.proprietarios ? imovelSel.proprietarios[0].pessoa?.nome + ' - ' : '') + imovelSel.endereco.complemento + ' - ' + imovelSel.condominio.name : "",
+          id: imovelSel.id,
+        });
+      }
+      boletoMethods.setValue('imovelId', imovelSel.id,
+        {
+          shouldDirty: true,
+          shouldValidate: true
+        }
+      );
+    }
+    else {
+      boletoMethods.setValue('imovelId', 0,
+        {
+          shouldDirty: false,
+          shouldValidate: false
+        }
+      );
+    }
+    setSelImovel(false);
+  }
+
   const handlerNewBoleto = () => {
     console.log('novo boleto');
     boletoMethods.reset();
     if (locacao.fields.length > 0) {
       locacao.remove(0);
+    }
+    if (imovel.fields.length > 0) {
+      imovel.remove(0);
     }
     setIsCreateDialogOpen(!isCreateDialogOpen);
 
@@ -606,7 +660,13 @@ export default function ListarBoletos({
 
     if (locacao.fields.length === 0) {
       boletoMethods.setValue('locacaoId', 0);
-      return false;
+      if (imovel.fields.length === 0) {
+        boletoMethods.setValue('imovelId', 0);
+        return false;
+      }
+      else {
+        boletoMethods.setValue('imovelId', imovel.fields[0].id);
+      }
     }
     else {
       boletoMethods.setValue('locacaoId', locacao.fields[0].id);
@@ -798,15 +858,72 @@ export default function ListarBoletos({
               <DialogTitle>Criar novo Boleto</DialogTitle>
               <DialogDescription>Preencha os dados do novo Boleto abaixo.</DialogDescription>
             </DialogHeader>
-            <div className="grid gap-2">
+            <div>
               <FormProvider {...boletoMethods}>
                 <DocumentUpload disabled={false} downloadDocuments={true} />
               </FormProvider>
 
               <form className="space-y-4 font-[Poppins-Regular]" onSubmit={boletoMethods.handleSubmit(handleSubmitBoleto)}>
-                <div className="grid grid-cols-2 items-center gap-4">
+                <div className="grid grid-cols-2 items-center gap-2">
 
-                  {(!selLocacao) && (
+                  {/*seleção de imovel */}
+                  {(!selImovel && (!selLocacao && locacao.fields.length === 0)) && (
+                    <div className='col-span-2'>
+                      {(imovel.fields.length > 0) ? (
+                        <>
+                          <Label className='text-base' >Imóvel</Label>
+                          <div className="grid grid-cols-1 gap-4 flex items-center">
+                            {imovel.fields.map((field, index) => (
+                              <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                                <Label >{field.nome}</Label>
+                                <button
+                                  className='border bg-zinc-200 hover:bg-zinc-400'
+                                  type="button"
+                                  onClick={() => {
+                                    boletoMethods.setValue('locacaoId', 0, { shouldDirty: false, shouldValidate: false });
+                                    imovel.remove(index);
+                                  }}
+                                >
+                                  <X className='px-1'></X>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      ) : (
+                        <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
+                          <Button type='button' size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'
+                            onClick={() => {
+                              setSelImovel(true);
+                            }}
+                          >Adicionar imóvel</Button>
+                        </div>
+                      )}
+                      {!!boletoMethods?.formState?.errors?.imovelId?.message && (
+                        boletoMethods.formState?.errors?.imovelId?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {boletoMethods.formState?.errors?.imovelId?.message}</p>
+                      )}
+
+                    </div>
+                  )}
+
+                  {/*Seleção de imóveis */}
+                  {selImovel && (
+                    <Card id='teste' className='h-full col-span-2'>
+                      <div className="flex  justify-end">
+                        <Button onClick={() => { handleSelectedImovel(undefined) }}
+                          className='w-4 h-8 -top-5 -right-5 relative rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
+                      </div>
+                      <CardHeader>
+                        <h1 className='flex items-center justify-center font-bold'>Selecionar Imóvel</h1>
+                      </CardHeader>
+                      <CardContent className='mt-2 h-120'>
+                        <ListarImoveisLocacao limitView={1} exclude='' onSelectImovel={handleSelectedImovel} />
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/*seleção de locação */}
+                  {((!selImovel && imovel.fields.length === 0) && !selLocacao) && (
                     <div className='col-span-2'>
                       {(locacao.fields.length > 0) ? (
                         <>
@@ -861,7 +978,7 @@ export default function ListarBoletos({
                     </Card>
                   )}
 
-                  {!selLocacao && (
+                  {(!selImovel && !selLocacao) && (
                     <>
                       <div className='mt-2 col-span-2'>
                         <div className="grid grid-cols-1 gap-4 mt-2">

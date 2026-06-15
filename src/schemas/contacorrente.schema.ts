@@ -1,6 +1,5 @@
 import { FormaEnvio } from '@/enums/cobranca/FormaEnvio'
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
-import { Form } from 'react-router-dom'
 import { z } from 'zod'
 
 export const contacorrenteSchema = z.object({
@@ -44,8 +43,8 @@ export const contacorrenteSchema = z.object({
     instrucaoRecId4: z.string().optional(),
 
     bancoId: z.string().min(1, 'Condomínio é obrigatório'),
-    carteiraId: z.string().min(1, 'Condomínio é obrigatório'),
-    especieId: z.string().min(1, 'Condomínio é obrigatório'),
+    carteiraId: z.string().optional(),
+    especieId: z.string().optional(),
     pessoaId: z.string().optional(),
     empresaId: z.coerce.number(),
 })

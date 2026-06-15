@@ -68,23 +68,23 @@ export const CriarContaCorrente = () => {
     const form = new FormData()
 
     if (data.agencia) {
-      form.append('agencia', data.agencia)
+      form.append('agencia', data.agencia.toString())
     }
 
     if (data.conta) {
-      form.append('conta', data.conta)
+      form.append('conta', data.conta.toString())
     }
 
     if (data.digito) {
-      form.append('digito', data.digito)
+      form.append('digito', data.digito.toString())
     }
 
     if (data.descricao) {
-      form.append('descricao', data.descricao)
+      form.append('descricao', data.descricao.toString())
     }
 
     if (data.usuarioBancoAPI) {
-      form.append('usuarioBancoAPI', data.usuarioBancoAPI);
+      form.append('usuarioBancoAPI', data.usuarioBancoAPI.toString());
     }
 
     if (data.senhaBancoAPI) {
@@ -115,11 +115,88 @@ export const CriarContaCorrente = () => {
       form.append('status', data.status.toString())
     }
 
+
+    if (data.pagtoParcial){
+      form.append('pagtoParcial', data.pagtoParcial.toString());
+    }
+    if (data.qtdeMaxParcial){
+      form.append('qtdeMaxParcial', data.qtdeMaxParcial.toString());
+    }
+    if (data.formaEnvio){
+      form.append('formaEnvio', data.formaEnvio.toString());
+    }
+    if (data.assuntoEmail){
+      form.append('assuntoEmail', data.assuntoEmail.toString());
+    }
+    if (data.mensagemEmail1){
+      form.append('mensagemEmail1', data.mensagemEmail1.toString());
+    }
+    if (data.mensagemEmail2){
+      form.append('mensagemEmail2', data.mensagemEmail2.toString());
+    }
+    if (data.mensagemEmail3){
+      form.append('mensagemEmail3', data.mensagemEmail3.toString());
+    }
+
+    if (data.tipoJurosCobId){
+      form.append('tipoJurosCobId', data.tipoJurosCobId.toString());
+    }
+    if (data.tipoMultaCobId){
+      form.append('tipoMultaCobId', data.tipoMultaCobId.toString());
+    }
+    if (data.tipoDescontoCobId){
+      form.append('tipoDescontoCobId', data.tipoDescontoCobId.toString());
+    }
+    if (data.tipoAutorizacaoCobId){
+      form.append('tipoAutorizacaoCobId', data.tipoAutorizacaoCobId.toString());
+    }
+    if (data.protestar){
+      form.append('protestar', data.protestar.toString());
+    }
+    if (data.qtdeDiasProtesto){
+      form.append('qtdeDiasProtesto', data.qtdeDiasProtesto.toString());
+    }
+    if (data.negativar){
+      form.append('negativar', data.negativar.toString());
+    }
+    if (data.qtdeDiasNegativar){
+      form.append('qtdeDiasNegativar', data.qtdeDiasNegativar.toString());
+    }
+
     form.append('bancoId', data.bancoId.toString());
-    form.append('instrucaoCobId', data.instrucaoCobId.toString());
-    form.append('instrucaoRecId', data.instrucaoRecId.toString());
-    form.append('carteiraId', data.carteiraId.toString());
-    form.append('especieId', data.especieId.toString());
+
+    if (data.instrucaoCobId1) {
+      form.append('instrucaoCobId1', data.instrucaoCobId1.toString());
+    }
+    if (data.instrucaoCobId2) {
+      form.append('instrucaoCobId2', data.instrucaoCobId2.toString());
+    }
+
+    if (data.instrucaoCobId3) {
+      form.append('instrucaoCobId3', data.instrucaoCobId3.toString());
+    }
+
+
+    if (data.instrucaoRecId1) {
+      form.append('instrucaoRecId1', data.instrucaoRecId1.toString());
+    }
+    if (data.instrucaoRecId2) {
+      form.append('instrucaoRecId2', data.instrucaoRecId2.toString());
+    }
+    if (data.instrucaoRecId3) {
+      form.append('instrucaoRecId3', data.instrucaoRecId3.toString());
+    }
+    if (data.instrucaoRecId4) {
+      form.append('instrucaoRecId4', data.instrucaoRecId4.toString());
+    }
+
+    if (data.carteiraId) {
+      form.append('carteiraId', data.carteiraId.toString());
+    }
+    if (data.especieId) {
+      form.append('especieId', data.especieId.toString());
+    }
+
     form.append('empresaId', glb_params.id_empresa ? glb_params.id_empresa : "0");
 
     const dataObject = Object.fromEntries(form.entries());
