@@ -4,6 +4,10 @@ import { ContaCorrente } from '@/interfaces/contacorrente'
 import { EspecieCobranca } from '@/interfaces/especiecobranca'
 import { InstrucaoCobranca } from '@/interfaces/instrucaocobranca'
 import { InstrucaoRecebimentos } from '@/interfaces/instrucaorecebimentos'
+import { TipoAutorizacaoCobranca } from '@/interfaces/tipoautorizacaocobranca'
+import { TipoDescontoCobranca } from '@/interfaces/tipodescontocobranca'
+import { TipoJurosCobranca } from '@/interfaces/tipojuroscobranca'
+import { TipoMultaCobranca } from '@/interfaces/tipomultacobranca'
 import api from '@/services/axios/api'
 import { isAxiosError } from 'axios'
 
@@ -68,6 +72,26 @@ export const getBanco = async (BancoId: number) => {
     }
     throw error;
   }
+}
+
+export const getTipoJurosCobranca = async (BancoId: number) => {
+  const result = await api.get<TipoJurosCobranca[]>('tipo-juros/' + BancoId)
+  return result.data;
+}
+
+export const getTipoDescontoCobranca = async (BancoId: number) => {
+  const result = await api.get<TipoDescontoCobranca[]>('tipo-descontos/' + BancoId)
+  return result.data;
+}
+
+export const getTipoMultaCobranca = async (BancoId: number) => {
+  const result = await api.get<TipoMultaCobranca[]>('tipo-multas/' + BancoId)
+  return result.data;
+}
+
+export const getTipoAutorizacaoCobranca = async (BancoId: number) => {
+  const result = await api.get<TipoAutorizacaoCobranca[]>('tipo-autorizacao/' + BancoId)
+  return result.data;
 }
 
 export const getInstrucaoCobranca = async (BancoId: number) => {

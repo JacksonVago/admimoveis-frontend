@@ -45,6 +45,15 @@ import { JobsStatus } from '@/enums/alertas/JobsStatus'
 import { getAlertasPag } from '../alertas/requests'
 import { Imovel } from '@/interfaces/imovel'
 import ListarImoveisLocacao from '../imoveis/listaimoveislocacao'
+import { ContaCorrente } from '@/interfaces/contacorrente'
+import { FormaEnvio } from '@/enums/cobranca/FormaEnvio'
+import { BoletosBancario } from '@/utils/boletos-bancario'
+
+const getContas = async (empresaId: number) => {
+  const result = await api.get<ContaCorrente[]>('/contas-corrente/' + empresaId)
+  return result.data;
+
+}
 
 const createBoleto = async (data: FormData): Promise<Boleto | any> => {
 
@@ -128,6 +137,7 @@ export default function ListarBoletos({
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
   const [showcard, setShowCard] = useState((isMobile ? false : true));
   const [selBoleto, setSelBoleto] = useState<Boleto>();
+  const [selConta, setSelConta] = useState<ContaCorrente>();
 
   const navigate = useNavigate();
 
@@ -146,7 +156,7 @@ export default function ListarBoletos({
   const [dataFinal, setdataFinal] = useState(searchParams.get('dataFinal') || moment.utc(new Date()).format("YYYY-MM-DD"));
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false)
-  //const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isBancoDialogOpen, setIsBancoDialogOpen] = useState(false)
 
   //Consulta alertas configurados
   const {
@@ -156,6 +166,13 @@ export default function ListarBoletos({
     queryFn: () => getAlertasPag(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {}),
   });
 
+  //Consulta contas corrente
+  const {
+    data: contas
+  } = useQuery({
+    queryKey: ['contas'],
+    queryFn: () => getContas(Number(glb_params.id_empresa)),
+  });
 
   const boletoMethods = useForm<BoletoSchema>({
     resolver: zodResolver(boletoSchema),
@@ -356,29 +373,6 @@ export default function ListarBoletos({
     style: 'currency',
     currency: 'BRL',
   });
-
-  const handleConfirmarBoleto = async (boleto: Boleto) => {
-    try {
-      boleto.status = BoletoStatus.CONFIRMADO;
-      boleto.documentos = [];
-      confirmarBoleto.mutateAsync(boleto);
-    } catch (error) {
-      toast({ title: 'Erro ao gerar boletos.', variant: 'destructive' });
-    }
-  }
-
-  const handleExcluirBoleto = async (boletoId: number) => {
-    try {
-      deleteBoleto.mutateAsync(boletoId);
-    } catch (error) {
-      toast({ title: 'Erro ao excluir boleto.', variant: 'destructive' });
-    }
-  }
-  const handlerChangeTipo = (tipo: string) => {
-    navigate({
-      search: `?page=1&limit=${limit}&search=${search}&status=${tipo}`
-    })
-  }
 
   //Validação dos dados do boleto
   function handleSubmitBoleto(data: BoletoSchema) {
@@ -685,7 +679,6 @@ export default function ListarBoletos({
 
   }
 
-  console.log(alertas);
   const handlerChangeAlerta = (value: string) => {
     let alerta = alertas?.data.filter(x => x.id === Number(value));
     jobMethods.setValue("descAlerta", alerta ? alerta[0].alerta.descricao : "");
@@ -823,6 +816,64 @@ export default function ListarBoletos({
 
   }
 
+  const handlerChangeContaCorrente = (value: string) => {
+    const conta = contas?.find(x => x.id === Number(value));
+
+    if (conta) {
+      setSelConta(conta);
+    }
+    else {
+      toast({ title: `Conta inexistente.` });
+    }
+  }
+
+  const handleConfirmarBoleto = async (boleto: Boleto) => {
+    try {
+      setSelBoleto(boleto);
+      /*
+      boleto.status = BoletoStatus.CONFIRMADO;
+      boleto.documentos = [];
+      confirmarBoleto.mutateAsync(boleto);*/
+      setIsBancoDialogOpen(true);
+    } catch (error) {
+      toast({ title: 'Erro ao emitir boleto.', variant: 'destructive' });
+    }
+  }
+
+  const handleExcluirBoleto = async (boletoId: number) => {
+    try {
+      deleteBoleto.mutateAsync(boletoId);
+    } catch (error) {
+      toast({ title: 'Erro ao excluir boleto.', variant: 'destructive' });
+    }
+  }
+  const handlerChangeTipo = (tipo: string) => {
+    navigate({
+      search: `?page=1&limit=${limit}&search=${search}&status=${tipo}`
+    })
+  }
+
+  const handlerEmitirBoleto = () => {
+    if (selBoleto && selConta) {
+      const banco = "Validar" + selConta.banco.codigo;
+      const msg = BoletosBancario[banco as keyof typeof BoletosBancario](selConta);
+
+      if (msg.length > 0){        
+        toast({ title: msg, variant: 'destructive' });
+      }
+      else{
+
+        //Envia boleto ao banco
+        let boleto:Boleto = selBoleto;
+        boleto.status = BoletoStatus.CONFIRMADO;
+        boleto.documentos = [];
+        confirmarBoleto.mutateAsync(boleto);
+        
+        toast({ title: 'Emissão efetuada com sucesso.' });
+      }
+      
+    }
+  }
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}
@@ -1541,6 +1592,62 @@ export default function ListarBoletos({
                   <Button size="sm" type='submit' className='hover:cursor-pointer hover:bg-gray-600'
                     onClick={() => handlerSendMail()}>
                     Enviar email</Button>
+                </DialogFooter>
+              </form>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/**Dialog de envio de boleto ao banco */}
+        <Dialog
+          open={isBancoDialogOpen}
+          onOpenChange={(value) => {
+            setIsBancoDialogOpen(value)
+          }}
+        >
+          <DialogContent>
+            <DialogHeader className='font-[Poppins-Regular]'>
+              <DialogTitle>Geração de Boletos/Envio ao banco</DialogTitle>
+              <DialogDescription>Preencha os dados para confirmação do boleto.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-2">
+              <form className="space-y-4 font-[Poppins-Regular]" onSubmit={jobMethods.handleSubmit(handleSubmitEmail)}>
+                <div className="grid grid-cols-1 items-center gap-4">
+                  <div className='mt-2'>
+                    <Label className='text-base font-[Poppins-Regular]'>
+                      Banco
+                      <div className="mt-2 border rounded-md pr-6">
+                        <Controller
+                          name="contaCorrenteId"
+                          control={boletoMethods.control}
+                          render={({ field }) => (
+                            <Select
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                                handlerChangeContaCorrente(value);
+                              }
+                              }
+                              value={field.value}
+                            >
+                              <SelectTrigger className='h-6'>
+                                <SelectValue placeholder="Selecione a conta" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {contas && contas.map((conta) => (
+                                  <SelectItem value={conta.id.toString()}>{conta.descricao}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                      </div>
+                    </Label>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button size="sm" type='submit' className='hover:cursor-pointer hover:bg-gray-600'
+                    onClick={() => handlerEmitirBoleto()}>
+                    Emitir Boleto</Button>
                 </DialogFooter>
               </form>
             </div>

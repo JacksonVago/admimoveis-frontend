@@ -37,12 +37,30 @@ export interface ContaCorrente {
 
   tipoJurosCob:TipoJurosCobranca;
   tipoJurosCobId:number;
+  valorJuros:number;
+  percJuros:number;
+  diasInicioJuros:number;
+
   tipoMultaCob:TipoMultaCobranca;
   tipoMultaCobId:number;
+  valorMulta:number;
+  percMulta:number;
+  diasInicioMulta:number;
+
   tipoDescontoCob:TipoDescontoCobranca;
   tipoDescontoCobId:number;
+  valorDesconto:number;
+  percDesconto:number;
+  diasInicioDesconto:number;
+
   tipoAutorizacaoCob:TipoAutorizacaoCobranca;
   tipoAutorizacaoCobId:number;
+  tipoRecebimentoDiv:string;
+  valorMinDiverg:number;
+  valorMaxDiverg:number;
+  percMinDiverg :number;
+  percMaxDiverg :number;
+
   protestar:boolean;
   qtdeDiasProtesto:number;
   negativar:boolean;
@@ -54,6 +72,8 @@ export interface ContaCorrente {
   instrucaoCobId2:number;
   instrucaoCob3:InstrucaoCobranca;
   instrucaoCobId3:number;
+  qtdeDiasAposVencto:number;
+  cobrancaDiaUtil:boolean;
 
   instrucaoRec1:InstrucaoRecebimentos;
   instrucaoRecId1:number;

@@ -68,6 +68,7 @@ export const boletoSchema = z.object({
       }
     )
   ).optional(),
+  contaCorrenteId: z.string().optional(),
   empresaId: z.coerce.number().min(1, 'Empresa é obrigatória'),
 });
 

@@ -1,4 +1,5 @@
 import { BoletoBancario } from "./boletobancario";
+import { ContaCorrente } from "./contacorrente";
 import { GenericAnexo } from "./generic-anexo";
 import { Imovel } from "./imovel";
 import { LancamentoCondominio } from "./lancamentocondominio";
@@ -32,9 +33,10 @@ export interface Boleto {
     documentos?:GenericAnexo[]
     lanctoLocacao?:LancamentoLocacao[];
     locatario?:Locatario;
-    boletosBancarios?: BoletoBancario[]
-    lanctoCondominio?: LancamentoCondominio[]
-    lancamentoImovels?: LancamentoImovel[]
+    boletosBancarios?: BoletoBancario[];
+    lanctoCondominio?: LancamentoCondominio[];
+    lancamentoImovels?: LancamentoImovel[];
+    contacorrente?: ContaCorrente;
 
   }
   

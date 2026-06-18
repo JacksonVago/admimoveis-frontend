@@ -25,9 +25,27 @@ export const contacorrenteSchema = z.object({
     mensagemEmail3: z.string().optional(),
 
     tipoJurosCobId: z.string().optional(),
+    valorJuros: z.coerce.number().or(z.string().transform(Number)).optional(),
+    percJuros: z.coerce.number().or(z.string().transform(Number)).optional(),
+    diasInicioJuros: z.coerce.number().or(z.string().transform(Number)).optional(),
+
     tipoMultaCobId: z.string().optional(),
+    valorMulta: z.coerce.number().or(z.string().transform(Number)).optional(),
+    percMulta: z.coerce.number().or(z.string().transform(Number)).optional(),
+    diasInicioMulta: z.coerce.number().or(z.string().transform(Number)).optional(),
+
     tipoDescontoCobId: z.string().optional(),
+    valorDesconto: z.coerce.number().or(z.string().transform(Number)).optional(),
+    percDesconto: z.coerce.number().or(z.string().transform(Number)).optional(),
+    diasInicioDesconto: z.coerce.number().or(z.string().transform(Number)).optional(),
+
     tipoAutorizacaoCobId: z.string().optional(),
+    tipoRecebimentoDiv: z.string().optional(),
+    valorMinDiverg: z.coerce.number().or(z.string().transform(Number)).optional(),
+    valorMaxDiverg: z.coerce.number().or(z.string().transform(Number)).optional(),
+    percMinDiverg: z.coerce.number().or(z.string().transform(Number)).optional(),
+    percMaxDiverg: z.coerce.number().or(z.string().transform(Number)).optional(),
+
     protestar: z.boolean().optional(),
     qtdeDiasProtesto: z.coerce.number().optional(),
     negativar: z.boolean().optional(),
@@ -36,6 +54,8 @@ export const contacorrenteSchema = z.object({
     instrucaoCobId1: z.string().optional(),
     instrucaoCobId2: z.string().optional(),
     instrucaoCobId3: z.string().optional(),
+    qtdeDiasAposVencto: z.coerce.number().optional(),
+    cobrancaDiaUtil: z.boolean().optional(),
 
     instrucaoRecId1: z.string().optional(),
     instrucaoRecId2: z.string().optional(),
@@ -47,6 +67,9 @@ export const contacorrenteSchema = z.object({
     especieId: z.string().optional(),
     pessoaId: z.string().optional(),
     empresaId: z.coerce.number(),
-})
+});
+/*.refine((data) => {
+    if (data.tipoJurosCobId)
+});*/
 
 export type ContaCorrenteSchema = z.infer<typeof contacorrenteSchema>

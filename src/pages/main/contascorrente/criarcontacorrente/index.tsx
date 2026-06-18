@@ -141,15 +141,61 @@ export const CriarContaCorrente = () => {
     if (data.tipoJurosCobId){
       form.append('tipoJurosCobId', data.tipoJurosCobId.toString());
     }
+    if (data.valorJuros){
+      form.append('valorJuros', data.valorJuros.toString());
+    }
+    if (data.percJuros){
+      form.append('percJuros', data.percJuros.toString());
+    }
+    if (data.diasInicioJuros){
+      form.append('diasInicioJuros', data.diasInicioJuros.toString());
+    }
+  
     if (data.tipoMultaCobId){
       form.append('tipoMultaCobId', data.tipoMultaCobId.toString());
     }
+    if (data.valorMulta){
+      form.append('valorMulta', data.valorMulta.toString());
+    }
+    if (data.percMulta){
+      form.append('percMulta', data.percMulta.toString());
+    }
+    if (data.diasInicioMulta){
+      form.append('diasInicioMulta', data.diasInicioMulta.toString());
+    }
+
     if (data.tipoDescontoCobId){
       form.append('tipoDescontoCobId', data.tipoDescontoCobId.toString());
     }
+    if (data.valorDesconto){
+      form.append('valorDesconto', data.valorDesconto.toString());
+    }
+    if (data.percDesconto){
+      form.append('percDesconto', data.percDesconto.toString());
+    }
+    if (data.diasInicioDesconto){
+      form.append('diasInicioDesconto', data.diasInicioDesconto.toString());
+    }
+
     if (data.tipoAutorizacaoCobId){
       form.append('tipoAutorizacaoCobId', data.tipoAutorizacaoCobId.toString());
     }
+    if (data.tipoRecebimentoDiv){
+      form.append('tipoRecebimentoDiv', data.tipoRecebimentoDiv.toString());
+    }
+    if (data.valorMinDiverg){
+      form.append('valorMinDiverg', data.valorMinDiverg.toString());
+    }
+    if (data.valorMaxDiverg){
+      form.append('valorMaxDiverg', data.valorMaxDiverg.toString());
+    }
+    if (data.percMinDiverg){
+      form.append('percMinDiverg', data.percMinDiverg.toString());
+    }
+    if (data.percMaxDiverg){
+      form.append('percMaxDiverg', data.percMaxDiverg.toString());
+    }
+
     if (data.protestar){
       form.append('protestar', data.protestar.toString());
     }
@@ -175,7 +221,12 @@ export const CriarContaCorrente = () => {
     if (data.instrucaoCobId3) {
       form.append('instrucaoCobId3', data.instrucaoCobId3.toString());
     }
-
+    if (data.qtdeDiasAposVencto) {
+      form.append('qtdeDiasAposVencto', data.qtdeDiasAposVencto.toString());
+    }
+    if (data.cobrancaDiaUtil) {
+      form.append('cobrancaDiaUtil', data.cobrancaDiaUtil.toString());
+    }
 
     if (data.instrucaoRecId1) {
       form.append('instrucaoRecId1', data.instrucaoRecId1.toString());
@@ -186,6 +237,7 @@ export const CriarContaCorrente = () => {
     if (data.instrucaoRecId3) {
       form.append('instrucaoRecId3', data.instrucaoRecId3.toString());
     }
+    
     if (data.instrucaoRecId4) {
       form.append('instrucaoRecId4', data.instrucaoRecId4.toString());
     }

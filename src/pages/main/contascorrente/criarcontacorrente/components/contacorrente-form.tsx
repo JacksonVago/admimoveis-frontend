@@ -10,14 +10,15 @@ import {
 } from '@/components/ui/select'
 import { Controller, UseFormReturn } from 'react-hook-form'
 import { useQuery } from '@tanstack/react-query'
-import { getBanco, getCarteiraCobranca, getEspecieCobranca, getInstrucaoCobranca, getInstrucaoRecebimentos } from '../../requests'
+import { getBanco, getCarteiraCobranca, getEspecieCobranca, getInstrucaoCobranca, getInstrucaoRecebimentos, getTipoAutorizacaoCobranca, getTipoDescontoCobranca, getTipoJurosCobranca, getTipoMultaCobranca } from '../../requests'
 import { useMediaQuery } from 'react-responsive'
 import { Eye, EyeOffIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ContaCorrenteSchema } from '@/schemas/contacorrente.schema'
 import { STATUS_PESSOA_OPTIONS } from '@/constants/pessoas'
 import { Switch, Thumb } from '@radix-ui/react-switch'
 import { FORMA_ENVIO_OPTIONS } from '@/constants/forma-envio'
+import { TIPO_DIVERG_COBRANCA_OPTIONS } from '@/constants/tipo-divergencia-cobranca'
 
 export const ContaCorrenteFormRoot = ({
   children,
@@ -59,6 +60,38 @@ export const ContaCorrenteFormContent = ({
     queryFn: () => getBanco(0),
   });
 
+  //Consulta Tipo de Juros
+  const {
+    data: tipoJuros
+  } = useQuery({
+    queryKey: ['tipoJuros', selBanco],
+    queryFn: () => getTipoJurosCobranca(selBanco),
+  });
+
+  //Consulta Tipo de Multa
+  const {
+    data: tipoMultas
+  } = useQuery({
+    queryKey: ['tipoMultas', selBanco],
+    queryFn: () => getTipoMultaCobranca(selBanco),
+  });
+
+  //Consulta Tipo de desconto
+  const {
+    data: tipoDescontos
+  } = useQuery({
+    queryKey: ['tipoDescontos', selBanco],
+    queryFn: () => getTipoDescontoCobranca(selBanco),
+  });
+
+  //Consulta Tipo de autorizacao
+  const {
+    data: tipoAutorizacao
+  } = useQuery({
+    queryKey: ['tipoAutorizacao', selBanco],
+    queryFn: () => getTipoAutorizacaoCobranca(selBanco),
+  });
+
   //Consulta Instrução de cobrança
   const {
     data: instrucaoCobranca
@@ -96,6 +129,14 @@ export const ContaCorrenteFormContent = ({
     setSelBanco(Number(value));
     console.log(selBanco)
   }
+
+  useEffect(() => {
+    handlerChangeBanco(createContaCorrenteMethods.getValues("bancoId"));
+  }, [])
+
+  /*console.log('conta dados', createContaCorrenteMethods.formState.errors);
+  console.log('conta dados', createContaCorrenteMethods.formState.isDirty);
+  console.log('conta dados', createContaCorrenteMethods.formState.isValid);*/
 
   return (
     <div className="space-y-4">
@@ -231,7 +272,7 @@ export const ContaCorrenteFormContent = ({
           </Label>
         </div>
 
-        <fieldset className="rounded-lg border-2 border-indigo-500 p-6">
+        <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
           <legend className="ml-4 px-2 text-indigo-600 font-bold">Dados de acesso à API</legend>
           <div className='mt-2 grid grid-cols-2 gap-4'>
             <div>
@@ -324,7 +365,7 @@ export const ContaCorrenteFormContent = ({
 
         </fieldset>
 
-        <fieldset className="rounded-lg border-2 border-indigo-500 p-6">
+        <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
           <legend className="ml-4 px-2 text-indigo-600 font-bold">Dados de Cobrança</legend>
 
           <div className='grid grid-cols-2'>
@@ -390,7 +431,7 @@ export const ContaCorrenteFormContent = ({
             </Label>
           </div>
 
-          <fieldset className="rounded-lg border-2 border-indigo-500 p-6">
+          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
             <legend className="ml-4 px-2 text-indigo-600 font-bold">Dados E-mail</legend>
 
             <div className='mt-2'>
@@ -438,7 +479,208 @@ export const ContaCorrenteFormContent = ({
             </div>
           </fieldset>
 
-          <fieldset className="rounded-lg border-2 border-indigo-500 p-6">
+          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
+            <legend className="ml-4 px-2 text-indigo-600 font-bold">Tipo de Juros</legend>
+            <div className='mt-2'>
+              <Label className='text-base font-[Poppins-Regular]'>
+                Tipo
+                <div className="mt-2 border rounded-md pr-6">
+                  <Controller
+                    name="tipoJurosCobId"
+                    control={createContaCorrenteMethods.control}
+                    render={({ field }) => (
+                      <Select
+                        disabled={disabled}
+                        onValueChange={(value) => field.onChange(value)}
+                        value={field.value}
+                      >
+                        <SelectTrigger className='h-6'>
+                          <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {tipoJuros && tipoJuros.map((juros) => (
+                            <SelectItem value={juros.id.toString()}>{juros.descricao}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+              </Label>
+            </div>
+
+            <div className='mt-2'>
+              <Label htmlFor="name">Valor Juros</Label>
+              <Input
+                className="mt-2"
+                type="number"
+                disabled={disabled}
+                placeholder="Valor Juros."
+                {...createContaCorrenteMethods.register('valorJuros')}
+              />
+            </div>
+
+            <div className='mt-2'>
+              <Label htmlFor="name">Percentual Juros</Label>
+              <Input
+                className="mt-2"
+                type="number"
+                step='0.01'
+                disabled={disabled}
+                placeholder="Mensagem.."
+                {...createContaCorrenteMethods.register('percJuros')}
+              />
+            </div>
+
+            <div className='mt-2'>
+              <Label htmlFor="name">Dias</Label>
+              <Input
+                className="mt-2"
+                type="number"
+                disabled={disabled}
+                placeholder="Mensagem.."
+                {...createContaCorrenteMethods.register('diasInicioJuros')}
+              />
+            </div>
+
+
+          </fieldset>
+
+          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
+            <legend className="ml-4 px-2 text-indigo-600 font-bold">Tipo de Multa</legend>
+            <div className='mt-2'>
+              <Label className='text-base font-[Poppins-Regular]'>
+                Tipo
+                <div className="mt-2 border rounded-md pr-6">
+                  <Controller
+                    name="tipoMultaCobId"
+                    control={createContaCorrenteMethods.control}
+                    render={({ field }) => (
+                      <Select
+                        disabled={disabled}
+                        onValueChange={(value) => field.onChange(value)}
+                        value={field.value}
+                      >
+                        <SelectTrigger className='h-6'>
+                          <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {tipoMultas && tipoMultas.map((multa) => (
+                            <SelectItem value={multa.id.toString()}>{multa.descricao}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+              </Label>
+            </div>
+
+
+            <div className='mt-2'>
+              <Label htmlFor="name">Valor Multa</Label>
+              <Input
+                className="mt-2"
+                type="number"
+                disabled={disabled}
+                placeholder="Valor Juros."
+                {...createContaCorrenteMethods.register('valorMulta')}
+              />
+            </div>
+
+            <div className='mt-2'>
+              <Label htmlFor="name">Percentual Multa</Label>
+              <Input
+                className="mt-2"
+                type="number"
+                step='0.01'
+                disabled={disabled}
+                placeholder="Perc. multa"
+                {...createContaCorrenteMethods.register('percMulta')}
+              />
+            </div>
+
+            <div className='mt-2'>
+              <Label htmlFor="name">Dias</Label>
+              <Input
+                className="mt-2"
+                type="number"
+                disabled={disabled}
+                placeholder="Mensagem.."
+                {...createContaCorrenteMethods.register('diasInicioMulta')}
+              />
+            </div>
+          </fieldset>
+
+          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
+            <legend className="ml-4 px-2 text-indigo-600 font-bold">Tipo de Desconto</legend>
+            <div className='mt-2'>
+              <Label className='text-base font-[Poppins-Regular]'>
+                Tipo Desconto
+                <div className="mt-2 border rounded-md pr-6">
+                  <Controller
+                    name="tipoDescontoCobId"
+                    control={createContaCorrenteMethods.control}
+                    render={({ field }) => (
+                      <Select
+                        disabled={disabled}
+                        onValueChange={(value) => field.onChange(value)}
+                        value={field.value}
+                      >
+                        <SelectTrigger className='h-6'>
+                          <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {tipoDescontos && tipoDescontos.map((desconto) => (
+                            <SelectItem value={desconto.id.toString()}>{desconto.descricao}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+              </Label>
+            </div>
+
+
+
+
+            <div className='mt-2'>
+              <Label htmlFor="name">Valor Desconto</Label>
+              <Input
+                className="mt-2"
+                type="number"
+                disabled={disabled}
+                placeholder="Valor desconto"
+                {...createContaCorrenteMethods.register('valorDesconto')}
+              />
+            </div>
+
+            <div className='mt-2'>
+              <Label htmlFor="name">Percentual Desconto</Label>
+              <Input
+                className="mt-2"
+                type="number"
+                step='0.01'
+                disabled={disabled}
+                placeholder="Perc. desconto"
+                {...createContaCorrenteMethods.register('percDesconto')}
+              />
+            </div>
+
+            <div className='mt-2'>
+              <Label htmlFor="name">Dias</Label>
+              <Input
+                className="mt-2"
+                type="number"
+                disabled={disabled}
+                placeholder=""
+                {...createContaCorrenteMethods.register('diasInicioDesconto')}
+              />
+            </div>
+          </fieldset>
+
+          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
             <legend className="ml-4 px-2 text-indigo-600 font-bold">Instruções de Cobrança</legend>
 
             <div className='mt-2'>
@@ -533,9 +775,34 @@ export const ContaCorrenteFormContent = ({
               </Label>
             </div>
 
+            <div className='mt-2'>
+              <Label htmlFor="name">Dias Após Vencimento</Label>
+              <Input
+                className="mt-2"
+                type="number"
+                disabled={disabled}
+                placeholder=""
+                {...createContaCorrenteMethods.register('qtdeDiasAposVencto')}
+              />
+            </div>
+
+            <div className={isMobile ? 'flex items-center justify-start align-middle mt-7' : 'flex items-center justify-start align-middle mt-7'}>
+              <label
+                className="Label"
+                htmlFor="diautil"
+                style={{ paddingRight: 15 }}
+              >
+                Somente dia útil
+              </label>
+              <Switch className="SwitchRoot focus:outline-none" id="diautil"
+                checked={createContaCorrenteMethods.getValues("cobrancaDiaUtil")}
+                onCheckedChange={(checked) => { createContaCorrenteMethods.setValue("cobrancaDiaUtil", checked); setPagParcial(checked); }}>
+                <Thumb className="SwitchThumb" />
+              </Switch>
+            </div>
           </fieldset>
 
-          <fieldset className="rounded-lg border-2 border-indigo-500 p-6">
+          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
             <legend className="ml-4 px-2 text-indigo-600 font-bold">Instruções de Recebimentos</legend>
 
             <div className='mt-2'>
@@ -661,6 +928,123 @@ export const ContaCorrenteFormContent = ({
             </div>
           </fieldset>
 
+          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
+            <legend className="ml-4 px-2 text-indigo-600 font-bold">Tipo de Autorização de divergência de cobrança</legend>
+            <div className='mt-2'>
+              <Label className='text-base font-[Poppins-Regular]'>
+                Tipo de Autorização
+                <div className="mt-2 border rounded-md pr-6">
+                  <Controller
+                    name="tipoAutorizacaoCobId"
+                    control={createContaCorrenteMethods.control}
+                    render={({ field }) => (
+                      <Select
+                        disabled={disabled}
+                        onValueChange={(value) => field.onChange(value)}
+                        value={field.value}
+                      >
+                        <SelectTrigger className='h-6'>
+                          <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {tipoAutorizacao && tipoAutorizacao.map((autorizacao) => (
+                            <SelectItem value={autorizacao.id.toString()}>{autorizacao.descricao}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+              </Label>
+            </div>
+
+            <div className='mt-2'>
+              <Label className='text-base font-[Poppins-Regular]'>
+                Tipo de Divergência
+                <div className="mt-2 border rounded-md pr-6">
+                  <Controller
+                    name="status"
+                    control={createContaCorrenteMethods.control}
+                    render={({ field }) => (
+                      <Select
+                        disabled={disabled}
+                        onValueChange={(value) => field.onChange(value)}
+                        value={field.value}
+                      >
+                        <SelectTrigger className='h-6'>
+                          <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {TIPO_DIVERG_COBRANCA_OPTIONS.map((tipo) => (
+                            <SelectItem className='text-base' key={tipo.label} value={tipo.value}>
+                              {tipo.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {/*!!createContaCorrenteMethods?.formState?.errors?.tipoAgendamento?.message && (
+                <span>{createContaCorrenteMethods?.formState?.errors?.tipoAgendamento?.message}</span>
+              )*/}
+                </div>
+              </Label>
+            </div>
+
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='mt-2'>
+                <Label htmlFor="name">Valor Mínimo</Label>
+                <Input
+                  className="mt-2"
+                  type="number"
+                  step='0.01'
+                  disabled={disabled}
+                  placeholder="Valor mínimo"
+                  {...createContaCorrenteMethods.register('valorMinDiverg')}
+                />
+              </div>
+
+              <div className='mt-2'>
+                <Label htmlFor="name">Valor máximo</Label>
+                <Input
+                  className="mt-2"
+                  type="number"
+                  step='0.01'
+                  disabled={disabled}
+                  placeholder="Valor máximo"
+                  {...createContaCorrenteMethods.register('valorMaxDiverg')}
+                />
+              </div>
+            </div>
+
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='mt-2'>
+                <Label htmlFor="name">Percentual Mínimo</Label>
+                <Input
+                  className="mt-2"
+                  type="number"
+                  step='0.01'
+                  disabled={disabled}
+                  placeholder="Percentual mínimo"
+                  {...createContaCorrenteMethods.register('percMinDiverg')}
+                />
+              </div>
+
+              <div className='mt-2'>
+                <Label htmlFor="name">Percentual máximo</Label>
+                <Input
+                  className="mt-2"
+                  type="number"
+                  step='0.01'
+                  disabled={disabled}
+                  placeholder="Percentual máximo"
+                  {...createContaCorrenteMethods.register('percMaxDiverg')}
+                />
+              </div>
+            </div>
+          </fieldset>
+
+
           <div className='mt-2'>
             <Label className='text-base font-[Poppins-Regular]'>
               Carteira de Cobrança
@@ -725,7 +1109,7 @@ export const ContaCorrenteFormContent = ({
         </fieldset>
 
       </div>
-    </div>
+    </div >
   )
 }
 
