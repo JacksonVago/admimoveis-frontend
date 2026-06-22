@@ -221,7 +221,7 @@ export const RoutesComponent = () => {
           <Route
             path={ROUTE.TIPOLANCAMENTO}
             element={
-              <ProtectedRoute permission="VIEW_TIPOLANCAMENTOS">
+              <ProtectedRoute permission="VIEW_TIPOS_LANC">
                 <ListarTiposLancamento />
               </ProtectedRoute>
             }
@@ -364,7 +364,7 @@ export const RoutesComponent = () => {
           <Route
             path={ROUTE.LANCAMENTOS_CONDOMINIOS}
             element={
-              <ProtectedRoute permission="VIEW_LANCAMENTOS_CONDOMINIOS">
+              <ProtectedRoute permission="VIEW_CONDOMINIO_LANCAMENTOS">
                 <ListarLancamentosCondominios exclude='' limitView={3} onSelectLancamento={undefined} />
               </ProtectedRoute>
             }
@@ -372,7 +372,7 @@ export const RoutesComponent = () => {
           <Route
             path={ROUTE.LANCAMENTOS_CONDOMINIOS_DETALHES}
             element={
-              <ProtectedRoute permission="VIEW_LANCAMENTOS_CONDOMINIOS">
+              <ProtectedRoute permission="UPDATE_CONDOMINIO_LANCAMENTO">
                 <DetalhesLancamentoCondominio />
               </ProtectedRoute>
             }
@@ -382,7 +382,7 @@ export const RoutesComponent = () => {
           <Route
             path={ROUTE.LANCAMENTOS}
             element={
-              <ProtectedRoute permission="VIEW_LANCAMENTOS">
+              <ProtectedRoute permission="VIEW_LOCACAO_LANCAMENTOS">
                 <ListarLancamentos exclude='' limitView={3} onSelectLancamento={undefined} />
               </ProtectedRoute>
             }
@@ -390,7 +390,7 @@ export const RoutesComponent = () => {
           <Route
             path={ROUTE.LANCAMENTOS_DETALHES}
             element={
-              <ProtectedRoute permission="VIEW_LANCAMENTOS">
+              <ProtectedRoute permission="UPDATE_LOCACAO_LANCAMENTO">
                 <DetalhesLancamento />
               </ProtectedRoute>
             }

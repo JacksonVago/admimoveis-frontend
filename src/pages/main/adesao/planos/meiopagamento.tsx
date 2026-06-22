@@ -91,7 +91,7 @@ export const MeioPagamento = () => {
     )
     useEffect(() => {
         if (localStorage) pagamentoMethods.reset(defaultValues)
-    }, [defaultValues])
+    }, [])
 
     const pagamentoMethods = useForm<PagamentoSchema>({
         resolver: zodResolver(pagamentoSchema),

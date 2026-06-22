@@ -723,7 +723,7 @@ export const DetalhesBloco = () => {
             <h2 className="text-2xl font-bold">Lançamentos</h2>
             {(isAdmin ||
               user?.permissions.includes("ALL") ||
-              user?.permissions.includes("CREATE_LANCAMENTO_CONDOMINIO")
+              user?.permissions.includes("CREATE_CONDOMINIO_LANCAMENTO")
             ) && (
                 <Button
                   size={"sm"}
@@ -757,7 +757,7 @@ export const DetalhesBloco = () => {
                         <DialogTrigger asChild>
                           {(isAdmin ||
                             user?.permissions.includes("ALL") ||
-                            user?.permissions.includes("CREATE_LANCAMENTO")
+                            user?.permissions.includes("CREATE_CONDOMINIO_LANCAMENTO")
                           ) && (
 
                               <Button size={'sm'}>
@@ -933,7 +933,7 @@ export const DetalhesBloco = () => {
                                 <div className='flex justify-center'>
                                   {((isAdmin ||
                                     user?.permissions.includes("ALL") ||
-                                    user?.permissions.includes("UPDATE_LANCAMENTO")
+                                    user?.permissions.includes("UPDATE_CONDOMINIO_LANCAMENTO")
                                   ) && lancamento.status === LancamentoStatus.ABERTO) && (
                                       <>
                                         <Button

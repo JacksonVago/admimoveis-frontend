@@ -176,7 +176,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <div className="flex justify-center rounded-lg">
                   <img
                     src={(glb_params.logo_url ? glb_params.logo_url : '')}
-                    className="rounded-md object-contain h-26"
+                    className="rounded-md object-contain h-20"
                   />
                 </div>
               </Link>

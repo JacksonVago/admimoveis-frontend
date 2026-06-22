@@ -48,6 +48,7 @@ import ListarImoveisLocacao from '../imoveis/listaimoveislocacao'
 import { ContaCorrente } from '@/interfaces/contacorrente'
 import { FormaEnvio } from '@/enums/cobranca/FormaEnvio'
 import { BoletosBancario } from '@/utils/boletos-bancario'
+import { BoletoBancario } from '@/interfaces/boletobancario'
 
 const getContas = async (empresaId: number) => {
   const result = await api.get<ContaCorrente[]>('/contas-corrente/' + empresaId)
@@ -853,25 +854,103 @@ export default function ListarBoletos({
     })
   }
 
-  const handlerEmitirBoleto = () => {
+  const handlerEmitirBoleto = async () => {
     if (selBoleto && selConta) {
       const banco = "Validar" + selConta.banco.codigo;
       const msg = BoletosBancario[banco as keyof typeof BoletosBancario](selConta);
 
-      if (msg.length > 0){        
+      if (msg.length > 0) {
         toast({ title: msg, variant: 'destructive' });
       }
-      else{
+      else {
 
         //Envia boleto ao banco
-        let boleto:Boleto = selBoleto;
+        let boleto: Boleto = selBoleto;
         boleto.status = BoletoStatus.CONFIRMADO;
         boleto.documentos = [];
-        confirmarBoleto.mutateAsync(boleto);
-        
+
+        let email = '';
+
+
+        //Envia dados ao banco
+        const boletoBancario: BoletoBancario = {
+          id: 0,
+          boletoId: boleto.id,
+          valor: boleto.valorOriginal, //Valor do boleto
+          valorPago: 0, //Valor pago no boleto
+          dataBoleto: (new Date()).toString(), //Emissao do boleto
+          dataVencimento: boleto.dataVencimento, //Vencimento do boleto
+          dataPagamento: boleto.dataPagamento, //Data de pagamento do boleto
+          formaPix: '', //Forma de pagamento PIX para recebimento
+          codigoBarras: '',
+          linhaDigitavel: '',
+          nossoNumero: boleto.id.toString(),
+          urlBoleto: '', //URL para visualização do boleto
+          registrado: 'N', //S/N Informa se ocorreu o registro do boleto
+          emvPIX: '', //Código EMV para pagamento via PIX
+          metodoPagamento: '', //Método de pagamento utilizado
+          status: '', //Status do boleto
+          observacao: '',
+
+          pagtoParcial: false, //Indica se o alerta está ativo ou não
+          qtdeMaxParcial: 0, //Quantide de pagamentos parcial 1..99
+          formaEnvio: '',
+          email: '',
+          assuntoEmail: '',
+          mensagemEmail1: '',
+          mensagemEmail2: '',
+          mensagemEmail3: '',
+
+          tipoJurosCobCod: '',
+          valorJuros: 0,
+          percJuros: 0,
+          diasInicioJuros: 0,
+
+          tipoMultaCobCod: '',
+          valorMulta: 0,
+          percMulta: 0,
+          diasInicioMulta: 0,
+
+          tipoDescontoCobCod: '',
+          valorDesconto: 0,
+          percDesconto: 0,
+          diasInicioDesconto: 0,
+
+          tipoAutorizacaoCobCod: '',
+          tipoRecebimentoDiv: '',
+          valorMinDiverg: 0,
+          valorMaxDiverg: 0,
+          percMinDiverg: 0,
+          percMaxDiverg: 0,
+
+          protestar: false,
+          qtdeDiasProtesto: 0,
+          negativar: false,
+          qtdeDiasNegativar: 0,
+
+          instrucaoCobCod1: '',
+          instrucaoCobCod2: '',
+          instrucaoCobCod3: '',
+
+          instrucaoRecCod1: '',
+          instrucaoRecCod2: '',
+          instrucaoRecCod3: '',
+          instrucaoRecCod4: '',
+
+          carteiraCod: '',
+          especieCod: '',
+          contaId: boleto.contacorrente ? boleto.contacorrente.id : 0
+
+        }
+        const retornoBanco = await api.put(`/boleto-bancario/enviar/`, boleto)
+        //Altera Status do boleto
+        if (retornoBanco) {
+          confirmarBoleto.mutateAsync(boleto);
+        }
+
         toast({ title: 'Emissão efetuada com sucesso.' });
       }
-      
+
     }
   }
   return (

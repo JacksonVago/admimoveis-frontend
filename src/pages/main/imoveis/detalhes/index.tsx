@@ -2423,7 +2423,7 @@ export const DetalhesImovel = () => {
                     <DialogTrigger asChild>
                       {(isAdmin ||
                         user?.permissions.includes("ALL") ||
-                        user?.permissions.includes("CREATE_LANCAMENTO")
+                        user?.permissions.includes("CREATE_CONDOMINIO_LANCAMENTO")
                       ) && (
 
                           <Button size={'sm'}>
@@ -2578,7 +2578,7 @@ export const DetalhesImovel = () => {
                             <div className='flex justify-center'>
                               {((isAdmin ||
                                 user?.permissions.includes("ALL") ||
-                                user?.permissions.includes("UPDATE_LANCAMENTO")
+                                user?.permissions.includes("UPDATE_CONDOMINIO_LANCAMENTO")
                               ) && lancamento.status === LancamentoStatus.ABERTO) && (
                                   <>
                                     <Button
@@ -2700,7 +2700,7 @@ export const DetalhesImovel = () => {
                             <div className='flex justify-center mt-2'>
                               {((isAdmin ||
                                 user?.permissions.includes("ALL") ||
-                                user?.permissions.includes("UPDATE_LANCAMENTO")
+                                user?.permissions.includes("UPDATE_CONDOMINIO_LANCAMENTO")
                               ) && boleto.status === BoletoStatus.PENDENTE) && (
                                   <>
                                     <Button
