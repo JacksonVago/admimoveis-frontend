@@ -343,7 +343,7 @@ export default function ListarLancamentosCondominios({
                       <div className='grid grid-cols-2 gap-10'>
                         {((isAdmin ||
                           user?.permissions.includes("ALL") ||
-                          user?.permissions.includes("UPDATE_LANCAMENTO"))) && (
+                          user?.permissions.includes("UPDATE_LOCACAO_LANCAMENTO"))) && (
 
                             <Button variant="secondary"
                               onClick={() => handleClickVerDetalhes(bloco?.id)}

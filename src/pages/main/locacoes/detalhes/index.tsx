@@ -1284,7 +1284,7 @@ export default function DetalhesLocacao() {
                     <DialogTrigger asChild>
                       {(isAdmin ||
                         user?.permissions.includes("ALL") ||
-                        user?.permissions.includes("CREATE_LANCAMENTO")
+                        user?.permissions.includes("CREATE_LOCACAO_LANCAMENTO")
                       ) && (
 
                           <Button size={'sm'}>
@@ -1439,7 +1439,7 @@ export default function DetalhesLocacao() {
                             <div className='flex justify-center'>
                               {((isAdmin ||
                                 user?.permissions.includes("ALL") ||
-                                user?.permissions.includes("UPDATE_LANCAMENTO")
+                                user?.permissions.includes("UPDATE_LOCACAO_LANCAMENTO")
                               ) && lancamento.status === LancamentoStatus.ABERTO) && (
                                   <>
                                     <Button
@@ -1561,7 +1561,7 @@ export default function DetalhesLocacao() {
                             <div className='flex justify-center mt-2'>
                               {((isAdmin ||
                                 user?.permissions.includes("ALL") ||
-                                user?.permissions.includes("UPDATE_LANCAMENTO")
+                                user?.permissions.includes("UPDATE_LOCACAO_LANCAMENTO")
                               ) && boleto.status === BoletoStatus.PENDENTE) && (
                                   <>
                                     <Button

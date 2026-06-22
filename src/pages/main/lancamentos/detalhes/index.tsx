@@ -416,7 +416,7 @@ export const DetalhesLancamento = () => {
                 <DialogTrigger asChild>
                   {(isAdmin ||
                     user?.permissions.includes("ALL") ||
-                    user?.permissions.includes("CREATE_LANCAMENTO")
+                    user?.permissions.includes("CREATE_LOCACAO_LANCAMENTO")
                   ) && (
 
                       <Button size={'sm'}>
@@ -571,7 +571,7 @@ export const DetalhesLancamento = () => {
                         <div className='flex justify-center'>
                           {((isAdmin ||
                             user?.permissions.includes("ALL") ||
-                            user?.permissions.includes("UPDATE_LANCAMENTO")
+                            user?.permissions.includes("UPDATE_LOCACAO_LANCAMENTO")
                           ) && lancamento.status === LancamentoStatus.ABERTO) && (
                               <>
                                 <Button

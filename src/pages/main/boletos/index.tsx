@@ -46,9 +46,9 @@ import { getAlertasPag } from '../alertas/requests'
 import { Imovel } from '@/interfaces/imovel'
 import ListarImoveisLocacao from '../imoveis/listaimoveislocacao'
 import { ContaCorrente } from '@/interfaces/contacorrente'
-import { FormaEnvio } from '@/enums/cobranca/FormaEnvio'
+//import { FormaEnvio } from '@/enums/cobranca/FormaEnvio'
 import { BoletosBancario } from '@/utils/boletos-bancario'
-import { BoletoBancario } from '@/interfaces/boletobancario'
+//import { BoletoBancario } from '@/interfaces/boletobancario'
 
 const getContas = async (empresaId: number) => {
   const result = await api.get<ContaCorrente[]>('/contas-corrente/' + empresaId)
@@ -869,7 +869,7 @@ export default function ListarBoletos({
         boleto.status = BoletoStatus.CONFIRMADO;
         boleto.documentos = [];
 
-        let email = '';
+        /*let email = '';
 
 
         //Envia dados ao banco
@@ -941,7 +941,7 @@ export default function ListarBoletos({
           especieCod: '',
           contaId: boleto.contacorrente ? boleto.contacorrente.id : 0
 
-        }
+        }*/
         const retornoBanco = await api.put(`/boleto-bancario/enviar/`, boleto)
         //Altera Status do boleto
         if (retornoBanco) {

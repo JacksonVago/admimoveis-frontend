@@ -134,7 +134,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (item.url === ROUTE.LOCACOES && user?.permissions.includes('VIEW_LOCACOES')) {
         return true
       }
-      if (item.url === ROUTE.LANCAMENTOS && user?.permissions.includes('VIEW_LANCAMENTOS')) {
+      if (item.url === ROUTE.LANCAMENTOS && user?.permissions.includes('VIEW_LOCACAO_LANCAMENTOS')) {
         return true
       }
       if ((item.url === ROUTE.PAGAMENTOS || item.url === ROUTE.REPASSES) && user?.permissions.includes('VIEW_PAGAMENTOS')) {
@@ -152,7 +152,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (item.url === ROUTE.TIPOIMOVEL && user?.permissions.includes('VIEW_TIPOS')) {
         return true
       }
-      if (item.url === ROUTE.LANCAMENTOS_CONDOMINIOS && user?.permissions.includes('VIEW_LANCAMENTOS_CONDOMINIOS')) {
+      if (item.url === ROUTE.LANCAMENTOS_CONDOMINIOS && user?.permissions.includes('VIEW_CONDOMINIO_LANCAMENTOS')) {
         return true
       }
       if (item.url === ROUTE.LANCAMENTOS_IMOVEIS && user?.permissions.includes('VIEW_LANCAMENTOS_IMOVEIS')) {
