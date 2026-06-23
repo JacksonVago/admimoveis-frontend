@@ -256,7 +256,7 @@ export const DetalhesImovel = () => {
 
   //Altera Imóvel
   const updateMutation = useMutation({
-    mutationFn: (data: FormData) => updateImovel(id!, data),    
+    mutationFn: (data: FormData) => updateImovel(id!, data),
     onSuccess: () => {
       ;['imovel', id].forEach((key) =>
         queryClient.invalidateQueries({
@@ -442,7 +442,7 @@ export const DetalhesImovel = () => {
           throw new Error(`Erro ao buscar imagem: ${image.url}, Status: ${response.status}`)
         }
         const blob = await response.blob()
-        
+
         const file = new File([blob], image.url, { type: blob.type })
         //const file = new File([blob], image.url, { type: 'application/png' })
         console.log('blob', file);
@@ -488,35 +488,35 @@ export const DetalhesImovel = () => {
     cep: enderecoData?.cep,
     estado: enderecoData?.estado,
     images: imageFiles,
-    condominioId: imovel?.condominioId,
+    condominioId: imovel?.condominioId ? imovel?.condominioId : undefined,
     blocoId: imovel?.blocoId,
-    condominioBloco: imovel?.condominioId.toString() + ';' + imovel?.blocoId.toString(),
+    condominioBloco: (imovel?.condominioId && imovel?.blocoId) ? imovel?.condominioId.toString() + ';' + imovel?.blocoId.toString() : undefined,
     imovelPhotos: imageFiles,
   }
 
-    //default values
-    const defaultValuesLan = useMemo(
-      () => ({
-        id: 0,
-        imovelId: imovel?.id,
-        dataLancamento: moment.utc(new Date()).format("YYYY-MM-DD"),
-        vencimentoLancamento: moment.utc(new Date()).format("YYYY-MM-DD"),
-        parcela: 1,
-        status: LancamentoStatus.ABERTO,
-      }),
-      [imovel]
-    )
-  
-  
+  //default values
+  const defaultValuesLan = useMemo(
+    () => ({
+      id: 0,
+      imovelId: imovel?.id,
+      dataLancamento: moment.utc(new Date()).format("YYYY-MM-DD"),
+      vencimentoLancamento: moment.utc(new Date()).format("YYYY-MM-DD"),
+      parcela: 1,
+      status: LancamentoStatus.ABERTO,
+    }),
+    [imovel]
+  )
+
+
   //Dados do imóvel schema de validação
   const imovelMethods = useForm<ImovelSchema>({
     resolver: zodResolver(imovelSchema),
     mode: 'all',
-    defaultValues:defaultValuesImovel
+    defaultValues: defaultValuesImovel
   })
 
   console.log(imovelMethods.getValues());
-  
+
   //Dados do proprietário schema de validação
   const imovelProp = useForm<PropImovelSchema>({
     resolver: zodResolver(propImoveSchema),
@@ -583,11 +583,13 @@ export const DetalhesImovel = () => {
   }, [isSuccess, imageFiles])
 
   useEffect(() => {
-    imovelMethods.setValue("condominioBloco", imovel?.condominioId.toString() + ';' + imovel?.blocoId.toString())
+    if (imovel?.condominioId && imovel?.blocoId) {
+      imovelMethods.setValue("condominioBloco", imovel?.condominioId.toString() + ';' + imovel?.blocoId.toString())
+    }
   }, [defaultValuesImovel])
 
   //Validade dados do imóvel no caso de alteração
-  const onSubmitImovelData = (data: ImovelSchema) => {    
+  const onSubmitImovelData = (data: ImovelSchema) => {
     setLoader(true);
     // Verifica se existem imagens novas ou se todas as imagens foram removidas
 
@@ -699,7 +701,7 @@ export const DetalhesImovel = () => {
       })
     }
 
-    updateMutation.mutate(form)    
+    updateMutation.mutate(form)
   }
 
   //Locação
@@ -728,7 +730,7 @@ export const DetalhesImovel = () => {
       valorDeposito: locacaoAtiva?.garantiaDepositoCalcao?.valorDeposito,
       quantidadeMeses: locacaoAtiva?.garantiaDepositoCalcao?.quantidadeMeses
     },
-    documentos: locacaoAtiva?.documentos,    
+    documentos: locacaoAtiva?.documentos,
   }
 
 
@@ -1336,7 +1338,7 @@ export const DetalhesImovel = () => {
 
   if (isLoading) return <PageLoader />
 
-  return (    
+  return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
       {loader && (<PageLoader />)}
 
@@ -1379,13 +1381,13 @@ export const DetalhesImovel = () => {
 
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <div className="w-full flex overflow-x-auto">
-        <TabsList>
-          <TabsTrigger value="personal-info" className='hover:cursor-pointer hover:bg-gray-200'>Dados do Imóvel</TabsTrigger>
-          <TabsTrigger value="proprietarios" className='hover:cursor-pointer hover:bg-gray-200'>Proprietários</TabsTrigger>
-          <TabsTrigger value="locacoes" className='hover:cursor-pointer hover:bg-gray-200'>Locação</TabsTrigger>
-          <TabsTrigger value="lancamentos" className='hover:cursor-pointer hover:bg-gray-200'>Lançamentos</TabsTrigger>
-          <TabsTrigger value="boletos" className='hover:cursor-pointer hover:bg-gray-200'>Boletos</TabsTrigger>
-        </TabsList>
+          <TabsList>
+            <TabsTrigger value="personal-info" className='hover:cursor-pointer hover:bg-gray-200'>Dados do Imóvel</TabsTrigger>
+            <TabsTrigger value="proprietarios" className='hover:cursor-pointer hover:bg-gray-200'>Proprietários</TabsTrigger>
+            <TabsTrigger value="locacoes" className='hover:cursor-pointer hover:bg-gray-200'>Locação</TabsTrigger>
+            <TabsTrigger value="lancamentos" className='hover:cursor-pointer hover:bg-gray-200'>Lançamentos</TabsTrigger>
+            <TabsTrigger value="boletos" className='hover:cursor-pointer hover:bg-gray-200'>Boletos</TabsTrigger>
+          </TabsList>
         </div>
 
         <TabsContent value="personal-info" className="space-y-4 font-[Poppins-regular]">
@@ -2407,7 +2409,7 @@ export const DetalhesImovel = () => {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <Label className="ml-1 mb-4 mt-8 font-bold">{
-                    (imovel?.proprietarios && imovel?.proprietarios.length > 0 ? imovel?.proprietarios[0].pessoa?.nome + ' - ' : '') + 
+                    (imovel?.proprietarios && imovel?.proprietarios.length > 0 ? imovel?.proprietarios[0].pessoa?.nome + ' - ' : '') +
                     getEnderecoFormatado(imovel?.endereco)}
                   </Label>
                   <Dialog

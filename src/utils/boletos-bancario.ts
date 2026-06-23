@@ -1,7 +1,7 @@
 import { FormaEnvio } from "@/enums/cobranca/FormaEnvio";
 import { ContaCorrente } from "@/interfaces/contacorrente";
 
-export const BoletosBancario = {
+export const BoletosBancarioValidate = {
     Validar237: (conta: ContaCorrente) => {
         let msg = '237';
         if (conta) {

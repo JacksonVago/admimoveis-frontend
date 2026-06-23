@@ -47,8 +47,8 @@ import { Imovel } from '@/interfaces/imovel'
 import ListarImoveisLocacao from '../imoveis/listaimoveislocacao'
 import { ContaCorrente } from '@/interfaces/contacorrente'
 //import { FormaEnvio } from '@/enums/cobranca/FormaEnvio'
-import { BoletosBancario } from '@/utils/boletos-bancario'
-//import { BoletoBancario } from '@/interfaces/boletobancario'
+import { BoletosBancarioValidate } from '@/utils/boletos-bancario'
+import { BoletoBancario } from '@/interfaces/boletobancario'
 
 const getContas = async (empresaId: number) => {
   const result = await api.get<ContaCorrente[]>('/contas-corrente/' + empresaId)
@@ -857,7 +857,7 @@ export default function ListarBoletos({
   const handlerEmitirBoleto = async () => {
     if (selBoleto && selConta) {
       const banco = "Validar" + selConta.banco.codigo;
-      const msg = BoletosBancario[banco as keyof typeof BoletosBancario](selConta);
+      const msg = BoletosBancarioValidate[banco as keyof typeof BoletosBancarioValidate](selConta);
 
       if (msg.length > 0) {
         toast({ title: msg, variant: 'destructive' });
@@ -869,7 +869,7 @@ export default function ListarBoletos({
         boleto.status = BoletoStatus.CONFIRMADO;
         boleto.documentos = [];
 
-        /*let email = '';
+        let email = '';
 
 
         //Envia dados ao banco
@@ -939,13 +939,14 @@ export default function ListarBoletos({
 
           carteiraCod: '',
           especieCod: '',
-          contaId: boleto.contacorrente ? boleto.contacorrente.id : 0
-
-        }*/
-        const retornoBanco = await api.put(`/boleto-bancario/enviar/`, boleto)
+          contaId: selConta ? selConta.id : 0        
+        }
+        console.log('envio: ', boletoBancario)
+        const retornoBanco = await api.post(`/boleto-bancario/enviar/`, boletoBancario)
         //Altera Status do boleto
+        console.log('retorno envio: ', retornoBanco)
         if (retornoBanco) {
-          confirmarBoleto.mutateAsync(boleto);
+          //confirmarBoleto.mutateAsync(boleto);
         }
 
         toast({ title: 'Emissão efetuada com sucesso.' });
