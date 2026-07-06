@@ -18,6 +18,7 @@ export interface ContaCorrente {
   conta:string;
   digito:string;
   descricao:string;
+  cooperativa:string;
   usuarioBancoAPI:string;
   senhaBancoAPI:string;
   chaveAppAPI:string;
@@ -34,7 +35,8 @@ export interface ContaCorrente {
   mensagemEmail1:string;
   mensagemEmail2:string;
   mensagemEmail3:string;
-
+  convenio: string;
+  
   tipoJurosCob:TipoJurosCobranca;
   tipoJurosCobId:number;
   valorJuros:number;

@@ -100,6 +100,7 @@ export default function ListarLancamentos({
   const isMobile = useMediaQuery({ query: '(max-width: 420px)' })
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
   const [showcard, setShowCard] = useState((isMobile ? false : true));
+  const [isOpenCobrancao, setIsOpenCobrancao] = useState(false)
 
   const navigate = useNavigate()
 
@@ -142,8 +143,8 @@ export default function ListarLancamentos({
       })
 
       toast({
-        title: 'Geração de Boleto',
-        description: `Boleto gerado com sucesso`
+        title: 'Geração de Cobrança',
+        description: `Cobrança gerada com sucesso`
       })
     }
   });
@@ -206,7 +207,7 @@ export default function ListarLancamentos({
     }
   }
 
-  const handleGerarBoleto = async (locacao: Locacao) => {
+  const handleGerarCobranca = async (locacao: Locacao) => {
     try {
       gerarBoleto.mutateAsync(locacao);
     } catch (error) {
@@ -362,54 +363,54 @@ export default function ListarLancamentos({
                       </CardContent>
                       <CardFooter className="flex justify-between">
                         <div className='grid grid-cols-2 gap-10'>
-                          {((isAdmin ||
-                            user?.permissions.includes("ALL") ||
-                            user?.permissions.includes("UPDATE_LOCACAO_LANCAMENTO"))) && (
+                          <div>
+                            {((isAdmin ||
+                              user?.permissions.includes("ALL") ||
+                              user?.permissions.includes("UPDATE_LOCACAO_LANCAMENTO"))) && (
 
-                              <Button variant="secondary"
-                                onClick={() => handleClickVerDetalhes(locacao?.id)}
-                                size={"sm"}>
-                                <Pencil className='h4 w4' /> Lançamentos
-                              </Button>
-                            )}
-                          {((isAdmin ||
-                            user?.permissions.includes("ALL") ||
-                            user?.permissions.includes("CREATE_PAGAMENTO")) &&
-                            (locacao.lancamentos && locacao.lancamentos?.length > 0 && locacao.lancamentos[0].status === LancamentoStatus.ABERTO)) && (
-                              /*<Button variant="secondary"
-                                onClick={() => handleGerarBoleto(locacao)}
-                                size={"sm"}>
-                                <Receipt className="h-4 w-4" />Gerar Boleto
-                              </Button>*/
+                                <Button variant="secondary"
+                                  onClick={() => handleClickVerDetalhes(locacao?.id)}
+                                  size={"sm"}>
+                                  <Pencil className='h4 w4' /> Lançamentos
+                                </Button>
+                              )}
+                          </div>
+                          <div>
+                            {((isAdmin ||
+                              user?.permissions.includes("ALL") ||
+                              user?.permissions.includes("CREATE_PAGAMENTO")) &&
+                              (locacao.lancamentos && locacao.lancamentos?.length > 0 && locacao.lancamentos[0].status === LancamentoStatus.ABERTO)) && (
 
-                              <>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" onClick={(e) => {
-                                      e.stopPropagation()
-                                      //setSelectedTipo(tipo)
-                                    }
-                                    } title='Geração de Boleto'>
-                                      <Receipt className="h-4 w-4" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        'Isso irá confirmar os lançamentos para geração do boleto.'
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                      <AlertDialogAction onClick={() => handleGerarBoleto(locacao)}>
-                                        'Sim, confirmar boleto.'
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </>
-                            )}
+                                <>
+                                  <Button variant="secondary"
+                                    onClick={() => setIsOpenCobrancao(true)}
+                                    size={"sm"}>
+                                    <Receipt className="h-4 w-4" />Gerar Cobrança
+                                  </Button>
+                                </>
+                              )}
+                          </div>
+                          <AlertDialog
+                            open={isOpenCobrancao}
+                            onOpenChange={(value) => {
+                              setIsOpenCobrancao(value)
+                            }}
+                          >
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  'Isso irá confirmar os lançamentos para geração da cobrança.'
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleGerarCobranca(locacao)}>
+                                  'Sim, confirmar cobrança.'
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </CardFooter>
                     </Card>
@@ -438,7 +439,7 @@ export default function ListarLancamentos({
                           <tr key={locacao.id} className="hover:bg-gray-300">
                             <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
                               {(locacao.locatarios && locacao.locatarios.length > 0 ? (locacao.locatarios[0].pessoa ? locacao.locatarios[0].pessoa.nome : 'Sem locatário') : 'Sem locatário')
-                              + ' - ' + (locacao.imovel?.endereco ? getEnderecoFormatado(locacao.imovel.endereco) : 'Sem endereço')}
+                                + ' - ' + (locacao.imovel?.endereco ? getEnderecoFormatado(locacao.imovel.endereco) : 'Sem endereço')}
                             </td>
                             <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
                               {locacao.locatarios && locacao.locatarios.length > 0 ? (locacao.locatarios[0].pessoa ? locacao.locatarios[0].pessoa.telefone : 'Sem telefone') : 'Sem telefone'}
@@ -457,7 +458,7 @@ export default function ListarLancamentos({
                               <div className="flex justify-end gap-2">
                                 <Button
                                   size="sm"
-                                  onClick={() =>{handleClickVerDetalhes(locacao.id)}}
+                                  onClick={() => { handleClickVerDetalhes(locacao.id) }}
                                   className='hover:cursor-pointer hover:bg-gray-700'
                                 >
                                   Ver detalhes

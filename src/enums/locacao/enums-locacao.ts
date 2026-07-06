@@ -30,3 +30,8 @@ export enum BoletoStatus {
   
 }
 
+export enum BoletoTipo {
+  IMOVEL = 'IMOVEL',
+  LOCACAO = 'LOCACAO',    
+}
+

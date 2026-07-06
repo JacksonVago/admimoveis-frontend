@@ -229,6 +229,17 @@ export const ContaCorrenteFormContent = ({
         </div>
 
         <div className='mt-2'>
+          <Label htmlFor="name">Cooperativa</Label>
+          <Input
+            className="mt-2"
+            type="text"
+            disabled={disabled}
+            placeholder="Cooperativa"
+            {...createContaCorrenteMethods.register('cooperativa')}
+          />
+        </div>
+
+        <div className='mt-2'>
           <Label htmlFor="name">Descrição</Label>
           <Input
             className="mt-2"
@@ -253,7 +264,7 @@ export const ContaCorrenteFormContent = ({
                     value={field.value}
                   >
                     <SelectTrigger className='h-6'>
-                      <SelectValue placeholder="Selecione o tipo" />
+                      <SelectValue placeholder="" />
                     </SelectTrigger>
                     <SelectContent>
                       {STATUS_PESSOA_OPTIONS.map((status) => (
@@ -270,6 +281,17 @@ export const ContaCorrenteFormContent = ({
               )*/}
             </div>
           </Label>
+        </div>
+
+        <div className='mt-2'>
+          <Label htmlFor="name">Código convênio</Label>
+          <Input
+            className="mt-2"
+            type="text"
+            disabled={disabled}
+            placeholder="Codigo"
+            {...createContaCorrenteMethods.register('convenio')}
+          />
         </div>
 
         <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
@@ -963,7 +985,7 @@ export const ContaCorrenteFormContent = ({
                 Tipo de Divergência
                 <div className="mt-2 border rounded-md pr-6">
                   <Controller
-                    name="status"
+                    name="tipoRecebimentoDiv"
                     control={createContaCorrenteMethods.control}
                     render={({ field }) => (
                       <Select

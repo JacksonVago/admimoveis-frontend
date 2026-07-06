@@ -83,6 +83,10 @@ export const CriarContaCorrente = () => {
       form.append('descricao', data.descricao.toString())
     }
 
+    if (data.cooperativa) {
+      form.append('cooperativa', data.cooperativa.toString())
+    }
+
     if (data.usuarioBancoAPI) {
       form.append('usuarioBancoAPI', data.usuarioBancoAPI.toString());
     }
@@ -136,6 +140,9 @@ export const CriarContaCorrente = () => {
     }
     if (data.mensagemEmail3){
       form.append('mensagemEmail3', data.mensagemEmail3.toString());
+    }
+    if (data.convenio) {
+      form.append('convenio', data.convenio.toString())
     }
 
     if (data.tipoJurosCobId){

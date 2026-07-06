@@ -4,13 +4,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import {  Edit} from 'lucide-react'
+import { Edit } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { PageLoader } from '@/pages/assistant/page-loader'
 import { queryClient } from '@/services/react-query/query-client'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
-import {  useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { useAuth } from '@/hooks/auth/use-auth'
 import axios from 'axios'
@@ -20,6 +20,7 @@ import { ConfiguracaoAlerta } from '@/interfaces/configuracaoalerta'
 import { getAlerta, updateAlerta } from '../requests'
 import { AlertaForm } from '../criaralerta/components/alerta-form'
 import { useForm } from 'react-hook-form'
+import { TipoAgendamento } from '@/enums/alertas/TipoAgendamento'
 
 
 //Valores default do imóvel
@@ -47,7 +48,7 @@ export const getFormattedDefaultValues = (configAlerta: ConfiguracaoAlerta | und
 export const DetalhesAlerta = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
-  
+
   const dataParams = useParams<{ id: string }>()
   const id = dataParams.id ? parseInt(dataParams.id) : undefined
 
@@ -176,8 +177,13 @@ export const DetalhesAlerta = () => {
       form.append('frequenciaEnvio', data.frequenciaEnvio.toString())
     }
 
-    if (data.dataInicio) {
-      form.append('dataInicio', data.dataInicio.toString())
+    if (data.tipoAgendamento && data.tipoAgendamento === TipoAgendamento.UNICO) {
+      if (data.tipoAgendamento === TipoAgendamento.UNICO) {
+        if (data.dataInicio) {
+          form.append('dataInicio', data.dataInicio.toString())
+        }
+      }
+
     }
 
     if (data.ocorreAcada) {
@@ -218,6 +224,7 @@ export const DetalhesAlerta = () => {
 
     form.append('alertaId', data.alertaId ? data.alertaId.toString() : '0');
     form.append('empresaId', glb_params.id_empresa ? glb_params.id_empresa : "0");
+
 
     updateMutation.mutate(form)
   }
@@ -292,7 +299,7 @@ export const DetalhesAlerta = () => {
               </AlertaForm.Root>
             </CardContent>
           </Card>
-        </TabsContent>        
+        </TabsContent>
       </Tabs>
     </div >
   )

@@ -33,8 +33,7 @@ import DetalhesEmpresa from '@/pages/main/empresas/detalhes'
 import ListarLancamentos from '@/pages/main/lancamentos'
 import ListarTiposLancamento from '@/pages/main/tipolancamento'
 import { DetalhesLancamento } from '@/pages/main/lancamentos/detalhes'
-import { DetalhesBoleto } from '@/pages/main/boletos/detalhes'
-import ListarBoletos from '@/pages/main/boletos'
+import { DetalhesBoleto } from '@/pages/main/pagamentos/detalhes'
 import ListarRepasses from '@/pages/main/relatoriorepasse'
 import { Adesao } from '@/pages/main/adesao'
 import { Planos } from '@/pages/main/adesao/planos'
@@ -58,6 +57,9 @@ import ListarAlertas from '@/pages/main/alertas/listaralertas'
 import { CriarContaCorrente } from '@/pages/main/contascorrente/criarcontacorrente'
 import { DetalhesContaCorrente } from '@/pages/main/contascorrente/detalhes'
 import ListarContasCorrentes from '@/pages/main/contascorrente/listarcontascorrente'
+import ListarBoletosBancarios from '@/pages/main/boletosbancarios'
+import { DetalhesBoletoBancario } from '@/pages/main/boletosbancarios/detalhes'
+import ListarPagamentos from '@/pages/main/pagamentos'
 
 export interface ProtectedRouteProps {
   permission: Permission
@@ -396,12 +398,12 @@ export const RoutesComponent = () => {
             }
           />
 
-          {/* Pagamentos */}
+          {/* Previsdão de cobrança */}
           <Route
             path={ROUTE.PAGAMENTOS}
             element={
               <ProtectedRoute permission="VIEW_PAGAMENTOS">
-                <ListarBoletos exclude='' limitView={3} />
+                <ListarPagamentos exclude='' limitView={3} />
               </ProtectedRoute>
             }
           />
@@ -410,6 +412,24 @@ export const RoutesComponent = () => {
             element={
               <ProtectedRoute permission="VIEW_PAGAMENTOS">
                 <DetalhesBoleto />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Boleto bancário */}
+          <Route
+            path={ROUTE.BOLETO_BANCARIO}
+            element={
+              <ProtectedRoute permission="VIEW_BOLETO_BANCARIO">
+                <ListarBoletosBancarios exclude='' limitView={3} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.BOLETO_BANCARIO_DETALHES}
+            element={
+              <ProtectedRoute permission="CREATE_BOLETO_BANCARIO">
+                <DetalhesBoletoBancario />
               </ProtectedRoute>
             }
           />

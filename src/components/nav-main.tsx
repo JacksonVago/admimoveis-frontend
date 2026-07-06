@@ -51,9 +51,9 @@ export function NavMain({
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem onClick={useSidebar().toggleSidebar}>
               <SidebarMenuButton className={isMobile ? "py-5" : "py-3"} asChild tooltip={item.title} onClick={()=>{handlerNavItemClick(item.url)}}>
-                <Link to={item.url}>
+                <Link to={item.url} >
                   <item.icon />
-                  <span style={{ "fontSize": isMobile ? "0.70rem" : "0.70rem" }}>{item.title}</span>
+                  <span style={{ "fontSize": isMobile ? "0.70rem" : "0.75rem" }}>{item.title}</span>
                 </Link>
               </SidebarMenuButton>
               {item.items?.length ? (

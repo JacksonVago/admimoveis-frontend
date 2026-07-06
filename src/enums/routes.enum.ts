@@ -103,6 +103,11 @@ export enum ROUTE {
   //Repasse routes
   REPASSES = '/repasses',
 
+  //Boletos bancários routes
+  BOLETO_BANCARIO = '/boleto-bancario',
+  BOLETO_BANCARIO_CRIAR = '/boleto-bancario/criar',
+  BOLETO_BANCARIO_DETALHES = '/boleto-bancario/:id',
+
   // Error routes
   NOT_FOUND = '*',
   UNAUTHORIZED = '/unauthorized'

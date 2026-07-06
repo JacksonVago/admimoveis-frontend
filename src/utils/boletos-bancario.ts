@@ -2,13 +2,38 @@ import { FormaEnvio } from "@/enums/cobranca/FormaEnvio";
 import { ContaCorrente } from "@/interfaces/contacorrente";
 
 export const BoletosBancarioValidate = {
-    Validar237: (conta: ContaCorrente) => {
-        let msg = '237';
+    Validar748: (conta: ContaCorrente) => {
+        let str_msg = '';
         if (conta) {
-            msg = 'tem boletos 237';
+            //Forma de envio
+            if (!conta.cooperativa || conta.cooperativa === '') {
+                str_msg = 'Código da cooperativa';
+            }
+
+            //Carteira de cobranca
+            if (!conta.convenio || conta.convenio === '') {
+                if (str_msg.length > 0) {
+                    str_msg += ', código do convênio';
+                }
+                else {
+                    str_msg += 'Código do convênio';
+                }
+            }
+
+            //Especie de cobranca
+            if (!conta.especieId || conta.especieId === 0) {
+                if (str_msg.length > 0) {
+                    str_msg += ', espécie de cobrança';
+                }
+                else {
+                    str_msg += 'Espécie de cobrança';
+                }
+            }
+
+            
         }
 
-        return msg
+        return str_msg
     },
 
     /*Validação de dados banco 341 - Itaú */

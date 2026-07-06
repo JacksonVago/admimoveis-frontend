@@ -7,6 +7,7 @@ export const contacorrenteSchema = z.object({
     agencia: z.string(),
     conta: z.string(),
     digito: z.string(),
+    cooperativa: z.string(),
     usuarioBancoAPI: z.string().optional(),
     senhaBancoAPI: z.string().optional(),
     chaveAppAPI: z.string().optional(),
@@ -23,6 +24,7 @@ export const contacorrenteSchema = z.object({
     mensagemEmail1: z.string().optional(),
     mensagemEmail2: z.string().optional(),
     mensagemEmail3: z.string().optional(),
+    convenio: z.string().optional(),
 
     tipoJurosCobId: z.string().optional(),
     valorJuros: z.coerce.number().or(z.string().transform(Number)).optional(),

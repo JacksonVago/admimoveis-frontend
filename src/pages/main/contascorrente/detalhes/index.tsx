@@ -179,6 +179,10 @@ export const DetalhesContaCorrente = () => {
       form.append('digito', data.digito)
     }
 
+    if (data.cooperativa) {
+      form.append('cooperativa', data.cooperativa.toString())
+    }
+
     if (data.descricao) {
       form.append('descricao', data.descricao)
     }
@@ -235,6 +239,9 @@ export const DetalhesContaCorrente = () => {
     }
     if (data.mensagemEmail3){
       form.append('mensagemEmail3', data.mensagemEmail3.toString());
+    }
+    if (data.convenio) {
+      form.append('convenio', data.convenio.toString())
     }
 
     if (data.tipoJurosCobId){

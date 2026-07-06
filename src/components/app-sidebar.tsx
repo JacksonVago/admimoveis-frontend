@@ -1,6 +1,6 @@
 'use client'
 
-import { Banknote, Building, Building2, CircleDollarSign, Cog, House, KeyRound, Landmark, Lock, LogOut, OctagonAlert, ReceiptText, Shapes, Users } from 'lucide-react'
+import { Banknote, Building, Building2, CircleDollarSign, Cog, HandCoins, House, KeyRound, Landmark, Lock, LogOut, OctagonAlert, ReceiptText, Shapes, Users } from 'lucide-react'
 import * as React from 'react'
 //import logo  from '../assets/logo-molina.png';
 
@@ -87,8 +87,13 @@ const data = {
       icon: Banknote
     },
     {
-      title: 'Boletos',
+      title: 'Previsões de Cobranças',
       url: ROUTE.PAGAMENTOS,
+      icon: HandCoins
+    },
+    {
+      title: 'Boletos Bancários',
+      url: ROUTE.BOLETO_BANCARIO,
       icon: CircleDollarSign
     },
     {
@@ -171,7 +176,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>        
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild className='my-5 flex justify-center'>
+            <SidebarMenuButton size="lg" asChild className='flex justify-center'>
               <Link to={ROUTE.HOME} className='h-auto'>
                 <div className="flex justify-center rounded-lg">
                   <img
@@ -189,10 +194,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <div
-          className="flex h-7 min-w-0 -translate-x-px items-center gap-4 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground font-[Poppins-Regular]"
+          className="flex h-5 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground font-[Poppins-Regular]"
           onClick={logout}
         >
-          <LogOut />
+          <LogOut size='sm' />
           Log out
         </div>
       </SidebarFooter>

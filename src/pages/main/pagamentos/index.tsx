@@ -27,7 +27,7 @@ import { Boleto } from '@/interfaces/boleto'
 import { cn } from '@/lib/utils'
 import { BoletoStatus } from '@/enums/locacao/enums-locacao'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { STATUS_BOLETO_OPTIONS } from '@/constants/status-boletos'
+import { STATUS_BOLETO_OPTIONS, TIPO_BOLETO_OPTIONS } from '@/constants/status-boletos'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -74,12 +74,13 @@ interface GetBoletosParams {
   limit?: number
   status?: string,
   exclude?: string
+  tipo?: string
   dataInicial?: string
   dataFinal?: string
 }
 
 // API & Query Logic
-export const getBoletos = async (empresaId: number, { page, limit, search, status, exclude, dataInicial, dataFinal }: GetBoletosParams) => {
+export const getBoletos = async (empresaId: number, { page, limit, search, status, exclude, tipo, dataInicial, dataFinal }: GetBoletosParams) => {
   const result = await api.get<BasePaginationData<Boleto>>('pagamentos/' + empresaId.toString(), {
     params: {
       page,
@@ -87,6 +88,7 @@ export const getBoletos = async (empresaId: number, { page, limit, search, statu
       status,
       search,
       exclude,
+      tipo,
       dataInicial,
       dataFinal
     }
@@ -101,26 +103,28 @@ export const useGetBoletosQueryOptions = (empresaId: number, {
   limit,
   status,
   exclude,
+  tipo,
   dataInicial,
   dataFinal,
   ...queryKeys
 }: {
-  search?: string
-  page?: number
-  limit?: number
+  search?: string,
+  page?: number,
+  limit?: number,
   status?: string,
-  exclude?: string
-  dataInicial?: string
-  dataFinal?: string
+  exclude?: string,
+  tipo?: string,
+  dataInicial?: string,
+  dataFinal?: string,
 } = {}) => {
   return queryOptions({
-    queryKey: ['boletos', empresaId, { search, page, limit, status, exclude, dataInicial, dataFinal }, queryKeys],
-    queryFn: () => getBoletos(empresaId, { search, page, limit, status, exclude, dataInicial, dataFinal })
+    queryKey: ['boletos', empresaId, { search, page, limit, status, exclude, tipo, dataInicial, dataFinal }, queryKeys],
+    queryFn: () => getBoletos(empresaId, { search, page, limit, status, exclude, tipo, dataInicial, dataFinal })
   })
 }
 
 //Lista de boletos
-export default function ListarBoletos({
+export default function ListarPagamentos({
   limitView,
   exclude,
   //onSelectBoleto
@@ -153,6 +157,7 @@ export default function ListarBoletos({
   const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 100 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || '';
   const status = searchParams.get('status') || '';
+  const tipo = searchParams.get('tipo') || '';
   const [dataInicial, setdataInicial] = useState(searchParams.get('dataInicial') || moment.utc(new Date()).format("YYYY-MM-DD"));
   const [dataFinal, setdataFinal] = useState(searchParams.get('dataFinal') || moment.utc(new Date()).format("YYYY-MM-DD"));
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -199,6 +204,7 @@ export default function ListarBoletos({
       search,
       status,
       exclude,
+      tipo,
       dataInicial,
       dataFinal
     })
@@ -296,10 +302,10 @@ export default function ListarBoletos({
   //always that we go to out of the total pages, we will go to the first page
 
   useEffect(() => {
-    glb_params.updTitle_form('Boletos');
+    glb_params.updTitle_form('Previsão de Cobranças');
     if (totalPages && page > totalPages) {
       navigate({
-        search: `?page=1&limit=${limit}&search=${search}&status=${(status !== null ? status : '')}`
+        search: `?page=1&limit=${limit}&search=${search}&status=${(status !== null ? status : '')}&tipo=${(tipo !== null ? tipo : '')}`
       })
     }
   }, [totalPages, page, navigate, limit, search])
@@ -697,6 +703,7 @@ export default function ListarBoletos({
 
 
         //Troca campo por dados do boleto
+
         console.log(str_campo);
         switch (descAlerta) {
           case "Aviso reajuste Locação":
@@ -711,6 +718,16 @@ export default function ListarBoletos({
           case "Aviso vencimento boleto":
             if (selBoleto) {
               switch (str_campo) {
+                case "<mes>":
+                  moment.locale('pt', {
+                    months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                  });
+                  console.log(moment(selBoleto.dataVencimento).locale('pt').format("MMMM"));
+                  console.log(moment(selBoleto.dataVencimento).format("MMMM"));
+
+                  textoAlerta = textoAlerta.replace(str_campo, moment.utc(selBoleto.dataVencimento).format("MMMM"));
+                  break;
+
                 case "<Data de Emissão>":
                   textoAlerta = textoAlerta.replace(str_campo, moment.utc(selBoleto.dataEmissao).format("DD/MM/YYYY"));
                   break;
@@ -848,12 +865,17 @@ export default function ListarBoletos({
       toast({ title: 'Erro ao excluir boleto.', variant: 'destructive' });
     }
   }
-  const handlerChangeTipo = (tipo: string) => {
+  const handlerChangeStatus = (status: string) => {
     navigate({
-      search: `?page=1&limit=${limit}&search=${search}&status=${tipo}`
+      search: `?page=1&limit=${limit}&search=${search}&status=${status}&tipo=${tipo}`
     })
   }
 
+  const handlerChangeTipo = (tipoBoleto: string) => {
+    navigate({
+      search: `?page=1&limit=${limit}&search=${search}&status=${status}&tipo=${tipoBoleto}`
+    })
+  }
   const handlerEmitirBoleto = async () => {
     if (selBoleto && selConta) {
       const banco = "Validar" + selConta.banco.codigo;
@@ -869,7 +891,7 @@ export default function ListarBoletos({
         boleto.status = BoletoStatus.CONFIRMADO;
         boleto.documentos = [];
 
-        let email = '';
+        //let email = '';
 
 
         //Envia dados ao banco
@@ -939,7 +961,7 @@ export default function ListarBoletos({
 
           carteiraCod: '',
           especieCod: '',
-          contaId: selConta ? selConta.id : 0        
+          contaId: selConta ? selConta.id : 0
         }
         console.log('envio: ', boletoBancario)
         const retornoBanco = await api.post(`/boleto-bancario/enviar/`, boletoBancario)
@@ -954,13 +976,91 @@ export default function ListarBoletos({
 
     }
   }
+
+  const handlerDownloadBoleto = async (boleto: Boleto) => {
+
+    if (selBoleto && selConta) {
+      const banco = "Validar" + selConta.banco.codigo;
+      const msg = BoletosBancarioValidate[banco as keyof typeof BoletosBancarioValidate](selConta);
+    }
+
+
+
+
+    try {
+      console.log(boleto);
+      if (boleto.boletosBancarios) {
+        api.get('/boleto-bancario/download/' + boleto.boletosBancarios[0].id)
+          .then(result => {
+            console.log(result.data);
+            console.log(result.data.data);
+
+            const rawData: ArrayBuffer = result.data.data;
+            const typedArray = new Uint8Array(rawData);
+
+
+            const blob = new Blob([typedArray], { type: 'application/pdf' });
+
+            const downloadUrl: string = window.URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = downloadUrl;
+            anchor.download = 'testeBoleto.pdf';
+
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+            window.URL.revokeObjectURL(downloadUrl);
+          });
+
+      }
+    } catch (error) {
+      console.error('Download failed:', error);
+    }
+  }
+
+  const handlerBoletoNossoNumero = async (boleto: Boleto) => {
+
+    try {
+      console.log(boleto);
+      if (boleto.boletosBancarios) {
+        api.get('/boleto-bancario/nossonumero/' + boleto.boletosBancarios[0].id)
+          .then(result => {
+            console.log(result.data);
+            console.log(result.data.data);
+
+          });
+
+      }
+    } catch (error) {
+      console.error('Download failed:', error);
+    }
+  }
+
+  const handlerBaixarBoleto = async (boleto: Boleto) => {
+
+    try {
+      console.log(boleto);
+      if (boleto.boletosBancarios) {
+        api.patch('/boleto-bancario/baixar/' + boleto.boletosBancarios[0].id)
+          .then(result => {
+            console.log(result.data);
+            console.log(result.data.data);
+
+          });
+
+      }
+    } catch (error) {
+      console.error('Download failed:', error);
+    }
+  }
+
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
       {/* Search & Filters */}
       {/* <div className="grid grid-cols-2 flex flex-col justify-end items-start gap-4 sm:flex-row sm:items-center"> */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {glb_params.origin_url.indexOf('lista') > -1 && (
-          <h1 className="text-2xl font-bold">Pagamentos</h1>
+          <h1 className="text-2xl font-bold">Cobranças</h1>
         )}
         <div className='grid grid-cols-3'>
           {
@@ -975,7 +1075,7 @@ export default function ListarBoletos({
         ) && (
             <Button size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'
               onClick={() => { handlerNewBoleto(); }}>
-              <Plus className="mr-2" /> Criar Boleto
+              <Plus className="mr-2" /> Criar Previsão
             </Button>
           )}
         <Dialog
@@ -986,8 +1086,8 @@ export default function ListarBoletos({
         >
           <DialogContent>
             <DialogHeader className='font-[Poppins-Regular]'>
-              <DialogTitle>Criar novo Boleto</DialogTitle>
-              <DialogDescription>Preencha os dados do novo Boleto abaixo.</DialogDescription>
+              <DialogTitle>Criar nova Previsão</DialogTitle>
+              <DialogDescription>Preencha os dados do nova Previsão abaixo.</DialogDescription>
             </DialogHeader>
             <div>
               <FormProvider {...boletoMethods}>
@@ -1167,7 +1267,7 @@ export default function ListarBoletos({
 
 
                       <div className='mt-2 text-base'>
-                        <Label className='text-base'>Situação do boleto</Label>
+                        <Label className='text-base'>Situação da cobrança</Label>
                         <div className='mt-2 mr-5'>
                           <Controller
                             name="status"
@@ -1207,7 +1307,7 @@ export default function ListarBoletos({
                   )}
                 </div>
                 <DialogFooter>
-                  <Button size="sm" type='submit' className='hover:cursor-pointer hover:bg-gray-600'>Criar Boleto</Button>
+                  <Button size="sm" type='submit' className='hover:cursor-pointer hover:bg-gray-600'>Criar Previsão</Button>
                 </DialogFooter>
               </form>
             </div>
@@ -1225,7 +1325,7 @@ export default function ListarBoletos({
           <Input
             onChange={handleSearchChange}
             value={search}
-            placeholder="Buscar pagamentos"
+            placeholder="Buscar cobranças"
             className="pl-8"
           />
         </div>
@@ -1259,7 +1359,7 @@ export default function ListarBoletos({
           </div>
         </div>
         <div className="flex gap-2">
-          <Select onValueChange={(value) => { handlerChangeTipo(value) }}>
+          <Select onValueChange={(value) => { handlerChangeStatus(value) }}>
             <SelectTrigger className="h-4 w-[160px]">
               <SelectValue placeholder="Situação" />
             </SelectTrigger>
@@ -1272,6 +1372,20 @@ export default function ListarBoletos({
             </SelectContent>
           </Select>
         </div>
+        <div className="flex gap-2">
+          <Select onValueChange={(value) => { handlerChangeTipo(value) }}>
+            <SelectTrigger className="h-4 w-[160px]">
+              <SelectValue placeholder="Tipo de boleto" />
+            </SelectTrigger>
+            <SelectContent>
+              {TIPO_BOLETO_OPTIONS.map((value) => (
+                <SelectItem key={value.label} value={value.value}>
+                  {value.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* pagamentos Grid */}
@@ -1279,7 +1393,7 @@ export default function ListarBoletos({
         {/* Search Results & No Results Message */}
         {hasSearchResults && (
           <p className="text-center text-muted-foreground">
-            Nenhum pagamento encontrado para a busca atual.
+            Nenhuma cobrança encontrada para a busca atual.
           </p>
         )}
 
@@ -1287,7 +1401,7 @@ export default function ListarBoletos({
         {(boletos.length === 0 && !hasSearchResults) && (
           <div className="col-span-3 flex flex-col items-center justify-center w-full">
             <p className="text-center text-muted-foreground">
-              Nenhum boleto disponível para este período.
+              Nenhuma cobrança disponível para este período.
             </p>
           </div>
         )}
@@ -1329,32 +1443,42 @@ export default function ListarBoletos({
                         </div>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <Label className="font-bold flex justify-start">
-                        Boleto :  {boleto.id}
+                    <CardContent >
+                      <Label className="font-bold flex justify-start" style={{ fontSize: '0.7rem' }}>
+                        Nº :  {boleto.id}
                       </Label>
                       <div className='grid grid-cols-2 gap-4 mt-2'>
-                        <Label className="font-bold flex justify-start">
+                        <Label className="font-bold flex justify-start" style={{ fontSize: '0.7rem' }}>
                           Emissão :  {moment.utc(boleto.dataEmissao).format("DD/MM/YYYY")}
                         </Label>
-                        <Label className="font-bold flex justify-end">
+                        <Label className="font-bold flex justify-end" style={{ fontSize: '0.7rem' }}>
                           Vencimento :  {moment.utc(boleto.dataVencimento).format("DD/MM/YYYY")}
                         </Label>
                       </div>
                       <div className='grid grid-cols-2 gap-4 mt-2'>
-                        <Label className="font-bold flex justify-start">
+                        <Label className="font-bold flex justify-start" style={{ fontSize: '0.7rem' }}>
                           Valor Original {usdFormatter.format(boleto.valorOriginal)}
                         </Label>
-                        <Label className="font-bold flex justify-end">
+                        <Label className="font-bold flex justify-end" style={{ fontSize: '0.7rem' }}>
                           Valor Pago {usdFormatter.format(boleto.valorPago)}
                         </Label>
                       </div>
-                      <Label className="font-bold flex justify-start mt-2">
+                      <Label className="font-bold flex justify-start mt-2" style={{ fontSize: '0.7rem' }}>
                         Situação :  {boleto.status}
                       </Label>
+                      {(boleto.boletosBancarios && boleto.boletosBancarios.length > 0) && (
+                        <Label className="font-bold flex justify-start mt-2" style={{ fontSize: '0.7rem' }}>
+                          Linha Digitável :  {boleto.boletosBancarios[0].linhaDigitavel}
+                        </Label>
+
+                      )
+
+                      }
+
+
                       {(boleto.locacao !== null ?
                         (boleto.lanctoLocacao && boleto.lanctoLocacao?.length > 0) ? (
-                          <>
+                          <div className='mt-2' >
                             <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
                             <div className='rounded-md border'>
                               <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
@@ -1402,15 +1526,15 @@ export default function ListarBoletos({
                               </Badge>
                             </div>
 
-                          </>
+                          </div>
                         )
-                          : (<p className="text-center text-muted-foreground mt-5">
+                          : (<p className="text-center text-muted-foreground mt-5" style={{ fontSize: '0.8rem' }}>
                             Não há lançamentos para esse boleto
                           </p>
                           )
                         :
                         (boleto.lancamentoImovels && boleto.lancamentoImovels?.length > 0) ? (
-                          <>
+                          <div className='mt-2'>
                             <Label style={{ 'fontSize': '0.7rem' }}> Lançamentos </Label>
                             <div className='rounded-md border'>
                               <div className='grid grid-cols-5 m-2 font-[Poppins-bold]' >
@@ -1458,9 +1582,9 @@ export default function ListarBoletos({
                               </Badge>
                             </div>
 
-                          </>
+                          </div>
                         )
-                          : (<p className="text-center text-muted-foreground mt-5">
+                          : (<p className="text-center text-muted-foreground mt-5" style={{ fontSize: '0.8rem' }}>
                             Não há lançamentos para esse boleto
                           </p>
                           )
@@ -1511,7 +1635,7 @@ export default function ListarBoletos({
                             Comprovante
                           </Button>
                         )}
-                        {boleto.status === BoletoStatus.CONFIRMADO && (
+                        {(boleto.status === BoletoStatus.PENDENTE || boleto.status === BoletoStatus.CONFIRMADO) && (
                           <Button variant="secondary"
                             className='hover:cursor-pointer hover:bg-gray-200'
                             onClick={() => handlerEnviaEmail(boleto)}
