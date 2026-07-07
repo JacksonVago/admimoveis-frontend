@@ -249,7 +249,7 @@ export default function ListarPagamentos({
     }
   });
 
-  const confirmarBoleto = useMutation({
+  /*const confirmarBoleto = useMutation({
     mutationFn: async (boleto: Boleto) => {
       console.log(boleto);
       return await api.put(`/pagamentos/statusPagamento/${boleto.id}`, boleto)
@@ -260,11 +260,11 @@ export default function ListarPagamentos({
       });
 
       toast({
-        title: 'Emissão de Boleto',
-        description: `Boleto gerado com sucesso`
+        title: 'Confirmação de Previsão de cobrança',
+        description: `Previsão de cobrança confirmada com sucesso`
       });
     }
-  });
+  });*/
 
   const deleteBoleto = useMutation({
     mutationFn: async (boletoId: number) => {
@@ -886,7 +886,7 @@ export default function ListarPagamentos({
       }
       else {
 
-        //Envia boleto ao banco
+        //Atualiza previsçao de pagamento
         let boleto: Boleto = selBoleto;
         boleto.status = BoletoStatus.CONFIRMADO;
         boleto.documentos = [];
@@ -971,86 +971,9 @@ export default function ListarPagamentos({
           //confirmarBoleto.mutateAsync(boleto);
         }
 
-        toast({ title: 'Emissão efetuada com sucesso.' });
+        toast({ title: 'Envio ao banco efetuada com sucesso.' });
       }
 
-    }
-  }
-
-  const handlerDownloadBoleto = async (boleto: Boleto) => {
-
-    if (selBoleto && selConta) {
-      const banco = "Validar" + selConta.banco.codigo;
-      const msg = BoletosBancarioValidate[banco as keyof typeof BoletosBancarioValidate](selConta);
-    }
-
-
-
-
-    try {
-      console.log(boleto);
-      if (boleto.boletosBancarios) {
-        api.get('/boleto-bancario/download/' + boleto.boletosBancarios[0].id)
-          .then(result => {
-            console.log(result.data);
-            console.log(result.data.data);
-
-            const rawData: ArrayBuffer = result.data.data;
-            const typedArray = new Uint8Array(rawData);
-
-
-            const blob = new Blob([typedArray], { type: 'application/pdf' });
-
-            const downloadUrl: string = window.URL.createObjectURL(blob);
-            const anchor = document.createElement('a');
-            anchor.href = downloadUrl;
-            anchor.download = 'testeBoleto.pdf';
-
-            document.body.appendChild(anchor);
-            anchor.click();
-            document.body.removeChild(anchor);
-            window.URL.revokeObjectURL(downloadUrl);
-          });
-
-      }
-    } catch (error) {
-      console.error('Download failed:', error);
-    }
-  }
-
-  const handlerBoletoNossoNumero = async (boleto: Boleto) => {
-
-    try {
-      console.log(boleto);
-      if (boleto.boletosBancarios) {
-        api.get('/boleto-bancario/nossonumero/' + boleto.boletosBancarios[0].id)
-          .then(result => {
-            console.log(result.data);
-            console.log(result.data.data);
-
-          });
-
-      }
-    } catch (error) {
-      console.error('Download failed:', error);
-    }
-  }
-
-  const handlerBaixarBoleto = async (boleto: Boleto) => {
-
-    try {
-      console.log(boleto);
-      if (boleto.boletosBancarios) {
-        api.patch('/boleto-bancario/baixar/' + boleto.boletosBancarios[0].id)
-          .then(result => {
-            console.log(result.data);
-            console.log(result.data.data);
-
-          });
-
-      }
-    } catch (error) {
-      console.error('Download failed:', error);
     }
   }
 
@@ -1601,6 +1524,7 @@ export default function ListarPagamentos({
                         {(isAdmin ||
                           user?.permissions.includes("ALL") ||
                           user?.permissions.includes("UPDATE_PAGAMENTO")
+                          
                         ) && (
 
                             <Button variant="secondary"

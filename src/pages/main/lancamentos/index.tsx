@@ -29,7 +29,7 @@ import { queryClient } from '@/services/react-query/query-client'
 import { usdFormatter } from '@/utils/format-money'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle} from '@/components/ui/alert-dialog'
 import { LancamentoLocacao } from '@/interfaces/lancamentos'
 
 // Types
@@ -100,7 +100,8 @@ export default function ListarLancamentos({
   const isMobile = useMediaQuery({ query: '(max-width: 420px)' })
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
   const [showcard, setShowCard] = useState((isMobile ? false : true));
-  const [isOpenCobrancao, setIsOpenCobrancao] = useState(false)
+  const [isOpenCobranca, setIsOpenCobranca] = useState(false)
+  const [selCobranca, setSelCobranca] = useState<Locacao>();
 
   const navigate = useNavigate()
 
@@ -207,9 +208,15 @@ export default function ListarLancamentos({
     }
   }
 
-  const handleGerarCobranca = async (locacao: Locacao) => {
+  const handlerOpenCobranca = async (locacao: Locacao) =>{
+    setSelCobranca(locacao);
+    setIsOpenCobranca(true);
+  }
+  const handleGerarCobranca = async () => {
     try {
-      gerarBoleto.mutateAsync(locacao);
+      if (selCobranca){
+        gerarBoleto.mutateAsync(selCobranca);
+      }
     } catch (error) {
       toast({ title: 'Erro ao gerar boleto.', variant: 'destructive' });
     }
@@ -383,7 +390,7 @@ export default function ListarLancamentos({
 
                                 <>
                                   <Button variant="secondary"
-                                    onClick={() => setIsOpenCobrancao(true)}
+                                    onClick={() => handlerOpenCobranca(locacao)}
                                     size={"sm"}>
                                     <Receipt className="h-4 w-4" />Gerar Cobrança
                                   </Button>
@@ -391,9 +398,9 @@ export default function ListarLancamentos({
                               )}
                           </div>
                           <AlertDialog
-                            open={isOpenCobrancao}
+                            open={isOpenCobranca}
                             onOpenChange={(value) => {
-                              setIsOpenCobrancao(value)
+                              setIsOpenCobranca(value)
                             }}
                           >
                             <AlertDialogContent>
@@ -405,7 +412,7 @@ export default function ListarLancamentos({
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleGerarCobranca(locacao)}>
+                                <AlertDialogAction onClick={() => handleGerarCobranca()}>
                                   'Sim, confirmar cobrança.'
                                 </AlertDialogAction>
                               </AlertDialogFooter>

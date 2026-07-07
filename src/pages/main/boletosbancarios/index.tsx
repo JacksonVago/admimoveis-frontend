@@ -11,8 +11,8 @@ import {
 } from '@/components/ui/pagination'
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
-import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { Download, IdCard, List, Mail, Plus, Receipt, Search, Trash, X } from 'lucide-react'
+import { queryOptions, useQuery } from '@tanstack/react-query'
+import { Download, IdCard, List, Mail, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
@@ -31,17 +31,12 @@ import { useAuth } from '@/hooks/auth/use-auth'
 import { Loader } from '@/components/ui/loader'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form'
-import { DocumentUpload } from '../imoveis/criarImovel/components/document-upload'
+import { Controller, useForm } from 'react-hook-form'
 import { Textarea } from '@/components/ui/textarea'
-import ListarLocacoes from '../locacoes'
 import axios from 'axios'
 import { jobSchema, JobSchema } from '@/schemas/job.schema'
 import { JobsStatus } from '@/enums/alertas/JobsStatus'
 import { getAlertasPag } from '../alertas/requests'
-import ListarImoveisLocacao from '../imoveis/listaimoveislocacao'
-import { ContaCorrente } from '@/interfaces/contacorrente'
-import { BoletosBancarioValidate } from '@/utils/boletos-bancario'
 import { BoletoBancario } from '@/interfaces/boletobancario'
 
 // Types
@@ -218,16 +213,6 @@ export default function ListarBoletosBancarios({
     navigate(`${ROUTE.BOLETO_BANCARIO}/${id}`)
   }
 
-  const handleClickVerComprovante = (boleto: Boleto) => {
-    if (boleto.documentos && boleto.documentos.length > 0) {
-      const documento = boleto.documentos[0]; // Assuming you want to view the first document
-      const url = import.meta.env.VITE_AZURE_BLOB_CONTAINER + documento.url;
-      window.open(url, '_blank');
-    } else {
-      toast({ title: 'Nenhum comprovante disponível.', variant: 'destructive' });
-    }
-  }
-
   // UI Logic
   const hasSearchResults = Boolean(!isLoading && search && boletosBancario?.length === 0)
 
@@ -311,14 +296,6 @@ export default function ListarBoletosBancarios({
 
   const handlerDownloadBoleto = async (boletoBancarioId: number) => {
 
-    /*if (selBoleto && selConta) {
-      const banco = "Validar" + selConta.banco.codigo;
-      const msg = BoletosBancarioValidate[banco as keyof typeof BoletosBancarioValidate](selConta);
-    }*/
-
-
-
-
     try {
       console.log(boletoBancarioId);
       if (boletoBancarioId) {
@@ -350,6 +327,7 @@ export default function ListarBoletosBancarios({
     }
   }
 
+  /*
   const handlerBoletoNossoNumero = async (boleto: Boleto) => {
 
     try {
@@ -366,7 +344,7 @@ export default function ListarBoletosBancarios({
     } catch (error) {
       console.error('Download failed:', error);
     }
-  }
+  }*/
 
   const handlerBaixarBoleto = async (boletoBancarioId: number) => {
 
