@@ -285,6 +285,7 @@ export default function ListarPagamentos({
   const jobMethods = useForm<JobSchema>({
     resolver: zodResolver(jobSchema),
     defaultValues: {
+
       empresaId: glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,
       str_start_date: new Date().toISOString(),
       str_end_date: new Date().toISOString(),
@@ -733,7 +734,7 @@ export default function ListarPagamentos({
                   break;
 
                 case "<Data de Vencimento>":
-                  textoAlerta = textoAlerta.replace(str_campo, moment.utc(selBoleto.dataEmissao).format("DD/MM/YYYY"));
+                  textoAlerta = textoAlerta.replace(str_campo, moment.utc(selBoleto.dataVencimento).format("DD/MM/YYYY"));
                   break;
 
                 case "<Valor Original>":
@@ -1642,6 +1643,7 @@ export default function ListarPagamentos({
         <Dialog
           open={isEmailDialogOpen}
           onOpenChange={(value) => {
+            jobMethods.reset();
             setIsEmailDialogOpen(value)
           }}
         >
