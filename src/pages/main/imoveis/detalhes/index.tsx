@@ -1336,10 +1336,13 @@ export const DetalhesImovel = () => {
     console.log(lancamentoMethods.getValues());
   }
 
+  console.log(imovelMethods.formState.errors);
+  console.log(imovelMethods.formState.isDirty);
+  console.log(imovelMethods.formState.isValid);
   if (isLoading) return <PageLoader />
 
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]" style={{color:"#034869"}}>
       {loader && (<PageLoader />)}
 
       <div className="flex items-center justify-between">
@@ -1359,7 +1362,7 @@ export const DetalhesImovel = () => {
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                <AlertDialogDescription>
+                <AlertDialogDescription style={{color:"#034869"}}>
                   Esta ação não pode ser desfeita. Isso excluirá permanentemente o imóvel e todos os
                   dados associados a ele.
                 </AlertDialogDescription>
@@ -1370,6 +1373,7 @@ export const DetalhesImovel = () => {
                   onClick={() => {
                     deleteImovelMutation.mutate(id!)
                   }}
+                  className=" hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                 >
                   Sim, excluir imóvel
                 </AlertDialogAction>
@@ -1382,16 +1386,16 @@ export const DetalhesImovel = () => {
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <div className="w-full flex overflow-x-auto">
           <TabsList>
-            <TabsTrigger value="personal-info" className='hover:cursor-pointer hover:bg-gray-200'>Dados do Imóvel</TabsTrigger>
-            <TabsTrigger value="proprietarios" className='hover:cursor-pointer hover:bg-gray-200'>Proprietários</TabsTrigger>
-            <TabsTrigger value="locacoes" className='hover:cursor-pointer hover:bg-gray-200'>Locação</TabsTrigger>
-            <TabsTrigger value="lancamentos" className='hover:cursor-pointer hover:bg-gray-200'>Lançamentos</TabsTrigger>
-            <TabsTrigger value="boletos" className='hover:cursor-pointer hover:bg-gray-200'>Boletos</TabsTrigger>
+            <TabsTrigger value="personal-info" style={{color:"#034869"}} className='hover:cursor-pointer hover:bg-gray-200'>Dados do Imóvel</TabsTrigger>
+            <TabsTrigger value="proprietarios" style={{color:"#034869"}} className='hover:cursor-pointer hover:bg-gray-200'>Proprietários</TabsTrigger>
+            <TabsTrigger value="locacoes" style={{color:"#034869"}} className='hover:cursor-pointer hover:bg-gray-200'>Locação</TabsTrigger>
+            <TabsTrigger value="lancamentos" style={{color:"#034869"}} className='hover:cursor-pointer hover:bg-gray-200'>Lançamentos</TabsTrigger>
+            <TabsTrigger value="boletos" style={{color:"#034869"}} className='hover:cursor-pointer hover:bg-gray-200'>Boletos</TabsTrigger>
           </TabsList>
         </div>
 
         <TabsContent value="personal-info" className="space-y-4 font-[Poppins-regular]">
-          <Card>
+          <Card style={{color:"#034869"}}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-1xl">
                 <span>Informações do Imóvel</span>
@@ -1428,6 +1432,7 @@ export const DetalhesImovel = () => {
                         !imovelMethods.formState.isDirty || !imovelMethods.formState.isValid
                       }
                       type="submit"
+                      className=" hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                     >
                       Salvar Alterações
                     </Button>
@@ -1447,7 +1452,9 @@ export const DetalhesImovel = () => {
               user?.permissions.includes("DELETE_IMOVEL")
             ) && (
 
-                <Button onClick={handlerNewProp} size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'>
+                <Button onClick={handlerNewProp} size={"sm"} 
+                className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+                >
                   <Plus className="mr-2 h-4 w-4" />
                   Novo Proprietrário
                 </Button>
@@ -1458,17 +1465,18 @@ export const DetalhesImovel = () => {
                   {!selPessoa && (
                     <>
                       <DialogTitle>Adicionar Novo Proprietário</DialogTitle>
-                      <DialogDescription>
+                      <DialogDescription style={{color:"#034869"}}>
                         Preencha os detalhes da novo proprietário para este imóvel.
                       </DialogDescription>
                     </>
                   )}
                 </DialogHeader>
 
-                <form className="space-y-4" onSubmit={imovelProp.handleSubmit(handleSubmitProprietario)}>
+                <form className="space-y-4" onSubmit={imovelProp.handleSubmit(handleSubmitProprietario)} style={{color:"#034869"}}>
                   {!selPessoa && (
                     <div className="grid grid-cols-1 gap-4 flex items-center">
-                      <Button onClick={() => { handlerSelProp('proprietarios') }}>
+                      <Button onClick={() => { handlerSelProp('proprietarios') }}
+                        className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
                         <Search className="mr-2 h-4 w-4" />
                         Proprietrários
                       </Button>
@@ -1522,7 +1530,7 @@ export const DetalhesImovel = () => {
                     </div>
                   )}
                   <DialogFooter>
-                    <Button type="submit" className={(selPessoa ? "hidden hover:cursor-pointer hover:bg-gray-600" : "dblock hover:cursor-pointer hover:bg-gray-600")}
+                    <Button type="submit" className={(selPessoa ? "hidden hover:cursor-pointer hover:bg-gray-600" : "dblock hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white")}
                     >Adicionar Proprietário</Button>
                   </DialogFooter>
                 </form>
@@ -1532,11 +1540,11 @@ export const DetalhesImovel = () => {
 
           <div className={(isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
             {imovel?.proprietarios?.map((proprietario) => (
-              <Card key={proprietario.id}>
+              <Card key={proprietario.id} style={{color:"#034869"}}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>{proprietario.pessoa?.nome}</span>
-                    <Badge variant="default">{proprietario.cotaImovel}</Badge>
+                    {/*<Badge variant="secondary" className='bg-[#a7d9f2]'>{proprietario.cotaImovel}</Badge>*/}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1570,7 +1578,7 @@ export const DetalhesImovel = () => {
                     ) && (
 
                         <Button
-                          className='mt-2 hover:cursor-pointer hover:bg-gray-300'
+                          className='mt-2 hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                           variant="secondary"
                           size="sm"
                           onClick={() => { handlerDetailProp(proprietario.pessoaId) }}
@@ -1698,7 +1706,7 @@ export const DetalhesImovel = () => {
         </TabsContent>
 
         {/* Locações */}
-        <TabsContent value="locacoes" className="space-y-4 font-[Poppins-regular]">
+        <TabsContent value="locacoes" className="space-y-4 font-[Poppins-regular]" style={{color:"#034869"}}>
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-[1.3rem]">Locações</h2>
             {/* <Button
@@ -1755,7 +1763,7 @@ export const DetalhesImovel = () => {
                       {/*Selecção de locatários */}
                       {selPessoa && (
                         <div>
-                          <Card id='teste' className='h-full'>
+                          <Card id='teste' className='h-full' style={{color:"#034869"}}>
                             <div className="flex  justify-end">
                               <Button onClick={() => { handleSelectProp(undefined) }}
                                 className='w-8 h-8 rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
@@ -1945,11 +1953,11 @@ export const DetalhesImovel = () => {
           {/*Lista de locações */}
           <div className={(isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
             {imovel?.locacoes?.map((locacao) => (
-              <Card key={locacao.id}>
+              <Card key={locacao.id} style={{color:"#034869"}}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>{locacao.id}</span>
-                    <Badge variant={locacao.status == LocacaoStatus.ENCERRADA ? "destructive" : "default"} >{locacao.status}</Badge>
+                    <Badge variant={locacao.status == LocacaoStatus.ENCERRADA ? "destructive" : "secondary"} className='bg-[#a7d9f2]'>{locacao.status}</Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1974,7 +1982,7 @@ export const DetalhesImovel = () => {
                     {locacao.locatarios?.map((locatario) => (
                       <div className='flex justify-start'>
                         <Button
-                          className='hover:cursor-pointer hover:bg-gray-300'
+                          className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                           variant="secondary"
                           size="sm"
                           onClick={() => { handlerDetailPessoa(parseFloat(locatario.pessoaId.toString())) }}
@@ -1998,6 +2006,7 @@ export const DetalhesImovel = () => {
                           <div className='flex justify-start'>
                             <Button
                               variant="secondary"
+                              className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                               size="sm"
                               onClick={() => { handlerDetailPessoa(parseFloat(fiador.pessoaId.toString())) }}
                               style={
@@ -2043,7 +2052,8 @@ export const DetalhesImovel = () => {
                   ) && (
 
                       <div className="grid grid-cols-2 gap-4 flex items-end mt-2">
-                        <Button size={"sm"} className='col-start-2' variant="secondary" onClick={() => { handlerSelProp('locacoes') }}>
+                        <Button size={"sm"} variant="secondary" onClick={() => { handlerSelProp('locacoes') }}
+                          className='col-start-2 hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'>
                           <CircleDollarSign className="mr-2 h-4 w-4" />
                           Pagamentos
                         </Button>
@@ -2353,7 +2363,7 @@ export const DetalhesImovel = () => {
         </TabsContent>
 
         {/* Lançamentos */}
-        <TabsContent value="lancamentos" className="space-y-4 font-[Poppins-regular]">
+        <TabsContent value="lancamentos" className="space-y-4 font-[Poppins-regular]" style={{color:"#034869"}}>
           <div className="flex items-center justify-between">
             <div className=
               {(isPortrait || isTablet || isBigScreen)
@@ -2391,7 +2401,7 @@ export const DetalhesImovel = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {STATUS_LANCAMENTO_OPTIONS.map((status) => (
-                      <SelectItem key={status.label} value={status.value}>
+                      <SelectItem key={status.label} value={status.value} style={{color:"#034869"}}>
                         {status.label}
                       </SelectItem>
                     ))}
@@ -2405,7 +2415,7 @@ export const DetalhesImovel = () => {
 
           {/* lancamentos Grid */}
           <div className="mx-auto w-full rounded-md">
-            <Card className='font-[Poppins-regular]'>
+            <Card className='font-[Poppins-regular]' style={{color:"#034869"}}>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <Label className="ml-1 mb-4 mt-8 font-bold">{
@@ -2428,7 +2438,8 @@ export const DetalhesImovel = () => {
                         user?.permissions.includes("CREATE_CONDOMINIO_LANCAMENTO")
                       ) && (
 
-                          <Button size={'sm'}>
+                          <Button size={'sm'}
+                          className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
                             <Plus className="mr-2 h-4 w-4" /> Lançamento
                           </Button>
                         )}
@@ -2549,7 +2560,9 @@ export const DetalhesImovel = () => {
                         </div>
 
                         <DialogFooter className='mt-2'>
-                          <Button size={"sm"} type='submit'>{titulo.includes('novo') ? 'Criar lançamento' : 'Confirmar Alteração'}</Button>
+                          <Button size={"sm"} type='submit'
+                          className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+                          >{titulo.includes('novo') ? 'Criar lançamento' : 'Confirmar Alteração'}</Button>
                         </DialogFooter>
                       </form>
                     </DialogContent>
@@ -2678,7 +2691,7 @@ export const DetalhesImovel = () => {
 
           {/* boletos Grid */}
           <div className="mx-auto w-full rounded-md">
-            <Card className='font-[Poppins-regular]'>
+            <Card className='font-[Poppins-regular]' style={{color:"#034869"}}>
               <CardContent>
                 {(imovel?.boletos && imovel.boletos.length > 0) ? (
                   <div className=''>
@@ -2702,7 +2715,7 @@ export const DetalhesImovel = () => {
                             <div className='flex justify-center mt-2'>
                               {((isAdmin ||
                                 user?.permissions.includes("ALL") ||
-                                user?.permissions.includes("UPDATE_CONDOMINIO_LANCAMENTO")
+                                user?.permissions.includes("UPDATE_LANCAMENTO_IMOVEL")
                               ) && boleto.status === BoletoStatus.PENDENTE) && (
                                   <>
                                     <Button
@@ -2732,13 +2745,14 @@ export const DetalhesImovel = () => {
                                       <AlertDialogContent>
                                         <AlertDialogHeader>
                                           <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                                          <AlertDialogDescription>
+                                          <AlertDialogDescription style={{color:"#034869"}}>
                                             Isso excluir o boleto da locação
                                           </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                          <AlertDialogAction onClick={() => { handleDeleteLancamento(boleto.id) }}>
+                                          <AlertDialogAction onClick={() => { handleDeleteLancamento(boleto.id) }}
+                                            className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
                                             Sim, excluir o boleto.
                                           </AlertDialogAction>
                                         </AlertDialogFooter>

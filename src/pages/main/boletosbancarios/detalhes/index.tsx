@@ -36,7 +36,7 @@ import api from '@/services/axios/api'
 import { queryClient } from '@/services/react-query/query-client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { CircleArrowLeft, CircleCheck, Pencil, Trash2 } from 'lucide-react'
+import { CircleCheck, Pencil, Trash2 } from 'lucide-react'
 import * as React from 'react'
 import { useForm, Controller, FormProvider } from 'react-hook-form'
 import { LancamentoStatus, BoletoStatus } from '@/enums/locacao/enums-locacao'
@@ -45,13 +45,13 @@ import { useGlobalParams } from '@/globals/GlobalParams';
 import { useMediaQuery } from 'react-responsive';
 import { TipoLancamento } from '@/interfaces/lancamentotipo'
 import axios from 'axios'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { boletoSchema, BoletoSchema } from '@/schemas/boleto.schema'
 import { Boleto } from '@/interfaces/boleto'
 import { usdFormatter } from '@/utils/format-money'
 import { STATUS_BOLETO_OPTIONS } from '@/constants/status-boletos'
 import { DocumentUpload } from '../../imoveis/criarImovel/components/document-upload'
-import { ROUTE } from '@/enums/routes.enum'
+//import { ROUTE } from '@/enums/routes.enum'
 //import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
 
 export const getTipos = async () => {
@@ -103,7 +103,7 @@ export const DetalhesBoletoBancario = () => {
 
   //Globals
   const glb_params = useGlobalParams();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   const { data: boleto } = useQuery({
     queryKey: ['boleto', id],
@@ -292,7 +292,11 @@ export const DetalhesBoletoBancario = () => {
 
 
   React.useEffect(() => {
-    glb_params.updTitle_form('Boletos');
+    glb_params.updTitle_form('Boletos Bancário');
+    if (glb_params.pastaOrig === '') {
+      glb_params.updPastaOrig('boleto-info');
+    }
+
     if (localStorage) boletoMethods.reset(defaultValues)
   }, [boleto, documentFiles])
 
@@ -330,9 +334,9 @@ export const DetalhesBoletoBancario = () => {
       boletoMethods.setValue("locacaoId", boleto.locacaoId);
     }*/
 
-  const handlerBackNav = () => {
+  /*const handlerBackNav = () => {
     navigate(`${ROUTE.PAGAMENTOS}/?page=1&dataInicial=${glb_params.data_inicial}&dataFinal=${glb_params.data_final}`)
-  }
+  }*/
 
   /*const handlerValidaLinhaDig = (value: string) => {
     if (value) {
@@ -408,12 +412,12 @@ export const DetalhesBoletoBancario = () => {
   return (
     <div className="scale mx-auto flex max-w-screen-xl transform flex-col items-center px-4 transition-transform">
       <div className="mx-auto w-full rounded-md">
-        <Card className='font-[Poppins-regular]'>
+        <Card className='font-[Poppins-regular]' style={{color:"#034869"}}>
           <CardHeader>
-            <CircleArrowLeft
+            {/*<CircleArrowLeft
               className='mb-5 hover:cursor-pointer hover:text-gray-500'
               onClick={handlerBackNav}
-            ></CircleArrowLeft>
+            ></CircleArrowLeft>*/}
             <CardTitle className="flex items-center justify-between">
               <div className='font-bold w-full'>
                 <div className='flex flex-direction-row'>

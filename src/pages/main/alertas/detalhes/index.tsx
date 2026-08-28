@@ -248,13 +248,13 @@ export const DetalhesAlerta = () => {
 
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <TabsList>
-          <TabsTrigger value="alerta-info" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Dados do alerta</TabsTrigger>
+          <TabsTrigger value="alerta-info" style={{color: "#034869"}} className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Dados do alerta</TabsTrigger>
           {/*<TabsTrigger value="imoveis" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Imóveis</TabsTrigger>
           <TabsTrigger value="lancamentos" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Lançamentos</TabsTrigger>*/}
         </TabsList>
 
         <TabsContent value="alerta-info" className="space-y-4 font-[Poppins-regular]">
-          <Card>
+          <Card style={{ color: "#034869" }}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-1xl">
                 <span>Informações do Alerta</span>
@@ -291,6 +291,7 @@ export const DetalhesAlerta = () => {
                         !alertaMethods.formState.isDirty || !alertaMethods.formState.isValid
                       }
                       type="submit"
+                      className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                     >
                       Salvar Alterações
                     </Button>

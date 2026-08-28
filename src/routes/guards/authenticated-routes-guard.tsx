@@ -7,6 +7,7 @@ export const AuthenticatedRoutesGuard = () => {
   const { isAuthenticated, isLoadingUserData } = useAuth()
   const location = useLocation() // Adds useLocation to store the current location
 
+  console.log('AuthenticatedRoutesGuard - isAuthenticated:', isAuthenticated);
   if (isLoadingUserData) {
     // loading component while checks if user is authenticated
     return <PageLoader />

@@ -142,7 +142,7 @@ export const ImovelFormContent = ({
                       handleChangeCondominio(value);
                       field.onChange(value);
                     }}
-                    value={field.value}
+                    value={field.value ? field.value : ''}
                   >
                     <SelectTrigger className='col-start-1 row-start-1 appearance-none border-blue-50 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full'>
                       <SelectValue placeholder="Selecione o condomínio" />
@@ -564,7 +564,6 @@ export const ImovelFormSubmitButton = ({
     <div className="">
       <Button
         type="submit"
-        className="mt-4"
         size={"sm"}
         disabled={
           disabled
@@ -572,6 +571,7 @@ export const ImovelFormSubmitButton = ({
           !createImovelMethods.formState.isDirty ||
           !createImovelMethods.formState.isValid
         }
+        className="mt-4 hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
       >
         Criar Imóvel
       </Button>

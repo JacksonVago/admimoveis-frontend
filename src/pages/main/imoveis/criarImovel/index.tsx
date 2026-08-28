@@ -128,6 +128,18 @@ export const CriarImovel = () => {
   const [createdImovel, setCreatedImovel] = React.useState<Imovel | undefined>()
   const imovelId = createdImovel?.id
 
+  React.useEffect(() => {
+    glb_params.updTitle_form('Imóveis');
+
+    if (glb_params.pastaOrig === '') {
+      glb_params.updPastaOrig('imovel-create');
+    }
+    else {
+      //setActiveTab(glb_params.pastaOrig);
+    }
+
+  }, []);
+  
   const { data: imovel } = useQuery({
     enabled: !!imovelId,
     queryKey: ['imovel', imovelId],
@@ -450,7 +462,7 @@ export const CriarImovel = () => {
       <div className="mb-8 flex w-full items-center justify-between">
       </div>
       <div className="mx-auto w-full rounded-md">
-        <Card>
+        <Card style={{color: "#034869"}}>
           <CardContent>
             <h2 className="mb-4 mt-8 text-xl font-bold">Criar um novo imovel</h2>
 

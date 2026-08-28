@@ -339,6 +339,7 @@ export const LocacaoFormContent = ({
                 ) : (
                   <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
                     <Button type='button'
+                    className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                       onClick={() => {
                         handlerSelImovel('imoveis')
                       }}
@@ -392,7 +393,7 @@ export const LocacaoFormContent = ({
 
             {/*Seleção de imóveis */}
             {selImovel && (
-              <Card id='teste' className='h-full'>
+              <Card id='teste' className='h-full' style={{color:"#034869"}}>
                 <div className="flex  justify-end">
                   <Button onClick={() => { handleSelectedImovel(undefined) }}
                     className='w-4 h-8 -top-5 -right-5 relative rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
@@ -408,7 +409,7 @@ export const LocacaoFormContent = ({
 
             {/*Seleção de locatários */}
             {selLocatario && (
-              <Card id='teste' className='h-full'>
+              <Card id='teste' className='h-full' style={{color:"#034869"}}>
                 <div className="flex  justify-end">
                   <Button onClick={() => { handleSelectedProp(undefined) }}
                     className='w-4 h-8 -top-5 -right-5 relative rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
@@ -565,7 +566,7 @@ export const LocacaoFormContent = ({
           <div>
             {(selGarantia === GarantiaLocacao.FIADOR && selFiador) && (
               <div>
-                <Card id='teste' className='h-full'>
+                <Card id='teste' className='h-full' style={{color:"#034869"}}>
                   <div className="flex  justify-end">
                     <Button onClick={() => { handleSelectFiador(undefined) }}
                       className='w-4 h-8 -top-5 -right-5 relative rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
@@ -706,7 +707,7 @@ export const LocacaoFormContent = ({
                       </SelectTrigger>
                       <SelectContent>
                         {STATUS_LOCACAO_OPTIONS.map((status) => (
-                          <SelectItem className='text-base' key={status.label} value={status.value}>
+                          <SelectItem className='text-base' key={status.label} value={status.value} style={{color:"#034869"}}>
                             {status.label}
                           </SelectItem>
                         ))}
@@ -735,6 +736,7 @@ export const LocacaoFormSubmitButton = ({
     <div className='flex justify-end mt-4'>
       <Button
         type="submit"
+        className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
         disabled={
           disabled
           ||

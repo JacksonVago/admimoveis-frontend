@@ -59,8 +59,9 @@ export const activeTipo = async (tipoData: {
 export const putUpdateTipo = (tipoData: {
   id: number
   name: string
+  empresaId: number
 }) => {
-  return api.put(`/tipoimovel/${tipoData.id}`, { name: tipoData.name })
+  return api.put(`/tipoimovel/${tipoData.id}`, { name: tipoData.name, empresaId: tipoData.empresaId })
 }
 
 
@@ -91,17 +92,17 @@ export default function ListarTipos() {
     useGetTiposQueryOptions(Number(glb_params.id_empresa))
   )
 
-  const tipos = data?.data;  
+  const tipos = data?.data;
 
   const createTipoMutation = useMutation({
     mutationFn: createTipo,
     onSuccess: () => {
-      ;['tipoimovel'].forEach((queryKey) => {
+      ['tipoimovel'].forEach((queryKey) => {
         queryClient.invalidateQueries({ queryKey: [queryKey] })
       });
       toast({
         title: 'Tipo de imóvel criado',
-        description: 'O novo tipo de imóvel foi criado com sucesso.',                
+        description: 'O novo tipo de imóvel foi criado com sucesso.',
       })
       setIsCreateDialogOpen(false)
       setNewTipo({ name: '', empresaId: Number(glb_params.id_empresa) })
@@ -135,7 +136,7 @@ export default function ListarTipos() {
   const activeTipoMutation = useMutation({
     mutationFn: activeTipo,
     onSuccess: () => {
-      ;['tipoimovel'].forEach((queryKey) => {
+      ['tipoimovel'].forEach((queryKey) => {
         queryClient.invalidateQueries({ queryKey: [queryKey] })
       });
       toast({
@@ -161,6 +162,10 @@ export default function ListarTipos() {
   const updateTipoMutation = useMutation({
     mutationFn: putUpdateTipo,
     onSuccess: () => {
+      ['tipoimovel'].forEach((queryKey) => {
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+      });
+
       toast({
         title: 'Tipo de imóvel atualizado',
         description: 'As informações do tipo de imóvel foram atualizadas com sucesso.'
@@ -207,31 +212,34 @@ export default function ListarTipos() {
       updateTipoMutation.mutate({
         id: selectedTipo.id,
         name: selectedTipo.name,
+        empresaId: Number(glb_params.id_empresa),
       })
     }
   }
 
 
   return (
-    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]" style={{ color: "#034869" }}>
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         {/* <h1 className="text-2xl font-bold">Cadastro de Tipo de Imóvel</h1> */}
         <Dialog
           open={isCreateDialogOpen}
           onOpenChange={(value) => {
             setIsCreateDialogOpen(value)
-            setNewTipo({ name: '', empresaId: Number(glb_params.id_empresa)})
+            setNewTipo({ name: '', empresaId: Number(glb_params.id_empresa) })
           }}
         >
           <DialogTrigger asChild>
-            <Button size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'>
-              <Plus className="mr-2 h-4 w-4" /> Criar Tipo de Imóvel
-            </Button>
+            <div className='flex justify-end w-full'>
+              <Button size={"sm"} className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
+                <Plus className="mr-2 h-4 w-4" /> Criar Tipo de Imóvel
+              </Button>
+            </div>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Criar novo Tipo de Imóvel</DialogTitle>
-              <DialogDescription>Preencha os dados do novo Tipo de Imóvel abaixo.</DialogDescription>
+              <DialogDescription style={{ color: "#034869" }}>Preencha os dados do novo Tipo de Imóvel abaixo.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
@@ -249,7 +257,7 @@ export default function ListarTipos() {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleCreateTipo} className='hover:cursor-pointer hover:bg-gray-600'>Criar Tipo</Button>
+              <Button onClick={handleCreateTipo} className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">Criar Tipo</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -293,7 +301,9 @@ export default function ListarTipos() {
                           e.stopPropagation()
                           setSelectedTipo(tipo)
                         }
-                        } title='Cancelar Tipo de Imóvel'>
+                        }
+                        className='hover:cursor-pointer hover:bg-gray-200'
+                          title='Cancelar Tipo de Imóvel'>
                           {tipo.status === PessoaStatus.CANCELADA ? <Recycle className="h-4 w-4" color='red' /> : <Trash2 className="h-4 w-4" />}
 
                         </Button>
@@ -301,13 +311,14 @@ export default function ListarTipos() {
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                          <AlertDialogDescription>
+                          <AlertDialogDescription style={{ color: "#034869" }}>
                             {tipo.status === PessoaStatus.CANCELADA ? 'Isso reativará o tipo de imóvel.' : 'Isso deixará o tipo de imóvel desativado.'}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                          <AlertDialogAction onClick={handleDeleteTipo}>
+                          <AlertDialogCancel >Cancelar</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleDeleteTipo}
+                          className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
                             {tipo.status === PessoaStatus.CANCELADA ? 'Sim, reativar o tipo de imóvel.' : 'Sim, desativar o tipo de imóvel.'}
                           </AlertDialogAction>
                         </AlertDialogFooter>
@@ -330,7 +341,7 @@ export default function ListarTipos() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Tipo de Imóvel</DialogTitle>
-            <DialogDescription>Edite os dados do colaborador abaixo.</DialogDescription>
+            <DialogDescription style={{ color: "#034869" }}>Edite os dados do colaborador abaixo.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
@@ -346,7 +357,8 @@ export default function ListarTipos() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={handleUpdateTipo}>Salvar alterações</Button>
+            <Button onClick={handleUpdateTipo}
+              className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">Salvar alterações</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

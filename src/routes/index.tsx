@@ -60,6 +60,7 @@ import ListarContasCorrentes from '@/pages/main/contascorrente/listarcontascorre
 import ListarBoletosBancarios from '@/pages/main/boletosbancarios'
 import { DetalhesBoletoBancario } from '@/pages/main/boletosbancarios/detalhes'
 import ListarPagamentos from '@/pages/main/pagamentos'
+import ListarGruposFluxoCaixa from '@/pages/main/grupofluxocaixa'
 
 export interface ProtectedRouteProps {
   permission: Permission
@@ -137,6 +138,7 @@ export const RoutesComponent = () => {
 
   useEffect(() => { }, [glb_params]);
 
+  console.log('user :', user);
   return (
     <SlideRoutes>
       {/*Bem vindo */}
@@ -215,6 +217,16 @@ export const RoutesComponent = () => {
             element={
               <ProtectedRoute permission="VIEW_CONTAS_CORRENTE">
                 <ListarContasCorrentes limitView={3} exclude='' onSelectContaCorrente={undefined} />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Grupo fluxo de caixa */}
+          <Route
+            path={ROUTE.GRUPO_FLUXO_CAIXA}
+            element={
+              <ProtectedRoute permission="VIEW_GRUPO_FLUXO_CAIXA">
+                <ListarGruposFluxoCaixa/>
               </ProtectedRoute>
             }
           />

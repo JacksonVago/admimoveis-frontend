@@ -8,6 +8,7 @@ import { CondominioForm } from './components/condominio-form'
 import { condominioSchema, CondominioSchema } from '@/schemas/condominio.schema'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import api from '@/services/axios/api'
+import { useEffect } from 'react'
 
 
 //const CONDOMINIO_KNOWN_ERRORS = ['Condomínio já cadastrado']
@@ -32,6 +33,18 @@ export const CriarCondominio = () => {
 
   //by priority, react query imovel is the updated imovel data
   const imovelData = condominio || createdCondominio*/
+
+  useEffect(() => {
+    glb_params.updTitle_form('Condomínios');
+
+    if (glb_params.pastaOrig === '') {
+      glb_params.updPastaOrig('condominio-create');
+    }
+    else {
+      //setActiveTab(glb_params.pastaOrig);
+    }
+
+  }, []);
 
   const createCondominioMethods = useForm<CondominioSchema>({
     resolver: zodResolver(condominioSchema),
@@ -113,14 +126,12 @@ export const CriarCondominio = () => {
     }
   }
 
-  console.log('condominio dados', createCondominioMethods.formState.errors);
-
   return (
-    <div className="scale mx-auto flex max-w-screen-xl transform flex-col items-center px-4 transition-transform">
+    <div className="scale mx-auto flex max-w-screen-xl transform flex-col items-center px-4 transition-transform" style={{color: "#034869"}}>
       <div className="mb-8 flex w-full items-center justify-between">
       </div>
       <div className="mx-auto w-full rounded-md">
-        <Card>
+        <Card style={{color: "#034869"}}>
           <CardContent>
             <h2 className="mb-4 mt-8 text-xl font-bold">Criar um novo condomínio</h2>
 

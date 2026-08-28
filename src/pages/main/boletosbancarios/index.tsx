@@ -12,7 +12,7 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { Download, IdCard, List, Mail, Search, Trash } from 'lucide-react'
+import { Download, IdCard, List, Mail, RefreshCcw, Search, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
@@ -109,7 +109,7 @@ export default function ListarBoletosBancarios({
   const isMobile = useMediaQuery({ query: '(max-width: 420px)' })
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
   const [showcard, setShowCard] = useState((isMobile ? false : true));
-  const [selBoleto, setSelBoleto] = useState<Boleto>();
+  const [selBoleto, setSelBoleto] = useState<BoletoBancario>();
 
   const navigate = useNavigate();
 
@@ -221,47 +221,96 @@ export default function ListarBoletosBancarios({
     currency: 'BRL',
   });
 
-  const handlerEnviaEmail = (boleto: Boleto | undefined) => {
+  const handlerEnviaEmail = (boleto: BoletoBancario | undefined) => {
     setSelBoleto(boleto);
-    if (boleto?.imovelId && boleto?.imovelId > 0) {
-      if (boleto.imovel?.proprietarios) {
-        jobMethods.setValue('str_email', boleto.imovel.proprietarios[0].pessoa ? boleto.imovel.proprietarios.map(loc => loc.pessoa ? loc.pessoa.email : "").join(";") : "");
+    if (boleto?.boleto?.imovelId && boleto?.boleto?.imovelId > 0) {
+      if (boleto?.boleto.imovel?.proprietarios) {
+        jobMethods.setValue('str_email', boleto?.boleto.imovel.proprietarios[0].pessoa ? boleto?.boleto.imovel.proprietarios.map(loc => loc.pessoa ? loc.pessoa.email : "").join(";") : "");
       }
     }
     else {
-      if (boleto?.locacaoId && boleto?.locacaoId > 0) {
-        if (boleto.locacao?.locatarios) {
-          jobMethods.setValue('str_email', boleto.locacao.locatarios[0].pessoa ? boleto.locacao.locatarios.map(loc => loc.pessoa ? loc.pessoa.email : "").join(";") : "");
+      if (boleto?.boleto?.locacaoId && boleto?.boleto?.locacaoId > 0) {
+        if (boleto?.boleto.locacao?.locatarios) {
+          jobMethods.setValue('str_email', boleto?.boleto.locacao.locatarios[0].pessoa ? boleto?.boleto.locacao.locatarios.map(loc => loc.pessoa ? loc.pessoa.email : "").join(";") : "");
         }
       }
     }
     setIsEmailDialogOpen(true);
   }
 
-  const handleSubmitEmail = (data: JobSchema) => {
-    const formData = new FormData();
+  const handleSubmitEmail = async (data: JobSchema) => {
+    try {
+      const formData = new FormData();
 
-    if (data.empresaId) {
-      formData.append('empresaId', data.empresaId.toString())
-    }
-    if (data.alertaId) {
-      formData.append('alertaId', data.alertaId.toString())
-    }
-    if (data.descAlerta) {
-      formData.append('descAlerta', data.descAlerta);
-    }
+      if (selBoleto?.id) {
+        console.log(selBoleto?.id);
+        //const const_pdf = await DownloadPdf(Number(selBoleto.id), false);
 
-    if (data.str_message) {
-      formData.append('str_message', data.str_message.toString());
+        api.get('/boleto-bancario/download/' + selBoleto?.id)
+          .then(result => {
+            console.log(result.data);
+            console.log(result.data.data);
+
+            const rawData: ArrayBuffer = result.data.data;
+            const typedArray = new Uint8Array(rawData);
+
+
+            const blob = new Blob([typedArray], { type: 'application/pdf' });
+
+            formData.append('email', jobMethods.getValues("str_email"))
+            formData.append('subject', jobMethods.getValues("descAlerta"))
+            formData.append('text', jobMethods.getValues("str_message"));
+            formData.append('pdf', blob, 'boleto.pdf');
+
+
+            const result_email = api.post<string>('/emails/sendpdf-email/' + selBoleto?.boleto?.empresaId,
+              formData, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            console.log(result_email);
+            toast({ title: 'Email enviado com sucesso.' });
+          });
+
+        /*DownloadPdf(Number(selBoleto.id), false).then((const_pdf) => {
+          console.log('const_pdf', const_pdf);
+          formData.append('email', jobMethods.getValues("str_email"))
+          formData.append('subject', jobMethods.getValues("descAlerta"))
+          formData.append('text', jobMethods.getValues("str_message"));
+          formData.append('pdf', const_pdf, 'boleto.pdf');
+
+
+          const result = api.post<string>('/emails/sendpdf-email/' + selBoleto?.boleto?.empresaId,
+            formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          console.log(result);
+          toast({ title: 'Email enviado com sucesso.' });
+        });*/
+      }
     }
+    catch (error) {
+      if (axios.isAxiosError(error)) {
+        // Check if there's a response and data within the error
+        if (error.response && error.response.data) {
+          console.error('Error message from server:', error.response.data);
+          toast({
+            title: 'Erro ao atualizar locacao',
+            description: error.response.data.message,
+          })
 
-    //createBoletoMutation.mutate({ data: formData });
-
+          // You can also set this error message to a state to display it in your UI
+        } else {
+          console.error('Axios error without response data:', error.message);
+        }
+      } else {
+        console.error('Non-Axios error:', error);
+      }
+    }
   }
 
   const handlerSendMail = async () => {
     try {
-      const result = await api.post<string>('/emails/send-email/' + selBoleto?.empresaId,
+      const result = await api.post<string>('/emails/send-email/' + selBoleto?.boleto?.empresaId,
         {
           email: jobMethods.getValues("str_email"),
           subject: jobMethods.getValues("descAlerta"),
@@ -299,6 +348,8 @@ export default function ListarBoletosBancarios({
     try {
       console.log(boletoBancarioId);
       if (boletoBancarioId) {
+        let resp = DownloadPdf(boletoBancarioId, true);
+        /*
         api.get('/boleto-bancario/download/' + boletoBancarioId)
           .then(result => {
             console.log(result.data);
@@ -313,14 +364,14 @@ export default function ListarBoletosBancarios({
             const downloadUrl: string = window.URL.createObjectURL(blob);
             const anchor = document.createElement('a');
             anchor.href = downloadUrl;
-            anchor.download = 'testeBoleto.pdf';
+            anchor.download = selBoleto?.id + '.pdf';
 
             document.body.appendChild(anchor);
             anchor.click();
             document.body.removeChild(anchor);
             window.URL.revokeObjectURL(downloadUrl);
           });
-
+        */
       }
     } catch (error) {
       console.error('Download failed:', error);
@@ -370,19 +421,193 @@ export default function ListarBoletosBancarios({
     })
   }
 
+  const handlerChangeAlerta = (value: string) => {
+    let alerta = alertas?.data.filter(x => x.id === Number(value));
+    jobMethods.setValue("descAlerta", alerta ? alerta[0].alerta.descricao : "");
+    let descAlerta = alerta ? alerta[0].alerta.descricao : "";
+    let textoAlerta = alerta ? alerta[0].textoAlerta : "";
+    let int_pos: number = 0;
+    let int_tam: number = 0;
+    let str_campo: string = "";
+
+    if (textoAlerta.length > 0) {
+      while (textoAlerta.indexOf('<', int_pos) > -1) {
+        int_pos = textoAlerta.indexOf('<', int_pos);
+        int_tam = textoAlerta.indexOf('>', int_pos);
+        str_campo = textoAlerta.substring(int_pos, int_tam + 1);
+
+
+        //Troca campo por dados do boleto
+
+        console.log(str_campo);
+        switch (descAlerta) {
+          case "Aviso reajuste Locação":
+            break;
+
+          case "Aviso renovação contrato":
+            break;
+
+          case "Aviso seguro incêndio":
+            break;
+
+          case "Aviso vencimento boleto":
+            if (selBoleto) {
+              switch (str_campo) {
+                case "<mes>":
+                  moment.locale('pt', {
+                    months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                  });
+                  console.log(moment(selBoleto.dataVencimento).locale('pt').format("MMMM"));
+                  console.log(moment(selBoleto.dataVencimento).format("MMMM"));
+
+                  textoAlerta = textoAlerta.replace(str_campo, moment.utc(selBoleto.dataVencimento).format("MMMM"));
+                  break;
+
+                case "<Data de Emissão>":
+                  textoAlerta = textoAlerta.replace(str_campo, moment.utc(selBoleto.dataBoleto).format("DD/MM/YYYY"));
+                  break;
+
+                case "<Data de Vencimento>":
+                  textoAlerta = textoAlerta.replace(str_campo, moment.utc(selBoleto.dataVencimento).format("DD/MM/YYYY"));
+                  break;
+
+                case "<Valor Original>":
+                  textoAlerta = textoAlerta.replace(str_campo, selBoleto.valor.toLocaleString('pt-BR'));
+                  break;
+
+                case "<Email>":
+                  let str_mail = ((selBoleto.boleto?.locatario && selBoleto.boleto?.locatario.pessoa) ? selBoleto.boleto?.locatario.pessoa.email : ((selBoleto.boleto?.imovel && selBoleto.boleto?.imovel.proprietarios && selBoleto.boleto?.imovel.proprietarios.length > 0 && selBoleto.boleto?.imovel.proprietarios[0].pessoa) ? selBoleto.boleto?.imovel.proprietarios[0].pessoa.email : '')) || '';
+                  textoAlerta = textoAlerta.replace(str_campo, str_mail);
+                  break;
+
+                case "<Link do Documento>":
+                  if (selBoleto.boleto?.documentos && selBoleto.boleto?.documentos.length > 0) {
+                    textoAlerta = textoAlerta.replace(str_campo, selBoleto.boleto?.documentos.map(doc => doc.url ? import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url : "").join("\n"));
+                  }
+                  break;
+
+                case "<Link do Boleto>":
+                  if (selBoleto.boleto?.documentos && selBoleto.boleto?.documentos.length > 0) {
+                    textoAlerta = textoAlerta.replace(str_campo, selBoleto.boleto?.documentos.map(doc => doc.url ? import.meta.env.VITE_AZURE_BLOB_CONTAINER + doc.url : "").join("\n"));
+                  }
+                  break;
+
+                case "<Linha Digitável Boleto>":
+                  textoAlerta = textoAlerta.replace(str_campo, selBoleto.linhaDigitavel && selBoleto.linhaDigitavel.length > 0 ? selBoleto.linhaDigitavel : '');
+                  break;
+
+                case "<Linha Digitável Lançamento>":
+                  if (selBoleto.boleto?.lancamentoImovels && selBoleto.boleto?.lancamentoImovels.length > 0) {
+                    textoAlerta = textoAlerta.replace(str_campo, selBoleto.boleto?.lancamentoImovels.map(lan => lan.linhaDigitavel ? lan.linhaDigitavel : "").join("\n"));
+                  }
+                  else {
+                    if (selBoleto.boleto?.lanctoCondominio && selBoleto.boleto?.lanctoCondominio.length > 0) {
+                      textoAlerta = textoAlerta.replace(str_campo, selBoleto.boleto?.lanctoCondominio.map(lan => lan.linhaDigitavel ? lan.linhaDigitavel : "").join("\n"));
+                    }
+                    else {
+                      if (selBoleto.boleto?.lanctoLocacao && selBoleto.boleto?.lanctoLocacao.length > 0) {
+                        textoAlerta = textoAlerta.replace(str_campo, selBoleto.boleto?.lanctoLocacao.map(lan => lan.linhaDigitavel ? lan.linhaDigitavel : "").join("\n"));
+                      }
+                      else {
+                        textoAlerta = textoAlerta.replace(str_campo, "");
+                      }
+                    }
+                  }
+                  break;
+              }
+            }
+            break;
+
+          case "Aviso boleto atrasado":
+            /*arr_campos = [
+              { check: false, campo: "dataEmissao", descricao: "Data de Emissão" },
+              { check: false, campo: "dataVencimento", descricao: "Data de Vencimento" },
+              { check: false, campo: "valorOriginal", descricao: "Valor Original" },
+              { check: false, campo: "email", descricao: "Email" },
+              { check: false, campo: "linkDocumento", descricao: "Link do Documento" },
+              { check: false, campo: "linhaDigitavelBol", descricao: "Linha Digitável Boleto" },
+              { check: false, campo: "linhaDigitavelLan", descricao: "Linha Digitável Lançamento" },
+            ]*/
+            break;
+
+          default:
+            break;
+        }
+
+        int_pos++;
+      }
+      jobMethods.setValue("str_message", textoAlerta);
+    }
+
+  }
+
+  const DownloadPdf = async (boletoBancarioId: number, download: boolean): Promise<any> => {
+    try {
+      console.log(boletoBancarioId);
+      if (boletoBancarioId) {
+        api.get('/boleto-bancario/download/' + boletoBancarioId)
+          .then(result => {
+            console.log(result.data);
+            console.log(result.data.data);
+
+            const rawData: ArrayBuffer = result.data.data;
+            const typedArray = new Uint8Array(rawData);
+
+
+            const blob = new Blob([typedArray], { type: 'application/pdf' });
+
+            if (download) {
+              const downloadUrl: string = window.URL.createObjectURL(blob);
+              const anchor = document.createElement('a');
+              anchor.href = downloadUrl;
+              anchor.download = selBoleto?.id + '.pdf';
+
+              document.body.appendChild(anchor);
+              anchor.click();
+              document.body.removeChild(anchor);
+              window.URL.revokeObjectURL(downloadUrl);
+            }
+            return blob;
+          });
+      }
+
+    } catch (error) {
+      console.error('Download failed:', error);
+      throw 'Error : ' + error;
+    }
+
+  }
+
+  const handlerValidarBoleto = (boletoBancarioId: number) => {
+    try {
+      console.log(boletoBancarioId);
+      if (boletoBancarioId) {
+        api.get('/boleto-bancario/nossonumero/' + boletoBancarioId)
+          .then(result => {
+            console.log(result.data);
+            console.log(result.data.data);
+
+          });
+
+      }
+    } catch (error) {
+      console.error('Download failed:', error);
+    }
+
+  }
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]" style={{ color: "#034869" }}>
       {/* Search & Filters */}
       {/* <div className="grid grid-cols-2 flex flex-col justify-end items-start gap-4 sm:flex-row sm:items-center"> */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {glb_params.origin_url.indexOf('lista') > -1 && (
           <h1 className="text-2xl font-bold">Boletos bancário</h1>
         )}
-        <div className='grid grid-cols-3'>
+        <div className='flex justify-end'>
           {
             showcard ?
-              (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />) :
-              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />)
+              (<List onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />)
           }
         </div>
       </div>
@@ -393,7 +618,7 @@ export default function ListarBoletosBancarios({
           : "grid grid-cols-1 gap-4 sm:flex-row sm:items-center sm:justify-between border-b"}
       >
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4" />
           <Input
             onChange={handleSearchChange}
             value={search}
@@ -437,7 +662,8 @@ export default function ListarBoletosBancarios({
             </SelectTrigger>
             <SelectContent>
               {STATUS_BOLETO_OPTIONS.map((value) => (
-                <SelectItem key={value.label} value={value.value}>
+                <SelectItem key={value.label} value={value.value}
+                  style={{ color: "#034869" }}>
                   {value.value}
                 </SelectItem>
               ))}
@@ -473,18 +699,18 @@ export default function ListarBoletosBancarios({
             (
               <>
                 {boletosBancario.map((boleto) => (
-                  <Card key={boleto.id} className="">
+                  <Card key={boleto.id} className="" style={{ color: "#034869" }}>
                     <CardHeader className="flex flex-row justify-between">
                       <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
                         <div className='grid grid-cols-2'>
                           {((boleto.boleto && boleto.boleto.locacao) ? (
-                            <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                            <p className="line-clamp-2 flex gap-1 text-sm ">
                               {boleto.boleto.locatario ? boleto.boleto.locatario.pessoa?.nome : ''} -
                               {boleto.boleto.locacao?.imovel?.endereco.complemento} -
                               {boleto.boleto.locacao?.imovel?.condominio ? boleto.boleto.locacao.imovel.condominio.name : ''}
                             </p>)
                             :
-                            (<p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                            (<p className="line-clamp-2 flex gap-1 text-sm ">
                               {(boleto.boleto && boleto.boleto.imovel && boleto.boleto.imovel.proprietarios && boleto.boleto.imovel.proprietarios.length > 0) ?
                                 boleto.boleto.imovel.proprietarios[0]?.pessoa?.nome : ''}
                               {boleto.boleto ? ' - ' + boleto.boleto.imovel?.endereco.complemento : ''}
@@ -527,7 +753,7 @@ export default function ListarBoletosBancarios({
                       </Label>
                       <Label className="font-bold flex justify-start mt-2" style={{ fontSize: '0.7rem' }}>
                         Linha Digitável :  {boleto.linhaDigitavel}
-                      </Label>                      
+                      </Label>
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <div className=
@@ -542,7 +768,7 @@ export default function ListarBoletosBancarios({
                         ) && (
 
                             <Button variant="secondary"
-                              className='hover:cursor-pointer hover:bg-gray-200'
+                              className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                               onClick={() => handleClickVerDetalhes(boleto.id ? boleto.id : 0)}
                               size={"sm"}>
                               Detalhes
@@ -551,31 +777,51 @@ export default function ListarBoletosBancarios({
                         {((isAdmin ||
                           user?.permissions.includes("ALL") ||
                           user?.permissions.includes("DELETE_PAGAMENTO")
-                        ) && (boleto.status === BoletoStatus.PENDENTE)) && (
+                        ) && (boleto.status === BoletoStatus.CONFIRMADO)) && (
                             <>
                               <Button variant="destructive"
                                 onClick={() => handlerBaixarBoleto(boleto.id)}
-                                size={"sm"}>
+                                size={"sm"}
+                                className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
+                              >
                                 <Trash className="h-4 w-4" />Baixar do banco
                               </Button>
                             </>
                           )}
                         {((isAdmin ||
                           user?.permissions.includes("ALL") ||
+                          user?.permissions.includes("DELETE_PAGAMENTO")
+                        ) && (boleto.status === "REGISTRADO")) && (
+                            <>
+                              <Button variant="destructive"
+                                onClick={() => handlerValidarBoleto(boleto.id)}
+                                size={"sm"}
+                                className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
+                              >
+                                <RefreshCcw className="h-4 w-4" />Atualizar Boleto
+                              </Button>
+                            </>
+                          )}
+                        {((isAdmin ||
+                          user?.permissions.includes("ALL") ||
                           user?.permissions.includes("VIEW_BOLETO_BANCARIO")
-                        )) && (
+                        ) && (boleto.status === BoletoStatus.CONFIRMADO ||
+                          boleto.status === "REGISTRADO"
+                          )) && (
                             <>
                               <Button variant="secondary"
                                 onClick={() => handlerDownloadBoleto(boleto.id)}
-                                size={"sm"}>
+                                size={"sm"}
+                                className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
+                              >
                                 <Download className="h-4 w-4" />Download Boleto
                               </Button>
                             </>
                           )}
-                        {boleto.status === BoletoStatus.CONFIRMADO && (
+                        {(boleto.status === BoletoStatus.CONFIRMADO || boleto.status === "REGISTRADO") && (
                           <Button variant="secondary"
                             className='hover:cursor-pointer hover:bg-gray-200'
-                            onClick={() => handlerEnviaEmail(boleto.boleto)}
+                            onClick={() => handlerEnviaEmail(boleto)}
                             size={"sm"}>
                             <Mail></Mail>
                           </Button>
@@ -614,8 +860,8 @@ export default function ListarBoletosBancarios({
                           )
                             :
                             (<td className={boleto.status === BoletoStatus.ATRASADO ? "border-b p-2 text-red-600" : "border-b p-2"}>
-                              {boleto.boleto && boleto.boleto.imovel && boleto.boleto.imovel.proprietarios && boleto.boleto.imovel.proprietarios.length > 0 ? 
-                              boleto.boleto.imovel.proprietarios[0]?.pessoa?.nome : ''}
+                              {boleto.boleto && boleto.boleto.imovel && boleto.boleto.imovel.proprietarios && boleto.boleto.imovel.proprietarios.length > 0 ?
+                                boleto.boleto.imovel.proprietarios[0]?.pessoa?.nome : ''}
                               {boleto.boleto && boleto.boleto.imovel ? ' - ' + boleto.boleto.imovel?.endereco.complemento : ''}
                               {boleto.boleto && boleto.boleto.imovel && boleto.boleto.imovel?.condominio ? ' - ' + boleto.boleto.imovel.condominio.name : ''}
                             </td>)
@@ -636,7 +882,7 @@ export default function ListarBoletosBancarios({
                               <Button
                                 size="sm"
                                 onClick={() => handleClickVerDetalhes(boleto.id)}
-                                className='hover:cursor-pointer hover:bg-gray-700'
+                                className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                               >
                                 Ver detalhes
                               </Button>
@@ -678,7 +924,7 @@ export default function ListarBoletosBancarios({
                           <Select
                             onValueChange={(value) => {
                               field.onChange(value);
-                              //handlerChangeAlerta(value);
+                              handlerChangeAlerta(value);
                             }}
                             value={String(field.value)}
                           >
@@ -731,7 +977,8 @@ export default function ListarBoletosBancarios({
                   </Label>
                 </div>
                 <DialogFooter>
-                  <Button size="sm" type='submit' className='hover:cursor-pointer hover:bg-gray-600'
+                  <Button size="sm" type='submit'
+                    className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                     onClick={() => handlerSendMail()}>
                     Enviar email</Button>
                 </DialogFooter>
@@ -755,13 +1002,13 @@ export default function ListarBoletosBancarios({
             <div className="grid gap-2">
               <form className="space-y-4 font-[Poppins-Regular]" onSubmit={jobMethods.handleSubmit(handleSubmitEmail)}>
                 <div className="grid grid-cols-1 items-center gap-4">
-                  
+
                 </div>
                 <DialogFooter>
                   <Button size="sm" type='submit' className='hover:cursor-pointer hover:bg-gray-600'
                     onClick={() => //handlerEmitirBoleto()
                       console.log('teste')
-                      }>
+                    }>
                     Emitir Boleto</Button>
                 </DialogFooter>
               </form>

@@ -243,14 +243,14 @@ export default function ListarImoveis({
   }
 
   return (
-    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]" style={{color: "#034869"}}>
       {/* Search & Filters */}
-      <div className="flex flex-row items-start justify-between gap-2 sm:flex-row sm:items-center">
+      <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {!onSelectImovel && (
           <div className='grid grid-cols-3'>
             {showcard ?
-              (<Table onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-200'/>) :
-              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-200'/>)
+              (<Table onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-200'/>) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-200'/>)
             }
             {/* <h1 className="col-span-2 text-2xl font-bold">Imoveis</h1> 
           <Button className='flex justify-center' style={{ 'backgroundColor': 'transparent'}}
@@ -265,7 +265,9 @@ export default function ListarImoveis({
           user?.permissions.includes("CREATE_IMOVEL")
         ) && !onSelectImovel) && (
             <div>
-              <Button size={"sm"} onClick={handleClickCreateImovel} className='hover:cursor-pointer hover:bg-gray-700'>
+              <Button size={"sm"} onClick={handleClickCreateImovel} 
+              className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+              >
                 <Plus className="mr-2 h-4 w-4" /> Criar imovel
               </Button>
             </div>
@@ -274,7 +276,7 @@ export default function ListarImoveis({
       </div>
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" style={{ color: "#034869" }} />
           <Input
             onChange={handleSearchChange}
             value={search}
@@ -290,7 +292,9 @@ export default function ListarImoveis({
             </SelectTrigger>
             <SelectContent>
               {imovelTipo?.data.map((value) => (
-                <SelectItem key={value.id} value={value.id.toString()}>
+                <SelectItem key={value.id} value={value.id.toString()}
+                style={{ color: "#034869" }}
+                >
                   {value.name}
                 </SelectItem>
               ))}
@@ -320,7 +324,7 @@ export default function ListarImoveis({
               (
                 <>
                   {imoveis?.map((imovel) => (
-                    <Card key={imovel.id} className="">
+                    <Card key={imovel.id} className="" style={{color: "#034869"}}>
                       <CardHeader className="flex flex-row justify-between">
                         <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>{imovel?.description}</CardTitle>
                         <Badge
@@ -335,7 +339,7 @@ export default function ListarImoveis({
                         </Badge>
                       </CardHeader>
                       <CardContent>
-                        <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                        <p className="line-clamp-2 flex gap-1 text-sm">
                           <MapPin className="inline-block h-4 w-4 cursor-pointer"
                             onClick={() => { handlerClickMaps(imovel?.endereco) }}
                             color='green'
@@ -366,7 +370,7 @@ export default function ListarImoveis({
                             variant="secondary"
                             size="sm"
                             onClick={() => handleClickVerDetalhes(imovel?.id.toString())}
-                            className='hover:cursor-pointer hover:bg-gray-300'
+                            className='mt-2 hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                           >
                             Ver detalhes
                           </Button>
@@ -393,7 +397,7 @@ export default function ListarImoveis({
                 </>
               ) :
               (
-                <div className='col-span-3'>
+                <div className='col-span-3' style={{ color: "#034869" }}>
                   <table className="w-full">
                     <thead>
                       <tr>
@@ -442,7 +446,7 @@ export default function ListarImoveis({
                               <Button
                                 size="sm"
                                 onClick={() => handleClickVerDetalhes(imovel?.id.toString())}
-                                className='hover:cursor-pointer hover:bg-gray-700'
+                                className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                               >
                                 Ver detalhes
                               </Button>

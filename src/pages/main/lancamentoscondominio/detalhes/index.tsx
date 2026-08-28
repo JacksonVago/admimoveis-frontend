@@ -55,8 +55,9 @@ import { LancamentoCondominio } from '@/interfaces/lancamentocondominio'
 import { Bloco } from '@/interfaces/bloco'
 import { useState } from 'react'
 import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
+import { usdFormatter } from '@/utils/format-money'
 
-export const getTipos = async (empresaId:number) => {
+export const getTipos = async (empresaId: number) => {
   return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
 }
 
@@ -162,6 +163,26 @@ export const DetalhesLancamentoCondominio = () => {
 
       if (data?.observacao) {
         form.append('observacao', data.observacao)
+      }
+
+      if (data?.numeroDocumento) {
+        form.append('numeroDocumento', data.numeroDocumento)
+      }
+
+      if (data?.dataDocumento) {
+        form.append('dataDocumento', data.dataDocumento)
+      }
+
+      if (data?.serieDocumento) {
+        form.append('serieDocumento', data.serieDocumento)
+      }
+
+      if (data?.valorDocumento) {
+        form.append('valorDocumento', data.valorDocumento.toString())
+      }
+
+      if (data?.descontoDocumento) {
+        form.append('descontoDocumento', data.descontoDocumento.toString())
       }
 
       if (data?.rateia) {
@@ -327,7 +348,7 @@ export const DetalhesLancamentoCondominio = () => {
     if (value) {
       // Remove espaços e traços
       const linhaDigitavelDig = value.replace(/\s/g, '').replace(/-/g, '');
-      const linhaDigitavel = linhaDigitavelDig.substring(0,11) + linhaDigitavelDig.substring(12,23) + linhaDigitavelDig.substring(24,35) + linhaDigitavelDig.substring(36,47);
+      const linhaDigitavel = linhaDigitavelDig.substring(0, 11) + linhaDigitavelDig.substring(12, 23) + linhaDigitavelDig.substring(24, 35) + linhaDigitavelDig.substring(36, 47);
       console.log(linhaDigitavel);
       // Verifica se a linha digitável tem 44 ou 48 dígitos
       if (linhaDigitavel.length === 44 || linhaDigitavel.length === 48) {
@@ -336,30 +357,30 @@ export const DetalhesLancamentoCondominio = () => {
           // Aqui você pode implementar a lógica de validação do dígito verificador, se necessário
           var dbl_valor = 0;
           var int_dig = 0;
-          var int_modulo = (linhaDigitavel.substring(2,1) === '6' ? 11 : 10)
+          var int_modulo = (linhaDigitavel.substring(2, 1) === '6' ? 11 : 10)
           var str_vencimento = '';
 
           //Validar digitos
           //Bloco 1
-          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(0,11), int_modulo);
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(0, 11), int_modulo);
           if (int_dig === parseInt(linhaDigitavelDig.substring(12, 1))) {
             return true;
           }
 
           //Bloco 2
-          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(12,11), int_modulo);
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(12, 11), int_modulo);
           if (int_dig === parseInt(linhaDigitavelDig.substring(23, 1))) {
             return true;
           }
 
           //Bloco 3
-          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(24,11), int_modulo);
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(24, 11), int_modulo);
           if (int_dig === parseInt(linhaDigitavelDig.substring(35, 1))) {
             return true;
           }
 
           //Bloco 4
-          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(36,11), int_modulo);
+          int_dig = Calc_DIG_Modulo(linhaDigitavel.substring(36, 11), int_modulo);
           if (int_dig === parseInt(linhaDigitavelDig.substring(47, 1))) {
             return true;
           }
@@ -399,10 +420,10 @@ export const DetalhesLancamentoCondominio = () => {
   return (
     <div className="scale mx-auto flex max-w-screen-xl transform flex-col items-center px-4 transition-transform">
       <div className="mx-auto w-full rounded-md">
-        <Card className='font-[Poppins-regular]'>
+        <Card className='font-[Poppins-regular]' style={{ color: "#034869" }}>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <Label className="ml-1 mb-4 mt-8 font-bold">{bloco?.condominio?.name + ' ' + bloco?.name + ' - '+ getEnderecoFormatado(bloco?.condominio?.endereco)}</Label>
+              <Label className="ml-1 mb-4 mt-8 font-bold">{bloco?.condominio?.name + ' ' + bloco?.name + ' - ' + getEnderecoFormatado(bloco?.condominio?.endereco)}</Label>
               <Dialog
                 open={isCreateDialogOpen}
                 onOpenChange={(value) => {
@@ -419,7 +440,9 @@ export const DetalhesLancamentoCondominio = () => {
                     user?.permissions.includes("CREATE_LOCACAO_LANCAMENTO")
                   ) && (
 
-                      <Button size={'sm'}>
+                      <Button size={'sm'}
+                        className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+                      >
                         <Plus className="mr-2 h-4 w-4" /> Lançamento
                       </Button>
                     )}
@@ -452,7 +475,9 @@ export const DetalhesLancamentoCondominio = () => {
                                 </SelectTrigger>
                                 <SelectContent>
                                   {tipolancamento?.data.map((tipo) => (
-                                    <SelectItem key={tipo.id} value={tipo.id.toString()}>
+                                    <SelectItem key={tipo.id} value={tipo.id.toString()}
+                                      style={{ color: "#034869" }}
+                                    >
                                       {tipo.name}
                                     </SelectItem>
                                   ))}
@@ -467,17 +492,17 @@ export const DetalhesLancamentoCondominio = () => {
                         </div>
                       </Label>
                     </div>
-                    
+
                     <div className='mt-2'>
                       <Label htmlFor="description">Código de Barras
-                      <Input 
-                        type='text'
-                        disabled={disabled}
-                        placeholder="Código de barras "
-                        {...lancamentoMethods.register('linhaDigitavel')}
-                        onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
-                      />
-                      {lancamentoMethods.formState?.errors?.linhaDigitavel?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{lancamentoMethods.formState?.errors?.linhaDigitavel?.message}</p>}
+                        <Input
+                          type='text'
+                          disabled={disabled}
+                          placeholder="Código de barras "
+                          {...lancamentoMethods.register('linhaDigitavel')}
+                          onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
+                        />
+                        {lancamentoMethods.formState?.errors?.linhaDigitavel?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{lancamentoMethods.formState?.errors?.linhaDigitavel?.message}</p>}
                       </Label>
                     </div>
 
@@ -552,10 +577,10 @@ export const DetalhesLancamentoCondominio = () => {
                                   <SelectValue placeholder="Sim/Não" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem key={'Sim'} value={'Sim'}>
+                                  <SelectItem key={'Sim'} value={'Sim'} style={{ color: "#034869" }}>
                                     Sim
                                   </SelectItem>
-                                  <SelectItem key={'Não'} value={'Não'}>
+                                  <SelectItem key={'Não'} value={'Não'} style={{ color: "#034869" }}>
                                     Não
                                   </SelectItem>
                                 </SelectContent>
@@ -576,8 +601,75 @@ export const DetalhesLancamentoCondominio = () => {
                       />
                     </div>
 
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-2" : "grid grid-cols-1 gap-4 mt-2")}>
+                      <Label htmlFor="description">Número da Nota
+                        <Input
+                          type='text'
+                          disabled={disabled}
+                          placeholder="Nota fiscal"
+                          {...lancamentoMethods.register('numeroDocumento')}
+                          onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
+                        />
+                        {lancamentoMethods.formState?.errors?.numeroDocumento?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{lancamentoMethods.formState?.errors?.numeroDocumento?.message}</p>}
+                      </Label>
+                      <Label htmlFor="description">Série da Nota
+                        <Input
+                          type='text'
+                          disabled={disabled}
+                          placeholder="Série"
+                          {...lancamentoMethods.register('serieDocumento')}
+                          onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
+                        />
+                        {lancamentoMethods.formState?.errors?.serieDocumento?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{lancamentoMethods.formState?.errors?.serieDocumento?.message}</p>}
+                      </Label>
+                    </div>
+
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-2" : "grid grid-cols-1 gap-4 mt-2")}>
+                      <Label className="text-base">
+                        Data da Nota
+                        <Input
+                          type='date'
+                          className="mt-2"
+                          disabled={disabled}
+                          placeholder="Data da Nota"
+                          {...lancamentoMethods.register('dataDocumento')}
+                        />
+                        {lancamentoMethods.formState?.errors?.dataDocumento?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{lancamentoMethods.formState?.errors?.dataDocumento?.message}</p>}
+                      </Label>
+                    </div>
+
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-3" : "grid grid-cols-1 gap-4 mt-3")}>
+                      <Label className="text-base">
+                        Valor da nota
+                        <Input
+                          type="number"
+                          step={'any'}
+                          className="mt-1"
+                          disabled={disabled}
+                          placeholder="Valor da Nota"
+                          {...lancamentoMethods.register('valorDocumento')}
+                        />
+                        {lancamentoMethods.formState?.errors?.valorDocumento?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {lancamentoMethods.formState?.errors?.valorDocumento?.message}</p>}
+                      </Label>
+
+                      <Label className="text-base">
+                        Desconto da nota
+                        <Input
+                          type="number"
+                          step={'any'}
+                          className="mt-1"
+                          disabled={true}
+                          {...lancamentoMethods.register('descontoDocumento')}
+                        />
+                        {lancamentoMethods.formState?.errors?.descontoDocumento?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {lancamentoMethods.formState?.errors?.descontoDocumento?.message}</p>}
+                      </Label>
+                    </div>
+
                     <DialogFooter className='mt-2'>
-                      <Button size={"sm"} type='submit'>{titulo.includes('novo') ? 'Criar lançamento' : 'Confirmar Alteração'}</Button>
+                      <Button size={"sm"} type='submit'
+                        className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+                      >
+                        {titulo.includes('novo') ? 'Criar lançamento' : 'Confirmar Alteração'}</Button>
                     </DialogFooter>
                   </form>
                 </DialogContent>
@@ -604,7 +696,7 @@ export const DetalhesLancamentoCondominio = () => {
                         <Label className={!isMobile ? 'flex items-center' : 'flex items-center col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
                         {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>) : (<></>)}
                         <Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.vencimentoLancamento).format("DD/MM/YYYY")}</Label>
-                        <Label className='flex justify-end items-center' style={{ 'fontSize': '0.7rem' }}>{lancamento.valorLancamento}</Label>
+                        <Label className='flex justify-end items-center' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(lancamento.valorLancamento)}</Label>
                         <div className='flex justify-center'>
                           {((isAdmin ||
                             user?.permissions.includes("ALL") ||
@@ -630,7 +722,8 @@ export const DetalhesLancamentoCondominio = () => {
                                       e.stopPropagation()
                                       //setSelectedTipo(tipo)
                                     }
-                                    } title='Excluir Lançamento'>
+                                    } title='Excluir Lançamento'
+                                    >
                                       <Trash2 className="h-4 w-4" />
 
                                     </Button>
@@ -644,7 +737,8 @@ export const DetalhesLancamentoCondominio = () => {
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                      <AlertDialogAction onClick={() => { handleDeleteLancamento(lancamento.id) }}>
+                                      <AlertDialogAction onClick={() => { handleDeleteLancamento(lancamento.id) }}
+                                        className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
                                         Sim, excluir o lançamento.
                                       </AlertDialogAction>
                                     </AlertDialogFooter>

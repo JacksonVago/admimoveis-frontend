@@ -534,7 +534,7 @@ export const DetalhesBloco = () => {
   if (isLoading) return <PageLoader />
 
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]" style={{color: "#034869"}}>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Detalhes</h1>
         {activeTab === 'bloco-info' && (
@@ -574,13 +574,13 @@ export const DetalhesBloco = () => {
 
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <TabsList>
-          <TabsTrigger value="bloco-info" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Dados do Bloco</TabsTrigger>
-          <TabsTrigger value="imoveis" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Imóveis</TabsTrigger>
-          <TabsTrigger value="lancamentos" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Lançamentos</TabsTrigger>
+          <TabsTrigger value="bloco-info" style={{color: "#034869"}} className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Dados do Bloco</TabsTrigger>
+          <TabsTrigger value="imoveis" style={{color: "#034869"}} className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Imóveis</TabsTrigger>
+          <TabsTrigger value="lancamentos" style={{color: "#034869"}} className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Lançamentos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bloco-info" className="space-y-4 font-[Poppins-regular]">
-          <Card>
+          <Card style={{color: "#034869"}}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-1xl">
                 <span>Informações do Bloco</span>
@@ -617,6 +617,7 @@ export const DetalhesBloco = () => {
                         !blocoMethods.formState.isDirty || !blocoMethods.formState.isValid
                       }
                       type="submit"
+                      className="mt-4 hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                     >
                       Salvar Alterações
                     </Button>
@@ -628,7 +629,7 @@ export const DetalhesBloco = () => {
         </TabsContent>
 
         {/*Imóveis */}
-        <TabsContent value="imoveis" className="space-y-4 font-[Poppins-regular]">
+        <TabsContent value="imoveis" className="space-y-4 font-[Poppins-regular]" style={{color: "#034869"}}>
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Imóveis</h2>
             {/*(isAdmin ||
@@ -651,16 +652,16 @@ export const DetalhesBloco = () => {
             )}
             {
               bloco?.imovels?.map((imovel) => (
-                <Card key={imovel.id}>
+                <Card key={imovel.id} style={{color: "#034869"}}>
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <span>{imovel.description}</span>
-                      <Badge variant="default">{imovel.status}</Badge>
+                      <Badge variant="secondary" className='bg-[#a7d9f2]'>{imovel.status}</Badge>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-4">
-                      <Bed className='text-gray-500' />
+                      <Bed className='text-[#034869]' />
                       <p>
                         {imovel.quartos}
                       </p>
@@ -668,20 +669,20 @@ export const DetalhesBloco = () => {
 
                     <div className="grid grid-cols-2 gap-4 mt-2">
                       <Label className="font-semibold">Metragem</Label>
-                      <div className='text-gray-500'>
+                      <div className='text-[#034869]'>
                         {imovel.metragem} m²
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4 mt-2">
-                    <Bath className='text-gray-500' />
-                      <div className='text-gray-500'>
+                    <Bath className='text-[#034869]' />
+                      <div className='text-[#034869]'>
                         {imovel.banheiros}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mt-2">
-                      <Car className='text-gray-500' />
-                      <div className='text-gray-500 '>
+                      <Car className='text-[#034869]' />
+                      <div className='text-[#034869] '>
                         {imovel.vagasEstacionamento}
                       </div>
 
@@ -694,7 +695,7 @@ export const DetalhesBloco = () => {
                       ) && (
 
                           <Button
-                            className='mt-2 hover:cursor-pointer hover:bg-gray-200'
+                            className='mt-2 hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                             variant="secondary"
                             size="sm"
                             onClick={() => { handlerDetailImovel(imovel.id) }}
@@ -718,7 +719,7 @@ export const DetalhesBloco = () => {
 
 
         {/*Lançamentos */}
-        <TabsContent value="lancamentos" className="space-y-4 font-[Poppins-regular]">
+        <TabsContent value="lancamentos" className="space-y-4 font-[Poppins-regular]" style={{color: "#034869"}}>
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Lançamentos</h2>
             {(isAdmin ||
@@ -727,7 +728,9 @@ export const DetalhesBloco = () => {
             ) && (
                 <Button
                   size={"sm"}
-                  onClick={handlerNewLancamento}>
+                  onClick={handlerNewLancamento}
+                  className="mt-4 hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+                  >
                   <Plus className="mr-2 h-4 w-4" />
                   Lançamento
                 </Button>
@@ -735,12 +738,12 @@ export const DetalhesBloco = () => {
           </div>
 
           <div className={(isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
-            {bloco?.lancamentosCondominios?.length === 0 && (
+            {/*bloco?.lancamentosCondominios?.length === 0 && (
               <span>Nenhum lançamento cadastrado para este bloco.</span>
-            )}
+            )*/}
             {
               <div className="mx-auto w-full rounded-md">
-                <Card className='font-[Poppins-regular]'>
+                <Card className='font-[Poppins-regular]' style={{color: "#034869"}}>
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <Label className="ml-1 mb-4 mt-8 font-bold">{bloco?.condominio?.name + ' ' + bloco?.name + ' - ' + getEnderecoFormatado(bloco?.condominio?.endereco)}</Label>
@@ -760,7 +763,9 @@ export const DetalhesBloco = () => {
                             user?.permissions.includes("CREATE_CONDOMINIO_LANCAMENTO")
                           ) && (
 
-                              <Button size={'sm'}>
+                              <Button size={'sm'}
+                              className="mt-4 hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+                              >
                                 <Plus className="mr-2 h-4 w-4" /> Lançamento
                               </Button>
                             )}

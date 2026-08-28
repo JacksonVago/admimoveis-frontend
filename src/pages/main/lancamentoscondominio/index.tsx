@@ -205,7 +205,7 @@ export default function ListarLancamentosCondominios({
   }
 
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]"  style={{color:"#034869"}}>
       {/* Search & Filters */}
       {/* <div className="grid grid-cols-2 flex flex-col justify-end items-start gap-4 sm:flex-row sm:items-center"> */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
@@ -220,7 +220,7 @@ export default function ListarLancamentosCondominios({
           : "grid grid-cols-1 gap-4 sm:flex-row sm:items-center sm:justify-between border-b"}
       >
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4" />
           <Input
             onChange={handleSearchChange}
             value={search}
@@ -280,7 +280,7 @@ export default function ListarLancamentosCondominios({
             condominios.map((condominio) => (
               ((condominio.blocos && condominio.blocos.length > 0) && (
                 condominio.blocos.map((bloco) => (
-                  <Card key={bloco.id} className="">
+                  <Card key={bloco.id} className=""  style={{color:"#034869"}}>
                     <CardHeader className="flex flex-row justify-between">
                       <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
                         <p>{`${condominio.name} - ${bloco.name}`}</p>
@@ -347,7 +347,9 @@ export default function ListarLancamentosCondominios({
 
                             <Button variant="secondary"
                               onClick={() => handleClickVerDetalhes(bloco?.id)}
-                              size={"sm"}>
+                              size={"sm"}
+                              className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+                              >
                               <Pencil className='h4 w4' /> Lançamentos
                             </Button>
                           )}

@@ -232,14 +232,14 @@ export const CondominioFormContent = ({
                     disabled={disabled}
                     aria-label={field.value}
                     onValueChange={(value) => field.onChange(value)}
-                    value={field.value}
+                    value={field.value}                    
                   >
                     <SelectTrigger value={field.value}>
-                      <SelectValue placeholder="Selecione a forma de rateio" />
+                      <SelectValue placeholder="Selecione a forma de rateio" style={{color: "#034869"}}/>
                     </SelectTrigger>
                     <SelectContent>
                       {FORMA_RATEIO_OPTIONS.map((value) => (
-                        <SelectItem key={value.label} value={value.value}>
+                        <SelectItem key={value.label} value={value.value} style={{color: "#034869"}}>
                           {value.label}
                         </SelectItem>
                       ))}
@@ -270,14 +270,14 @@ export const CondominioFormSubmitButton = ({
     <div className="">
       <Button
         type="submit"
-        className="mt-4 hover:cursor-pointer hover:bg-gray-600"
+        className="mt-4 hover:bg-[#066c9f] hover:cursor-pointer bg-[#034869]"
         size={"sm"}
         disabled={
           disabled
           ||
           !createCondominioMethods.formState.isDirty ||
           !createCondominioMethods.formState.isValid
-        }        
+        }                
       >
         Criar Condomínio
       </Button>

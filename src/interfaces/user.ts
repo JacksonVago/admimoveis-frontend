@@ -151,6 +151,11 @@ export type Permission =
   | 'DELETE_BOLETO_BANCARIO'
   | 'VIEW_BOLETO_BANCARIO'
 
+  //Grupo fluxo de caixa
+  | 'CREATE_GRUPO_FLUXO_CAIXA'
+  | 'UPDATE_GRUPO_FLUXO_CAIXA'
+  | 'DELETE_GRUPO_FLUXO_CAIXA'
+  | 'VIEW_GRUPO_FLUXO_CAIXA'
 
 export const userPermissions: {
   [key in Permission]: string
@@ -291,6 +296,13 @@ export const userPermissions: {
   UPDATE_CLIENTE: 'Atualizar clientes',
   DELETE_CLIENTE: 'Deletar clientes',
   VIEW_CLIENTES: 'Visualizar clientes',
+
+  //Grupo fluxo de caixa
+  CREATE_GRUPO_FLUXO_CAIXA: 'Visualizar Grupo de Fluxo de Caixa',
+  UPDATE_GRUPO_FLUXO_CAIXA: 'Visualizar Grupo de Fluxo de Caixa',
+  DELETE_GRUPO_FLUXO_CAIXA: 'Visualizar Grupo de Fluxo de Caixa',
+  VIEW_GRUPO_FLUXO_CAIXA: 'Visualizar Grupo de Fluxo de Caixa'
+
 }
 
 export enum UserRole {

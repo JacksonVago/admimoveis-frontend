@@ -11,6 +11,7 @@ import { createContaCorrente } from '../requests'
 import { queryClient } from '@/services/react-query/query-client'
 import axios from 'axios'
 import { contacorrenteSchema, ContaCorrenteSchema } from '@/schemas/contacorrente.schema'
+import { useEffect } from 'react'
 
 
 //TODO: create a interface for created imovel
@@ -27,6 +28,18 @@ export const CriarContaCorrente = () => {
     },
     mode: 'all'
   })
+
+  useEffect(() => {
+    glb_params.updTitle_form('Contas Correntes');
+
+    if (glb_params.pastaOrig === '') {
+      glb_params.updPastaOrig('contacorrente-create');
+    }
+    else {
+      //setActiveTab(glb_params.pastaOrig);
+    }
+
+  }, [])
 
   const createMutation = useMutation({
     mutationFn: (data: FormData) => createContaCorrente(data),
@@ -274,7 +287,7 @@ export const CriarContaCorrente = () => {
       <div className="mb-8 flex w-full items-center justify-between">
       </div>
       <div className="mx-auto w-full rounded-md">
-        <Card>
+        <Card style={{ color: "#034869" }}>
           <CardContent>
             <h2 className="mb-4 mt-8 text-xl font-bold">Criar um nova conta corrente</h2>
             {/* ======contacorrente====== */}

@@ -124,9 +124,9 @@ export const imovelSchema = z.object({
   documentosToDeleteIds: z.array(z.number()).optional(),
 
   empresaId: z.number().min(1, 'Empresa é obrigatória'),
-  condominioId: z.number().optional(),
-  blocoId: z.number().optional(),  
-  condominioBloco : z.string().optional(),
+  condominioId: z.number().optional().nullable(),
+  blocoId: z.number().optional().nullable(),  
+  condominioBloco : z.string().optional().nullable(),
 })
 
 export type ImovelSchema = z.infer<typeof imovelSchema>

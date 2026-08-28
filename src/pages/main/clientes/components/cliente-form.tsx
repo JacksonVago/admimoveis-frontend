@@ -43,7 +43,7 @@ export const ClienteFormContent = ({
       <FormProvider {...createClienteMethods}>
         <DocumentUpload disabled={disabled} downloadDocuments={disabled} />
       </FormProvider>
-      <div className="space-y-4 font-[Poppins-Regular]">
+      <div className="space-y-4 font-[Poppins-Regular]" >
         <div className="grid grid-cols-2 gap-4">
           <Label className="text-base">
             Nome
@@ -472,6 +472,7 @@ export const ClienteFormSubmitButton = ({
           !createClienteMethods.formState.isDirty ||
           !createClienteMethods.formState.isValid
         }
+        className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
       >
         Finalizar Cadastro
       </Button>

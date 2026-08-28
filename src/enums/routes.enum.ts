@@ -108,6 +108,11 @@ export enum ROUTE {
   BOLETO_BANCARIO_CRIAR = '/boleto-bancario/criar',
   BOLETO_BANCARIO_DETALHES = '/boleto-bancario/:id',
 
+  //Grupo Fluxo de caixa
+  GRUPO_FLUXO_CAIXA = '/grupo-fluxo-caixa',
+  GRUPO_FLUXO_CAIXA_CRIAR = '/grupo-fluxo-caixa/criar',
+  GRUPO_FLUXO_CAIXA_DETALHES = '/grupo-fluxo-caixa/:id',
+
   // Error routes
   NOT_FOUND = '*',
   UNAUTHORIZED = '/unauthorized'

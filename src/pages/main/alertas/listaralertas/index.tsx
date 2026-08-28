@@ -27,7 +27,7 @@ import { ConfiguracaoAlerta } from '@/interfaces/configuracaoalerta'
 
 
 // API & Query Logic
-export const useGetAlertasQueryOptions = (empresaId:number, {
+export const useGetAlertasQueryOptions = (empresaId: number, {
   search,
   page,
   limit,
@@ -75,7 +75,7 @@ export default function ListarAlertas({
   const search = searchParams.get('search') || ''
 
   const { data, isLoading } = useQuery(
-    useGetAlertasQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,{
+    useGetAlertasQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {
       page,
       limit,
       search,
@@ -104,7 +104,7 @@ export default function ListarAlertas({
   }, [totalPages, page, limit, search])
 
   useEffect(() => {
-    if (isMobile){
+    if (isMobile) {
       setShowCard(true);
     }
   }, [isMobile])
@@ -138,23 +138,17 @@ export default function ListarAlertas({
     navigate(`${ROUTE.ALERTAS}/${id}`)
   }
 
-  
+
   return (
-    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]" style={{ color: "#034869" }}>
       {/* Search & Filters */}
-      <div className="flex flex-row items-start justify-between gap-2 sm:flex-row sm:items-center">
+      <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {!onSelectAlerta && (
           <div className='grid grid-cols-3'>
             {showcard ?
-              (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer '/>) :
-              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer '/>)
+              (<List onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer ' />) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer ' />)
             }
-            {/* <h1 className="col-span-2 text-2xl font-bold">Imoveis</h1> 
-          <Button className='flex justify-center' style={{ 'backgroundColor': 'transparent'}}
-            onClick={() => { setShowCard(!showcard) }}>
-              {showcard ? (<Table color='black' />) : (<IdCard color='black' />)}
-            
-          </Button>*/}
           </div>
         )}
         {((isAdmin ||
@@ -162,7 +156,7 @@ export default function ListarAlertas({
           user?.permissions.includes("CREATE_ALERTA")
         ) && !onSelectAlerta) && (
             <Button size={"sm"} onClick={handleClickCreateAlerta}
-            className='hover:bg-gray-500 hover:cursor-pointer'>
+              className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
               <Plus className="mr-2 h-4 w-4" /> Criar alerta
             </Button>
           )
@@ -190,7 +184,10 @@ export default function ListarAlertas({
         {/*hasSearchResults && (
           <p className="text-center text-muted-foreground">Nenhum alerta encontrado</p>
         )*/}
-        <p className="text-center text-muted-foreground">Nenhum alerta encontrado</p>
+        {(!alertas || alertas.length === 0) && (
+          <p className="text-center text-muted-foreground" style={{ color: "#034869" }}>Nenhum alerta encontrado</p>
+        )}
+
         {/* Alertas Cards */}
 
         {isLoading ? (
@@ -198,7 +195,7 @@ export default function ListarAlertas({
             <Loader />
           </div>
         ) :
-        
+
           (
             showcard ?
               (
@@ -206,7 +203,7 @@ export default function ListarAlertas({
                   {alertas?.map((alerta) => (
                     <Card key={alerta.id} className="">
                       <CardHeader className="flex flex-row justify-between">
-                        <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>{alerta?.descricao}</CardTitle>
+                        <CardTitle className="line-clamp-1" style={{ fontSize: '1rem', color: '#034869' }}>{alerta?.descricao}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <p className='font-[Poppins-bold]'>{alerta.dataInicioEnvio}</p>
@@ -220,7 +217,7 @@ export default function ListarAlertas({
                             variant="secondary"
                             size="sm"
                             onClick={() => handleClickVerDetalhes(alerta.id.toString())}
-                            className='hover:bg-gray-200 hover:cursor-pointer'
+                            className='hover:bg-gray-200 hover:cursor-pointer bg-[#a7d9f2]'
                           >
                             Ver detalhes
                           </Button>
@@ -293,13 +290,13 @@ export default function ListarAlertas({
         <PaginationContent>
           {/* Previous & Next Buttons */}
           <PaginationItem>
-            <PaginationPrevious onClick={() => handlePageChange(page - 1)} 
-              className='hover:bg-gray-200 hover:cursor-pointer'/>
+            <PaginationPrevious onClick={() => handlePageChange(page - 1)}
+              className='hover:bg-gray-200 hover:cursor-pointer' />
           </PaginationItem>
           {generatePaginationLinks(page, !totalPages ? 1 : totalPages, (limit === 1 ? limit : isBigScreen ? 10 : isPortrait ? 10 : isTablet ? 5 : 1), handlePageChange)}
           <PaginationItem>
-            <PaginationNext onClick={() => handlePageChange(page + 1)} 
-              className='hover:bg-gray-200 hover:cursor-pointer'/>
+            <PaginationNext onClick={() => handlePageChange(page + 1)}
+              className='hover:bg-gray-200 hover:cursor-pointer' />
           </PaginationItem>
         </PaginationContent>
       </Pagination>

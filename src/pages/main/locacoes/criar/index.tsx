@@ -146,7 +146,7 @@ export default function CriarLocacao (){
   }
   return (
     <div className="mx-auto max-w-screen-xl">
-      <Card className='py-10'>
+      <Card className='py-10' style={{color:"#034869"}}>
         <CardContent>
           <h2 className="mb-4 mt-8 text-xl font-bold">Criar uma nova Locação</h2>
           <LocacaoFormRoot

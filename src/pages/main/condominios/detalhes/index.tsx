@@ -302,7 +302,7 @@ export const DetalhesCondominio = () => {
   if (isLoading) return <PageLoader />
 
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]" style={{color: "#034869"}}>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Detalhes</h1>
         {activeTab === 'cond-info' && (
@@ -342,13 +342,13 @@ export const DetalhesCondominio = () => {
 
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <TabsList>
-          <TabsTrigger value="cond-info" className=' hover:cursor-pointer hover:bg-gray-200'>Dados do Condomínio</TabsTrigger>
-          <TabsTrigger value="blocos" className=' hover:cursor-pointer hover:bg-gray-200'>Blocos</TabsTrigger>
-          <TabsTrigger value="imoveis" className=' hover:cursor-pointer hover:bg-gray-200'>Imóveis</TabsTrigger>
+          <TabsTrigger value="cond-info" className=' hover:cursor-pointer hover:bg-gray-200' style={{color: "#034869"}}>Dados do Condomínio</TabsTrigger>
+          <TabsTrigger value="blocos" className=' hover:cursor-pointer hover:bg-gray-200' style={{color: "#034869"}}>Blocos</TabsTrigger>
+          <TabsTrigger value="imoveis" className=' hover:cursor-pointer hover:bg-gray-200' style={{color: "#034869"}}>Imóveis</TabsTrigger>
         </TabsList>
 
         <TabsContent value="cond-info" className="space-y-4 font-[Poppins-regular]">
-          <Card>
+          <Card style={{color: "#034869"}}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-1xl">
                 <span>Informações do Condomínio</span>

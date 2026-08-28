@@ -17,46 +17,39 @@ import { lancamentoTipo } from '@/enums/locacao/enums-locacao'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TIPO_LANCAMENTO_OPTIONS } from '@/constants/lancamento-tipo'
 import { Switch, Thumb } from '@radix-ui/react-switch'
+import { GrupoFluxoCaixa } from '@/interfaces/grupo-fluxo-caixa'
+import { Controller, useForm } from 'react-hook-form'
+import { tipolancamentoSchema, TipoLancamentoSchema } from '@/schemas/tipolancamento.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 
 // API & Query Logic
+export const getGrupos = async (empresaId: number) => {
+  return await api.get<GrupoFluxoCaixa[]>('grupo-fluxo-caixa/' + empresaId)
+}
+
+export const useGetGruposQueryOptions = (empresaId: number) => {
+  return queryOptions({
+    queryKey: ['grupos', empresaId],
+    queryFn: () => getGrupos(empresaId)
+  })
+}
+
 export const getTipos = async (empresaId: number) => {
   return await api.get<TipoLancamento[]>('tipolancamento/' + empresaId)
 }
 
 export const useGetTiposQueryOptions = (empresaId: number) => {
   return queryOptions({
-    queryKey: ['tipolancamento',empresaId],
+    queryKey: ['tipolancamento', empresaId],
     queryFn: () => getTipos(empresaId)
   })
 }
 
-export const createTipo = ({
-  name,
-  tipo,
-  automatico,
-  parcelas,
-  geraObservacao,
-  valorFixo,
-  empresaId,
-}: {
-  name: string,
-  tipo: lancamentoTipo,
-  automatico: string,
-  parcelas: number,
-  geraObservacao: string,
-  valorFixo: number,
-  empresaId: number,
-}) => {
-  return api.post('/tipolancamento', {
-    name: name,
-    tipo: tipo,
-    automatico: automatico,
-    parcelas: parcelas,
-    geraObservacao: geraObservacao,
-    valorFixo: valorFixo,
-    empresaId: empresaId
-  })
+export const createTipo = async (data: FormData) => {
+  return await api.post('/tipolancamento', data, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
 }
 
 export const activeTipo = async (tipoData: {
@@ -67,77 +60,74 @@ export const activeTipo = async (tipoData: {
   return result.data;
 }
 
-export const putUpdateTipo = (tipoData: {
-  id: number
-  name: string
-  tipo: lancamentoTipo
-  automatico: string
-  parcelas: number
-  geraObservacao: string
-  valorFixo: number
-  empresaId: number
-}) => {
-  return api.put(`/tipolancamento/${tipoData.id}`,
-    {
-      name: tipoData.name,
-      tipo: tipoData.tipo,
-      automatico: tipoData.automatico,
-      parcelas: tipoData.parcelas,
-      geraObservacao: tipoData.geraObservacao,
-      valorFixo: tipoData.valorFixo,
-      empresaId: tipoData.empresaId
-    })
+export const putUpdateTipo = async (data: FormData) => {
+  return api.put(`/tipolancamento/${data.get('id')}`, data
+    , {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
 }
 
 
 // Component
 export default function ListarTiposLancamento() {
+  //Globals
+  const glb_params = useGlobalParams();
 
-
+  const [titulo, setTitulo] = React.useState("Criar Tipo de Lançamento")
   const [selectedTipo, setSelectedTipo] = React.useState<TipoLancamento | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
-  const [newTipo, setNewTipo] = React.useState(
-    {
+
+  //default values
+  const defaultValues = React.useMemo(
+    () => ({
+      id: 0,
       name: '',
       tipo: lancamentoTipo.DEBITO,
       automatico: 'N',
       parcelas: 0,
       geraObservacao: 'N',
       valorFixo: 0,
-      empresaId: 0,
-    }
+      grupofluxoId: 0,
+      empresaId: glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,
+    }),
+    [glb_params.id_empresa]
   )
-  //Globals
-  const glb_params = useGlobalParams();
+
+  const tipoMethods = useForm<TipoLancamentoSchema>({
+    resolver: zodResolver(tipolancamentoSchema),
+    defaultValues,
+    mode: 'all'
+  });
+
+  const [chkAutom, setChkAutom] = React.useState(tipoMethods.getValues("automatico") === "S" ? true : false);
+  const [chkGeraObs, setChkGeraObs] = React.useState(tipoMethods.getValues("geraObservacao") === "S" ? true : false);
+
+  const { data: dataGrp } = useQuery(
+    useGetGruposQueryOptions(Number(glb_params.id_empresa))
+  )
+
+  const grupos = dataGrp?.data;
 
   const { data, isLoading } = useQuery(
     useGetTiposQueryOptions(Number(glb_params.id_empresa))
   )
 
   const tipos = data?.data;
+  console.log("tipos: ", tipos);
 
   const createTipoMutation = useMutation({
-    mutationFn: createTipo,
+    mutationFn: async (data: FormData) => {
+      return await createTipo(data);
+    },
     onSuccess: () => {
       ;['tipolancamento'].forEach((queryKey) => {
         queryClient.invalidateQueries({ queryKey: [queryKey] })
       });
       toast({
         title: 'Tipo de lançamento criado',
-        description: 'O novo tipo de lançamento foi criado com sucesso.',        
+        description: 'O novo tipo de lançamento foi criado com sucesso.',
       })
-      setIsCreateDialogOpen(false)
-      setNewTipo({
-        name: '',
-        tipo: lancamentoTipo.DEBITO,
-        automatico: 'N',
-        parcelas: 0,
-        geraObservacao: 'N',
-        valorFixo: 0,
-        empresaId: Number(glb_params.id_empresa)
-      }
-      )
+      setIsCreateDialogOpen(false);
     },
     onError: (error) => {
       if (axios.isAxiosError(error)) {
@@ -168,7 +158,7 @@ export default function ListarTiposLancamento() {
   const activeTipoMutation = useMutation({
     mutationFn: activeTipo,
     onSuccess: () => {
-      ;['tipolancamento'].forEach((queryKey) => {
+      ['tipolancamento'].forEach((queryKey) => {
         queryClient.invalidateQueries({ queryKey: [queryKey] })
       });
       toast({
@@ -192,13 +182,19 @@ export default function ListarTiposLancamento() {
   }, [])
 
   const updateTipoMutation = useMutation({
-    mutationFn: putUpdateTipo,
+    mutationFn: async (data: FormData) => {
+      return await putUpdateTipo(data);
+    },
     onSuccess: () => {
+      ['tipolancamento'].forEach((queryKey) => {
+        queryClient.invalidateQueries({ queryKey: [queryKey] })
+      });
+
       toast({
         title: 'Tipo de lançamento atualizado',
         description: 'As informações do tipo de lançamento foram atualizadas com sucesso.'
       })
-      setIsEditDialogOpen(false)
+      setIsCreateDialogOpen(false)
     },
     onError: () => {
       toast({
@@ -210,29 +206,6 @@ export default function ListarTiposLancamento() {
   })
 
 
-  const handleCreateTipo = () => {
-
-    console.log(newTipo);
-    if (newTipo.name.trim() !== '') {
-      createTipoMutation.mutate({
-        name: newTipo.name,
-        tipo: newTipo.tipo,
-        automatico: newTipo.automatico,
-        parcelas: newTipo.parcelas,
-        geraObservacao: newTipo.geraObservacao,
-        valorFixo: newTipo.valorFixo,
-        empresaId: Number(glb_params.id_empresa),
-      });
-    }
-    else {
-      toast({
-        title: 'Erro ao criar tipo de lançamento',
-        description: "O nome do tipo de lançamento não pode estar vazio.",
-        variant: 'destructive'
-      });
-    }
-
-  }
 
   const handleDeleteTipo = () => {
     if (selectedTipo) {
@@ -241,149 +214,307 @@ export default function ListarTiposLancamento() {
     }
   }
 
-  const handleUpdateTipo = () => {
-    if (selectedTipo) {
-      updateTipoMutation.mutate({
-        id: selectedTipo.id,
-        name: selectedTipo.name,
-        tipo: selectedTipo.tipo,
-        automatico: selectedTipo.automatico,
-        parcelas: selectedTipo.parcelas,
-        geraObservacao: selectedTipo.geraObservacao,
-        valorFixo: selectedTipo.valorFixo,
-        empresaId: Number(glb_params.id_empresa),
-      })
+  const handlerChkAutom = (checked: boolean) => {
+    tipoMethods.setValue("automatico", checked ? "S" : "N");
+    setChkAutom(checked);
+  };
+
+  const handlerChkGeraObs = (checked: boolean) => {
+    tipoMethods.setValue("geraObservacao", checked ? "S" : "N");
+    setChkGeraObs(checked);
+  };
+
+  const onSubmitTipoLancamentoData = async (data: TipoLancamentoSchema) => {
+    try {
+      const form = new FormData()
+
+      if (data?.name) {
+        form.append('name', data.name)
+      }
+
+
+      if (data?.tipo) {
+        form.append('tipo', data.tipo)
+      }
+
+      if (data?.automatico) {
+        form.append('automatico', data.automatico)
+      }
+
+      if (data?.parcelas) {
+        form.append('parcelas', data.parcelas.toString())
+      }
+      else {
+        form.append('parcelas', '0')
+      }
+
+      if (data?.geraObservacao) {
+        form.append('geraObservacao', data.geraObservacao)
+      }
+
+      if (data?.valorFixo) {
+        form.append('valorFixo', data.valorFixo.toString())
+      }
+      else {
+        form.append('valorFixo', "0")
+      }
+
+
+      if (data?.grupofluxoId) {
+        form.append('grupofluxoId', data.grupofluxoId.toString())
+      }
+
+      if (data?.id) {
+        form.append('id', data.id.toString())
+      }
+
+      form.append('id', data.id.toString())
+
+      if (data.empresaId) {
+        form.append('empresaId', data.empresaId.toString())
+      }
+
+      if (titulo === "Criar Tipo de Lançamento") {
+        await createTipoMutation.mutate(form);
+      }
+      else {
+        await updateTipoMutation.mutate(form)
+      }
+
+      setIsCreateDialogOpen(false);
+      //setIsEditing(false);
+
+    } catch (error) {
+
+      if (axios.isAxiosError(error)) {
+        // Check if there's a response and data within the error
+        if (error.response && error.response.data) {
+          console.error('Error message from server:', error.response.data);
+          toast({
+            title: 'Erro ao atualizar os lançamentos',
+            description: error.response.data.message,
+          })
+
+          // You can also set this error message to a state to display it in your UI
+        } else {
+          console.error('Axios error without response data:', error.message);
+        }
+      } else {
+        console.error('Non-Axios error:', error);
+        toast({
+          title: 'Erro',
+          description: error instanceof Error ? error.message : 'Ocorreu um erro ao tentar atualizar o lançamento. Tente novamente.',
+          variant: 'destructive'
+        })
+      }
     }
   }
 
-  console.log(selectedTipo);
+  const handleEditTipoLancamento = (tipo: TipoLancamento) => {
+    setSelectedTipo(tipo)
+    setTitulo("Alterar tipo de lançamento")
+    setIsCreateDialogOpen(true);
+    tipoMethods.setValue("id", tipo.id);
+    tipoMethods.setValue("name", tipo.name);
+    tipoMethods.setValue("tipo", tipo.tipo);
+    tipoMethods.setValue("automatico", tipo.automatico === "S" ? "S" : "N");
+    tipoMethods.setValue("geraObservacao", tipo.geraObservacao === "S" ? "S" : "N");
+    tipoMethods.setValue("parcelas", tipo.parcelas);
+    tipoMethods.setValue("valorFixo", tipo.valorFixo);
+    tipoMethods.setValue("grupofluxoId", tipo.grupofluxoId);
+    tipoMethods.setValue("empresaId", tipo.empresaId);
+    console.log(tipoMethods.getValues());
+  }
 
   return (
-    <div className="container mx-auto p-4 font-[Poppins-regular]">
+    <div className="container mx-auto p-4 font-[Poppins-regular] " style={{ color: "#034869" }}>
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <Dialog
           open={isCreateDialogOpen}
           onOpenChange={(value) => {
             setIsCreateDialogOpen(value)
-            setNewTipo({
-              name: '',
-              tipo: lancamentoTipo.DEBITO,
-              automatico: 'N',
-              parcelas: 0,
-              geraObservacao: 'N',
-              valorFixo: 0,
-              empresaId: Number(glb_params.id_empresa),
+            if (!value) {
+              setTitulo("Criar Tipo de Lançamento");
+              tipoMethods.reset(defaultValues);
             }
-            )
+
           }}
         >
           <DialogTrigger asChild>
-            <Button size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'>
-              <Plus className="mr-2 h-4 w-4 font-[Poppins-regular]" /> Criar Tipo de Lançamento
-            </Button>
+            <div className='flex justify-end w-full'>
+              <Button size={"sm"}
+                className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+              >
+                <Plus className="mr-2 h-4 w-4 font-[Poppins-regular]" /> Criar Tipo de Lançamento
+              </Button>
+            </div>
           </DialogTrigger>
           <DialogContent className='font-[Poppins-regular]'>
             <DialogHeader>
-              <DialogTitle>Criar novo Tipo de Lançamento</DialogTitle>
-              <DialogDescription>Preencha os dados do novo Tipo de Lançamento abaixo.</DialogDescription>
+              <DialogTitle>{titulo}</DialogTitle>
+              <DialogDescription style={{ color: '#034869' }}>{titulo.includes('novo') ? 'Preencha os dados do novo lançamento abaixo.' : ''}</DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4 font-[Poppins-regular]">
-              <div className="grid grid-cols-1 items-center gap-4">
-                <Label className='text-base'>
-                  Descrição
-                </Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Iptu, condomínio, etc..."
-                  value={newTipo.name}
-                  onChange={(e) => setNewTipo({ ...newTipo, name: e.target.value.toUpperCase() })}
-                />
+            <form onSubmit={tipoMethods.handleSubmit(onSubmitTipoLancamentoData)}>
+              <div className="grid gap-4 font-[Poppins-regular]">
+                <div className="grid grid-cols-1 items-center">
+                  <Label className='text-base'>
+                    Descrição
+                  </Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Iptu, condomínio, etc..."
+                    {...tipoMethods.register('name')}
+                  />
+                  {tipoMethods.formState.errors.name?.message &&
+                    (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                      {tipoMethods.formState.errors.name.message}
+                    </p>)}
+
+                </div>
               </div>
-            </div>
-            <div className='text-base'>
-              <Label className='text-base'>Tipo de lançamento</Label>
-              <div className='mt-2 mr-5 w-32'>
-                <Select
-                  onValueChange={(value: lancamentoTipo) => setNewTipo({ ...newTipo, tipo: value })}
+
+              <div className='mt-2'>
+                <Label className="text-base">
+                  Tipo de Lançamento
+                  <div className='mt-2'>
+                    <Controller
+                      name="tipo"
+                      control={tipoMethods.control}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                          }}
+                          value={String(field.value)}
+                        >
+                          <SelectTrigger className='col-start-1 row-start-1 appearance-none border-blue-50 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full'>
+                            <SelectValue placeholder="Selecione o condomínio" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {TIPO_LANCAMENTO_OPTIONS.map((lancto) => (
+                              <SelectItem className='text-base' key={lancto.label} value={lancto.value}>
+                                {lancto.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {tipoMethods.formState?.errors?.tipo?.message && (
+                      <span>{tipoMethods.formState?.errors?.tipo?.message}</span>
+                    )}
+                  </div>
+                </Label>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <label
+                  className="Label"
+                  htmlFor="airplane-mode"
+                  style={{ paddingRight: 15, color: '#034869' }}
+
                 >
-                  <SelectTrigger className='h-4'>
-                    <SelectValue placeholder="Selecione o tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TIPO_LANCAMENTO_OPTIONS.map((lancto) => (
-                      <SelectItem className='text-base' key={lancto.label} value={lancto.value}>
-                        {lancto.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  Automático
+                </label>
+                <Switch className="SwitchRoot focus:outline-none" id="airplane-mode"
+                  checked={chkAutom}
+                  onCheckedChange={handlerChkAutom}>
+                  <Thumb className="SwitchThumb" />
+                </Switch>
               </div>
-            </div>
 
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label
-                className="Label"
-                htmlFor="airplane-mode"
-                style={{ paddingRight: 15 }}
-              >
-                Automático
-              </label>
-              <Switch className="SwitchRoot focus:outline-none" id="airplane-mode"
-                checked={newTipo.automatico === "S" ? true : false}
-                onCheckedChange={(checked) => setNewTipo({ ...newTipo, automatico: (checked ? "S" : "N") })}>
-                <Thumb className="SwitchThumb" />
-              </Switch>
-            </div>
+              <div className="grid gap-4 font-[Poppins-regular]">
+                <div className="grid grid-cols-1 items-center gap-4">
+                  <Label className='text-base'>
+                    Parcelas
+                  </Label>
+                  <Input
+                    id="name"
+                    type="number"
+                    placeholder="Parcelas"
+                    {...tipoMethods.register('parcelas')}
+                  />
+                  {tipoMethods.formState.errors.parcelas?.message &&
+                    (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                      {tipoMethods.formState.errors.parcelas.message}
+                    </p>)}
+                </div>
+              </div>
 
-            <div className="grid gap-4 py-4 font-[Poppins-regular]">
-              <div className="grid grid-cols-1 items-center gap-4">
-                <Label className='text-base'>
-                  Parcelas
+              <div className="grid gap-4 font-[Poppins-regular]">
+                <div className="grid grid-cols-1 items-center gap-4">
+                  <Label className='text-base'>
+                    Valor Fixo
+                  </Label>
+                  <Input
+                    id="name"
+                    type="number"
+                    placeholder="Valor Fixo"
+                    {...tipoMethods.register('valorFixo')}
+                  />
+                  {tipoMethods.formState.errors.valorFixo?.message &&
+                    (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                      {tipoMethods.formState.errors.valorFixo.message}
+                    </p>)}
+                </div>
+              </div>
+
+              <div className='mt-2'>
+                <Label className="text-base">
+                  Grupo Fluxo de caixa
+                  <div className='mt-2'>
+                    <Controller
+                      name="grupofluxoId"
+                      control={tipoMethods.control}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                          }}
+                          value={String(field.value)}
+                        >
+                          <SelectTrigger className='col-start-1 row-start-1 appearance-none border-blue-50 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full'>
+                            <SelectValue placeholder="Selecione o condomínio" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {grupos?.map((grupo) => (
+                              <SelectItem key={grupo.id} value={grupo.id.toString()}>
+                                {grupo.descricao}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    {tipoMethods.formState?.errors?.grupofluxoId?.message && (
+                      <span>{tipoMethods.formState?.errors?.grupofluxoId?.message}</span>
+                    )}
+                  </div>
                 </Label>
-                <Input
-                  id="name"
-                  type="number"
-                  placeholder="Parcelas"
-                  value={newTipo.parcelas}
-                  onChange={(e) => setNewTipo({ ...newTipo, parcelas: Number(e.target.value) })}
-                />
               </div>
-            </div>
 
-            <div className="grid gap-4 py-4 font-[Poppins-regular]">
-              <div className="grid grid-cols-1 items-center gap-4">
-                <Label className='text-base'>
-                  Valor Fixo
-                </Label>
-                <Input
-                  id="name"
-                  type="number"
-                  placeholder="Valor Fixo"
-                  value={newTipo.valorFixo}
-                  onChange={(e) => setNewTipo({ ...newTipo, valorFixo: Number(e.target.value) })}
-                />
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <label
+                  className="Label"
+                  htmlFor="airplane-mode"
+                  style={{ paddingRight: 15, color: '#034869' }}
+                >
+                  Gera Observação
+                </label>
+                <Switch className="SwitchRoot focus:outline-none" id="airplane-mode"
+                  checked={chkGeraObs}
+                  onCheckedChange={handlerChkGeraObs}>
+                  <Thumb className="SwitchThumb" />
+                </Switch>
               </div>
-            </div>
 
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label
-                className="Label"
-                htmlFor="airplane-mode"
-                style={{ paddingRight: 15 }}
-              >
-                Gera Observação
-              </label>
-              <Switch className="SwitchRoot focus:outline-none" id="airplane-mode"
-                checked={newTipo.geraObservacao === "S" ? true : false}
-                onCheckedChange={(checked) => setNewTipo({ ...newTipo, geraObservacao: (checked ? "S" : "N") })}>
-                <Thumb className="SwitchThumb" />
-              </Switch>
-            </div>
-
-            <DialogFooter>
-              <Button onClick={handleCreateTipo} className='hover:cursor-pointer hover:bg-gray-600'>Criar Tipo</Button>
-            </DialogFooter>
+              <DialogFooter>
+                <Button type='submit'
+                  className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
+                  {titulo.includes('Criar') ? 'Criar Tipo' : 'Confirmar Alteração'}</Button>
+              </DialogFooter>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
@@ -399,6 +530,7 @@ export default function ListarTiposLancamento() {
               <th className="border-b p-2 text-left">Nome</th>
               <th className="border-b p-2 text-left">Tipo</th>
               <th className="border-b p-2 text-left">Automático</th>
+              <th className="border-b p-2 text-left">Grupo Fluxo</th>
               <th className="border-b p-2 text-left"></th>
             </tr>
           </thead>
@@ -408,6 +540,7 @@ export default function ListarTiposLancamento() {
                 <td className={tipo.status === PessoaStatus.CANCELADA ? "border-b p-2 text-red-600" : "border-b p-2"}>{tipo.name}</td>
                 <td className={tipo.status === PessoaStatus.CANCELADA ? "border-b p-2 text-red-600" : "border-b p-2"}>{tipo.tipo}</td>
                 <td className={tipo.status === PessoaStatus.CANCELADA ? "border-b p-2 text-red-600" : "border-b p-2"}>{tipo.automatico}</td>
+                <td className={tipo.status === PessoaStatus.CANCELADA ? "border-b p-2 text-red-600" : "border-b p-2"}>{tipo.grupofluxo ? tipo.grupofluxo.descricao : ""}</td>
                 <td className="border-b p-2">
                   <div className="flex space-x-2">
                     {tipo.status === PessoaStatus.ATIVA && (
@@ -416,8 +549,7 @@ export default function ListarTiposLancamento() {
                         size="icon"
                         onClick={(e) => {
                           e.stopPropagation()
-                          setSelectedTipo(tipo)
-                          setIsEditDialogOpen(true)
+                          handleEditTipoLancamento(tipo);
                         }}
                       >
                         <Pencil className="h-4 w-4" />
@@ -456,118 +588,6 @@ export default function ListarTiposLancamento() {
           </tbody>
         </table>
       )}
-
-      <Dialog
-        open={isEditDialogOpen}
-        onOpenChange={(value) => {
-          setIsEditDialogOpen(value)
-        }}
-      >
-        <DialogContent className='font-[Poppins-regular]'>
-          <DialogHeader>
-            <DialogTitle>Editar Tipo de Lançamento</DialogTitle>
-            <DialogDescription>Edite os dados do Lançamento abaixo.</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4">
-            <div className="grid grid-cols-1 items-center gap-4">
-              <Label className="text-base">
-                Descrição
-              </Label>
-              <Input
-                id="edit-name"
-                value={selectedTipo?.name || ''}
-                onChange={(e) => setSelectedTipo((prev) => ({ ...prev!, name: e.target.value.toUpperCase() }))}
-                className="col-span-3"
-              />
-            </div>
-
-            <div className='mt-2 text-base'>
-              <Label className='text-base'>Tipo de lançamento</Label>
-              <div className='mt-2 w-52'>
-                <Select
-                  onValueChange={(value: lancamentoTipo) => setSelectedTipo((prev) => ({ ...prev!, tipo: value }))}
-                  value={selectedTipo?.tipo}
-                >
-                  <SelectTrigger className='h-4'>
-                    <SelectValue placeholder="Selecione o tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TIPO_LANCAMENTO_OPTIONS.map((lancto) => (
-                      <SelectItem className='text-base' key={lancto.label} value={lancto.value}>
-                        {lancto.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label
-                className="Label"
-                htmlFor="airplane-mode"
-                style={{ paddingRight: 15 }}
-              >
-                Automático
-              </label>
-              <Switch className="SwitchRoot focus:outline-none" id="airplane-mode"
-                checked={selectedTipo?.automatico === "S" ? true : false}
-                onCheckedChange={(checked) => setSelectedTipo((prev) => ({ ...prev!, automatico: (checked ? "S" : "N") }))}>
-                <Thumb className="SwitchThumb" />
-              </Switch>
-            </div>
-
-            <div className="grid gap-4 py-4 font-[Poppins-regular]">
-              <div className="grid grid-cols-1 items-center gap-4">
-                <Label className='text-base'>
-                  Parcelas
-                </Label>
-                <Input
-                  id="name"
-                  type="number"
-                  placeholder="Parcelas"
-                  value={selectedTipo?.parcelas}
-                  onChange={(e) => setSelectedTipo((prev) => ({ ...prev!, parcelas: Number(e.target.value)}))}
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-4 py-4 font-[Poppins-regular]">
-              <div className="grid grid-cols-1 items-center gap-4">
-                <Label className='text-base'>
-                  Valor Fixo
-                </Label>
-                <Input
-                  id="name"
-                  type="number"
-                  placeholder="Valor Fixo"
-                  value={selectedTipo?.valorFixo}
-                  onChange={(e) => setSelectedTipo((prev) => ({ ...prev!, valorFixo: Number(e.target.value)}))}
-                />
-              </div>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label
-                className="Label"
-                htmlFor="airplane-mode"
-                style={{ paddingRight: 15 }}
-              >
-                Gera Observação
-              </label>
-              <Switch className="SwitchRoot focus:outline-none" id="airplane-mode"
-                checked={selectedTipo?.geraObservacao === "S" ? true : false}
-                onCheckedChange={(checked) => setSelectedTipo((prev) => ({ ...prev!, geraObservacao: (checked ? "S" : "N") }))}>
-                <Thumb className="SwitchThumb" />
-              </Switch>
-            </div>
-
-          </div>
-          <DialogFooter>
-            <Button onClick={handleUpdateTipo}>Salvar alterações</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
     </div>
   )

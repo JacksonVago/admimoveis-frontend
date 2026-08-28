@@ -125,7 +125,7 @@ export default function ListarLocacoes({
   const locacoes = data?.data?.data || []
   const totalPages = data?.data?.totalPages
 
-  console.log(totalPages)
+  console.log(locacoes)
   // const hasTotalPages = !!totalPages
   // const canGoToNextPage = hasTotalPages && page < totalPages
   // const canGoToPreviousPage = hasTotalPages && page > totalPages
@@ -203,14 +203,14 @@ export default function ListarLocacoes({
 
 
   return (
-    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]" style={{color:"#034869"}}>
       {/* Search & Filters */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         <div className='grid grid-cols-3'>
           {(txtVinc === '' ?
             (showcard ?
-              (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />) :
-              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />)
+              (<List onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />)
             ) : (<></>))
           }
         </div>
@@ -218,7 +218,8 @@ export default function ListarLocacoes({
           user?.permissions.includes("ALL") ||
           user?.permissions.includes("CREATE_LOCACAO")
         ) && (
-            <Button onClick={handleClickCreateLocacao} size={"sm"} className='hover:cursor-pointer hover:bg-gray-700'>
+            <Button onClick={handleClickCreateLocacao} size={"sm"} 
+            className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
               <Plus className="h-4 w-4" />Criar Locação
             </Button>
           )}
@@ -227,7 +228,7 @@ export default function ListarLocacoes({
       <div className={isTablet ? (txtVinc === '' ? 'grid grid-cols-6 gap-4' : 'grid grid-cols-1 gap-4') : 'grid grid-cols-1 gap-4'}>
         <div className="col-span-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2 top-2.5 h-4 w-4" />
             <Input
               onChange={handleSearchChange}
               value={search}
@@ -244,7 +245,7 @@ export default function ListarLocacoes({
             </SelectTrigger>
             <SelectContent>
               {STATUS_LOCACAO_OPTIONS.map((value) => (
-                <SelectItem key={value.label} value={value.label}>
+                <SelectItem key={value.label} value={value.label} style={{color:"#034869"}}>
                   {value.label}
                 </SelectItem>
               ))}
@@ -257,7 +258,7 @@ export default function ListarLocacoes({
       <div className={limit === 1 ? "grid gap-6 grid-cols-1" : "grid gap-6 sm:grid-cols-1 lg:grid-cols-3"}>
         {/* Search Results & No Results Message */}
         {hasSearchResults && (
-          <p className="text-center text-muted-foreground">
+          <p className="text-center">
             Nenhuma locação encontrado para a busca atual.
           </p>
         )}
@@ -275,7 +276,7 @@ export default function ListarLocacoes({
               (
                 <>
                   {locacoes?.map((locacao) => (
-                    <Card key={locacao.id} className="flex flex-col">
+                    <Card key={locacao.id} className="flex flex-col" style={{color:"#034869"}}>
                       <CardHeader>
                         <CardTitle className="flex items-center justify-between">
                           <span className="text-wrap"
@@ -284,8 +285,8 @@ export default function ListarLocacoes({
                                 fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
                               }}
 
-                          >{(locacao?.locatarios ? locacao?.locatarios[0].pessoa?.nome : '') + ' - ' + locacao?.imovel?.condominio.name + ' - ' + locacao?.imovel?.endereco?.complemento}</span>
-                          <Badge variant="secondary">
+                          >{(locacao?.locatarios ? locacao?.locatarios[0].pessoa?.nome : '') + (locacao?.imovel?.condominio ? ' - ' + locacao?.imovel?.condominio.name : '') + ' - ' + locacao?.imovel?.endereco?.complemento}</span>
+                          <Badge variant="secondary" className='bg-[#a7d9f2]'>
                             {locacao?.locatarios?.length}
                             {locacao?.locatarios?.length && locacao?.locatarios?.length > 1
                               ? ' locatários'
@@ -310,7 +311,7 @@ export default function ListarLocacoes({
                           <Button
                             variant="secondary"
                             size="sm"
-                            className="w-full hover:cursor-pointer hover:bg-gray-200"
+                            className="w-full hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]"
                             onClick={handleClickVerDetalhes(locacao.id)}
                             style={
                               {
@@ -362,7 +363,7 @@ export default function ListarLocacoes({
                         {locacoes?.map((locacao) => (
                           <tr key={locacao.id} className="hover:bg-gray-300">
                             <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
-                              {(locacao.locatarios ? locacao?.locatarios[0].pessoa?.nome : '') + ' - ' + locacao?.imovel?.condominio.name + ' - ' + locacao?.imovel?.endereco?.complemento}
+                              {(locacao.locatarios ? locacao?.locatarios[0].pessoa?.nome : '') + (locacao?.imovel?.condominio ? ' - ' + locacao?.imovel?.condominio.name : '') + ' - ' + locacao?.imovel?.endereco?.complemento}
                             </td>
                             <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
                               <div>

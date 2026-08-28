@@ -126,13 +126,16 @@ export const ContaCorrenteFormContent = ({
   });
 
   const handlerChangeBanco = (value: string) => {
-    setSelBanco(Number(value));
-    console.log(selBanco)
-  }
+    setSelBanco(Number(value));    
+  };
+
+  useEffect(() => {
+    console.log(selBanco);
+  }, [selBanco]);
 
   useEffect(() => {
     handlerChangeBanco(createContaCorrenteMethods.getValues("bancoId"));
-  }, [])
+  }, []);
 
   /*console.log('conta dados', createContaCorrenteMethods.formState.errors);
   console.log('conta dados', createContaCorrenteMethods.formState.isDirty);
@@ -294,8 +297,8 @@ export const ContaCorrenteFormContent = ({
           />
         </div>
 
-        <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
-          <legend className="ml-4 px-2 text-indigo-600 font-bold">Dados de acesso à API</legend>
+        <fieldset className="rounded-lg border-2 border-[#034869] p-6 mt-2">
+          <legend className="ml-4 px-2 text-[#034869] font-bold">Dados de acesso à API</legend>
           <div className='mt-2 grid grid-cols-2 gap-4'>
             <div>
               <Label htmlFor="name">Usuário API
@@ -325,7 +328,7 @@ export const ContaCorrenteFormContent = ({
                 </p>)*/}
               </Label>
               <div className='bg-white relative -top-8 left-[90%] p-0 w-[24px]' onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <Eye color='black'></Eye> : <EyeOffIcon color='black'></EyeOffIcon>}
+                {showPassword ? <Eye color='#034869'></Eye> : <EyeOffIcon color='#034869'></EyeOffIcon>}
               </div>
             </div>
           </div>
@@ -387,15 +390,15 @@ export const ContaCorrenteFormContent = ({
 
         </fieldset>
 
-        <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
-          <legend className="ml-4 px-2 text-indigo-600 font-bold">Dados de Cobrança</legend>
+        <fieldset className="rounded-lg border-2 border-[#034869] p-6 mt-2">
+          <legend className="ml-4 px-2 text-[#034869] font-bold">Dados de Cobrança</legend>
 
           <div className='grid grid-cols-2'>
-            <div className={isMobile ? 'flex items-center justify-start align-middle mt-7' : 'flex items-center justify-start align-middle mt-7'}>
+            <div className={isMobile ? 'flex items-center justify-start align-middle mt-7 mb-3' : 'flex items-center justify-start align-middle mt-7 mb-3'}>
               <label
                 className="Label"
                 htmlFor="boletos"
-                style={{ paddingRight: 15 }}
+                style={{ paddingRight: 15, color: "#034869" }}
               >
                 Pagamento parcial
               </label>
@@ -453,8 +456,8 @@ export const ContaCorrenteFormContent = ({
             </Label>
           </div>
 
-          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
-            <legend className="ml-4 px-2 text-indigo-600 font-bold">Dados E-mail</legend>
+          <fieldset className="rounded-lg border-2 border-[#034869] p-6 mt-2">
+            <legend className="ml-4 px-2 text-[#034869] font-bold">Dados E-mail</legend>
 
             <div className='mt-2'>
               <Label htmlFor="name">Assunto E-mail</Label>
@@ -501,8 +504,8 @@ export const ContaCorrenteFormContent = ({
             </div>
           </fieldset>
 
-          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
-            <legend className="ml-4 px-2 text-indigo-600 font-bold">Tipo de Juros</legend>
+          <fieldset className="rounded-lg border-2 border-[#034869] p-6 mt-2">
+            <legend className="ml-4 px-2 text-[#034869] font-bold">Tipo de Juros</legend>
             <div className='mt-2'>
               <Label className='text-base font-[Poppins-Regular]'>
                 Tipo
@@ -568,8 +571,8 @@ export const ContaCorrenteFormContent = ({
 
           </fieldset>
 
-          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
-            <legend className="ml-4 px-2 text-indigo-600 font-bold">Tipo de Multa</legend>
+          <fieldset className="rounded-lg border-2 border-[#034869] p-6 mt-2">
+            <legend className="ml-4 px-2 text-[#034869] font-bold">Tipo de Multa</legend>
             <div className='mt-2'>
               <Label className='text-base font-[Poppins-Regular]'>
                 Tipo
@@ -634,8 +637,8 @@ export const ContaCorrenteFormContent = ({
             </div>
           </fieldset>
 
-          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
-            <legend className="ml-4 px-2 text-indigo-600 font-bold">Tipo de Desconto</legend>
+          <fieldset className="rounded-lg border-2 border-[#034869] p-6 mt-2">
+            <legend className="ml-4 px-2 text-[#034869] font-bold">Tipo de Desconto</legend>
             <div className='mt-2'>
               <Label className='text-base font-[Poppins-Regular]'>
                 Tipo Desconto
@@ -702,8 +705,8 @@ export const ContaCorrenteFormContent = ({
             </div>
           </fieldset>
 
-          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
-            <legend className="ml-4 px-2 text-indigo-600 font-bold">Instruções de Cobrança</legend>
+          <fieldset className="rounded-lg border-2 border-[#034869] p-6 mt-2">
+            <legend className="ml-4 px-2 text-[#034869] font-bold">Instruções de Cobrança</legend>
 
             <div className='mt-2'>
               <Label className='text-base font-[Poppins-Regular]'>
@@ -812,7 +815,7 @@ export const ContaCorrenteFormContent = ({
               <label
                 className="Label"
                 htmlFor="diautil"
-                style={{ paddingRight: 15 }}
+                style={{ paddingRight: 15, color: "#034869" }}
               >
                 Somente dia útil
               </label>
@@ -824,8 +827,8 @@ export const ContaCorrenteFormContent = ({
             </div>
           </fieldset>
 
-          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
-            <legend className="ml-4 px-2 text-indigo-600 font-bold">Instruções de Recebimentos</legend>
+          <fieldset className="rounded-lg border-2 border-[#034869] p-6 mt-2">
+            <legend className="ml-4 px-2 text-[#034869] font-bold">Instruções de Recebimentos</legend>
 
             <div className='mt-2'>
               <Label className='text-base font-[Poppins-Regular]'>
@@ -950,8 +953,8 @@ export const ContaCorrenteFormContent = ({
             </div>
           </fieldset>
 
-          <fieldset className="rounded-lg border-2 border-indigo-500 p-6 mt-2">
-            <legend className="ml-4 px-2 text-indigo-600 font-bold">Tipo de Autorização de divergência de cobrança</legend>
+          <fieldset className="rounded-lg border-2 border-[#034869] p-6 mt-2">
+            <legend className="ml-4 px-2 text-[#034869] font-bold">Tipo de Autorização de divergência de cobrança</legend>
             <div className='mt-2'>
               <Label className='text-base font-[Poppins-Regular]'>
                 Tipo de Autorização
@@ -1146,7 +1149,7 @@ export const ContaCorrenteFormSubmitButton = ({
     <div className="">
       <Button
         type="submit"
-        className="mt-4"
+        className="mt-4 hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
         size={"sm"}
         disabled={
           disabled

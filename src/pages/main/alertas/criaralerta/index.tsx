@@ -11,6 +11,7 @@ import { useMutation } from '@tanstack/react-query'
 import { createAlerta } from '../requests'
 import { queryClient } from '@/services/react-query/query-client'
 import axios from 'axios'
+import { useEffect } from 'react'
 
 
 //TODO: create a interface for created imovel
@@ -59,6 +60,18 @@ export const CriarAlerta = () => {
       }
     }
   })
+
+  useEffect(() => {
+    glb_params.updTitle_form('Alertas');
+
+    if (glb_params.pastaOrig === '') {
+      glb_params.updPastaOrig('alerta-create');
+    }
+    else {
+      //setActiveTab(glb_params.pastaOrig);
+    }
+
+  }, [])
 
 
   //Validade dados do condomínio no caso de alteração
@@ -150,7 +163,7 @@ export const CriarAlerta = () => {
       <div className="mb-8 flex w-full items-center justify-between">
       </div>
       <div className="mx-auto w-full rounded-md">
-        <Card>
+        <Card style={{ color: "#034869" }}>
           <CardContent>
             <h2 className="mb-4 mt-8 text-xl font-bold">Criar um novo alerta</h2>
             {/* ======alerta====== */}

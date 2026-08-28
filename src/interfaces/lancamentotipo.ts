@@ -3,6 +3,7 @@ import { PessoaStatus } from "@/enums/pessoal/status-pesoa";
 import { LancamentoLocacao } from "./lancamentos";
 import { Empresa } from "./empresa";
 import { LancamentoCondominio } from "./lancamentocondominio";
+import { GrupoFluxoCaixa } from "./grupo-fluxo-caixa";
 
 export interface TipoLancamento {
     id: number;
@@ -17,6 +18,8 @@ export interface TipoLancamento {
     updatedAt?: string;
     lancamentosLocacoes: LancamentoLocacao[];
     lancamentosCondominio: LancamentoCondominio[];
+    grupofluxo: GrupoFluxoCaixa;
+    grupofluxoId: number;
     empresa: Empresa;
     empresaId: number;
 }

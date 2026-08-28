@@ -340,12 +340,12 @@ export const DetalhesEmpresaForm = () => {
   return (
     <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
       <TabsList>
-        <TabsTrigger value="personal-info" className='hover:cursor-pointer hover:bg-gray-200'>Dados da Empresa</TabsTrigger>
-        <TabsTrigger value="alertas" className='hover:cursor-pointer hover:bg-gray-200'>Alertas</TabsTrigger>
+        <TabsTrigger value="personal-info" className='hover:cursor-pointer hover:bg-gray-200'  style={{color:'#034869'}}>Dados da Empresa</TabsTrigger>
+        <TabsTrigger value="alertas" className='hover:cursor-pointer hover:bg-gray-200'  style={{color:'#034869'}}>Alertas</TabsTrigger>
       </TabsList>
 
       <TabsContent value="personal-info" className="space-y-4 font-[Poppins-regular]">
-        <Card>
+        <Card  style={{color:'#034869'}}>
           <CardHeader>
             <CardTitle className="flex items-center justify-end">
               {/*<h2 className="mb-4 mt-8 text-xl font-bold">Configurações</h2>*/}
@@ -353,7 +353,7 @@ export const DetalhesEmpresaForm = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
-                className='bg-gray-100 hover:cursor-pointer'
+                className='hover:bg-[#81cbef] hover:cursor-pointer bg-[#a7d9f2]'
               >
                 <Edit className="mr-2 h-4 w-4" />
                 {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}

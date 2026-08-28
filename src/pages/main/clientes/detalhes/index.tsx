@@ -297,7 +297,7 @@ export const DetalhesClienteForm = ({
   const hasLocatario = !!cliente?.locatarios?.length;
 
   return (
-    <Card>
+    <Card style={{color: "#034869"}}>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <h2 className="mb-4 mt-8 text-xl font-bold">Dados Pessoais</h2>
@@ -335,7 +335,7 @@ export const DetalhesClienteForm = ({
           <div className="mt-4">
             {disabled && (
               <Button
-                className="hover:cursor-pointer"
+                className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                 disabled={
                   !clienteMethods.formState.isDirty || !clienteMethods.formState.isValid
                 }
@@ -791,7 +791,7 @@ export default function DetalhesCliente() {
   }
 
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]"  style={{color: "#034869"}}>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{cliente?.nome}</h1>
         <AlertDialog>
@@ -826,10 +826,10 @@ export default function DetalhesCliente() {
       </div>
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <TabsList >
-          <TabsTrigger value="personal-info" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Dados Pessoais</TabsTrigger>
-          <TabsTrigger value="propriedades" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Propriedades</TabsTrigger>
-          <TabsTrigger value="locacoes" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Locações</TabsTrigger>
-          <TabsTrigger value="finance" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Fianças</TabsTrigger>
+          <TabsTrigger value="personal-info" className='text-[0.7rem] hover:cursor-pointer hover:bg-[#a7d9f2]'  style={{color: "#034869"}}>Dados Pessoais</TabsTrigger>
+          <TabsTrigger value="propriedades" className='text-[0.7rem] hover:cursor-pointer hover:bg-[#a7d9f2]' style={{color: "#034869"}}>Propriedades</TabsTrigger>
+          <TabsTrigger value="locacoes" className='text-[0.7rem] hover:cursor-pointer hover:bg-[#a7d9f2]' style={{color: "#034869"}}>Locações</TabsTrigger>
+          <TabsTrigger value="finance" className='text-[0.7rem] hover:cursor-pointer hover:bg-[#a7d9f2]' style={{color: "#034869"}}>Fianças</TabsTrigger>
         </TabsList>
 
         <TabsContent value="personal-info" className="space-y-4">
@@ -845,14 +845,14 @@ export default function DetalhesCliente() {
               user?.permissions.includes("UPDATE_PROPRIETARIO")
             ) && (
                 <Button
-                  className='hover:cursor-pointer hover:bg-gray-600'
+                  className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                   size={"sm"}
                   onClick={handlerNewProp}>
                   <Plus className="mr-2 h-4 w-4" />
                   Propriedade
                 </Button>
               )}
-            <Dialog open={openImovel} onOpenChange={setOpenImovel}>
+            <Dialog open={openImovel} onOpenChange={setOpenImovel} >
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Adicionar Nova Propriedade</DialogTitle>
@@ -861,7 +861,7 @@ export default function DetalhesCliente() {
                   </DialogDescription>
                 </DialogHeader>
 
-                <form className="space-y-4" onSubmit={clienteProp.handleSubmit(handleSubmitPropriedade)}>
+                <form className="space-y-4" onSubmit={clienteProp.handleSubmit(handleSubmitPropriedade)} style={{ color: "#034869" }}>
                   <div className="grid grid-cols-1 gap-4 flex items-center">
                     <Button onClick={() => { handlerSelImovel('propriedades') }}
                       className='hover:cursor-pointer'>
@@ -929,11 +929,11 @@ export default function DetalhesCliente() {
 
           <div className={(isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
             {cliente?.proprietarios?.map((proprietario) => (
-              <Card key={proprietario.id}>
+              <Card key={proprietario.id} style={{ color: "#034869" }}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>{proprietario.id}</span>
-                    <Badge variant="default">{proprietario.imovel?.tipo.name}</Badge>
+                    <Badge variant="secondary" className='bg-[#a7d9f2]'>{proprietario.imovel?.tipo.name}</Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -960,7 +960,7 @@ export default function DetalhesCliente() {
                   ) && (
                       <div className="grid grid-cols-3 gap-4 flex items-end mt-2">
                         <Button
-                          className='col-start-3 hover:cursor-pointer hover:bg-gray-200'
+                          className='col-start-3 hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                           variant="secondary"
                           size="sm"
                           onClick={() => { handlerDetailImovel(proprietario.imovelId) }}
@@ -994,7 +994,7 @@ export default function DetalhesCliente() {
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>Alterar Propriedade</DialogTitle>
-                        <DialogDescription>
+                        <DialogDescription style={{ color: "#034869" }}>
                           Preencha os detalhes da nova propriedade para este cliente.
                         </DialogDescription>
                       </DialogHeader>
@@ -1040,7 +1040,7 @@ export default function DetalhesCliente() {
                         <DialogFooter>
                           <DialogClose asChild>
                             <Button type="submit"
-                              className='hover:cursor-pointer hover:bg-gray-600'
+                              className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                             >Salvar Alterações</Button>
                           </DialogClose>
                         </DialogFooter>
@@ -1074,11 +1074,11 @@ export default function DetalhesCliente() {
             {cliente?.locatarios?.map((locatario) => (
               locatario.locacoes?.map((locacao) => {
                 return (
-                  <Card key={locacao.id}>
+                  <Card key={locacao.id} style={{ color: "#034869" }}>
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
                         <span>{locacao.id}</span>
-                        <Badge variant="default">{locacao.status}</Badge>
+                        <Badge variant="secondary" className='bg-[#a7d9f2]'>{locacao.status}</Badge>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -1110,7 +1110,7 @@ export default function DetalhesCliente() {
                       ) && (
                           <div className='grid grid-cols-3 gap-4 flex items-end mt-2'>
                             <Button
-                              className='col-start-3 hover:cursor-pointer hover:bg-gray-200'
+                              className='col-start-3 hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                               variant="secondary"
                               size="sm"
                               onClick={() => { handlerDetailImovel(parseFloat(locacao?.imovelId.toString())) }}
@@ -1371,11 +1371,11 @@ export default function DetalhesCliente() {
           </div>
 
           {cliente?.fiador?.locacoes?.map((locacao) => (
-            <Card key={locacao.id}>
+            <Card key={locacao.id}  style={{ color: "#034869" }}>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>{locacao.id}</span>
-                  <Badge variant="default">{locacao.imovel?.tipo.name}</Badge>
+                  <Badge variant="secondary" className='bg-[#a7d9f2]'>{locacao.imovel?.tipo.name}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>

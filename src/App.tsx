@@ -16,9 +16,14 @@ function App() {
   script.async = true;
   document.body.appendChild(script);
 
+  const trustLogoScript = document.createElement("script");
+  trustLogoScript.src = "https://secure.trust-provider.com/trustlogo/javascript/trustlogo.js";
+  trustLogoScript.async = true;
+  document.body.appendChild(trustLogoScript);
+
   return (
     <>
-      <AppProvider>
+      <AppProvider >
         <RoutesComponent />
       </AppProvider>
     </>

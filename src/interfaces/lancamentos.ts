@@ -12,6 +12,11 @@ export interface LancamentoLocacao {
   vencimentoLancamento: string
   linhaDigitavel:string;
   observacao?: string
+  numeroDocumento?: string
+  dataDocumento?: string
+  serieDocumento?: string
+  valorDocumento?: number
+  descontoDocumento?: number
   status:LancamentoStatus
   locacao: Locacao
   locacaoId: number

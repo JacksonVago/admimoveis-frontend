@@ -220,7 +220,7 @@ export function DocumentUpload({
         </Carousel>
       ) : (
         <div className="rounded-md bg-muted py-8 text-center">
-          <p className="text-muted-foreground">Nenhum documento adicionado</p>
+          <p>Nenhum documento adicionado</p>
         </div>
       )}
       {/*formState.errors[documentField] && (

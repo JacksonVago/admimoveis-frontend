@@ -223,7 +223,7 @@ export default function ListarLancamentos({
   }
 
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]" style={{color:"#034869"}}>
       {/* Search & Filters */}
       {/* <div className="grid grid-cols-2 flex flex-col justify-end items-start gap-4 sm:flex-row sm:items-center"> */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
@@ -231,10 +231,10 @@ export default function ListarLancamentos({
           <h1 className="text-2xl font-bold">Lançamentos de Locações</h1>
         )}
       </div>
-      <div className='grid grid-cols-3'>
+      <div className='flex justify-end'>
         {showcard ?
-          (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />) :
-          (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />)
+          (<List onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />) :
+          (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />)
         }
       </div>
 
@@ -244,7 +244,7 @@ export default function ListarLancamentos({
           : "grid grid-cols-1 gap-4 sm:flex-row sm:items-center sm:justify-between border-b"}
       >
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4" />
           <Input
             onChange={handleSearchChange}
             value={search}
@@ -305,10 +305,10 @@ export default function ListarLancamentos({
               (
                 <>
                   {locacoes.map((locacao) => (
-                    <Card key={locacao.id} className="">
+                    <Card key={locacao.id} className="" style={{color:"#034869"}}>
                       <CardHeader className="flex flex-row justify-between">
                         <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
-                          <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                          <p className="line-clamp-2 flex gap-1 text-sm">
                             <MapPin className="inline-block h-4 w-4 cursor-pointer"
                               onClick={() => { handlerClickMaps(locacao.imovel?.endereco) }}
                               color='green'
@@ -377,7 +377,9 @@ export default function ListarLancamentos({
 
                                 <Button variant="secondary"
                                   onClick={() => handleClickVerDetalhes(locacao?.id)}
-                                  size={"sm"}>
+                                  size={"sm"}
+                                  className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+                                  >
                                   <Pencil className='h4 w4' /> Lançamentos
                                 </Button>
                               )}
@@ -391,7 +393,9 @@ export default function ListarLancamentos({
                                 <>
                                   <Button variant="secondary"
                                     onClick={() => handlerOpenCobranca(locacao)}
-                                    size={"sm"}>
+                                    size={"sm"}
+                                    className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+                                    >
                                     <Receipt className="h-4 w-4" />Gerar Cobrança
                                   </Button>
                                 </>
@@ -412,7 +416,8 @@ export default function ListarLancamentos({
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleGerarCobranca()}>
+                                <AlertDialogAction onClick={() => handleGerarCobranca()}
+                                  className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
                                   'Sim, confirmar cobrança.'
                                 </AlertDialogAction>
                               </AlertDialogFooter>
@@ -466,7 +471,7 @@ export default function ListarLancamentos({
                                 <Button
                                   size="sm"
                                   onClick={() => { handleClickVerDetalhes(locacao.id) }}
-                                  className='hover:cursor-pointer hover:bg-gray-700'
+                                  className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                                 >
                                   Ver detalhes
                                 </Button>

@@ -168,6 +168,26 @@ export const DetalhesLancamento = () => {
         form.append('observacao', data.observacao)
       }
 
+      if (data?.numeroDocumento) {
+        form.append('numeroDocumento', data.numeroDocumento)
+      }
+
+      if (data?.dataDocumento) {
+        form.append('dataDocumento', data.dataDocumento)
+      }
+
+      if (data?.serieDocumento) {
+        form.append('serieDocumento', data.serieDocumento)
+      }
+
+      if (data?.valorDocumento) {
+        form.append('valorDocumento', data.valorDocumento.toString())
+      }
+
+      if (data?.descontoDocumento) {
+        form.append('descontoDocumento', data.descontoDocumento.toString())
+      }
+
       if (data?.status) {
         form.append('status', data.status)
       }
@@ -399,7 +419,7 @@ export const DetalhesLancamento = () => {
   return (
     <div className="scale mx-auto flex max-w-screen-xl transform flex-col items-center px-4 transition-transform">
       <div className="mx-auto w-full rounded-md">
-        <Card className='font-[Poppins-regular]'>
+        <Card className='font-[Poppins-regular]' style={{ color: "#034869" }}>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <Label className="ml-1 mb-4 mt-8 font-bold">{(locacao?.locatarios ? locacao?.locatarios[0].pessoa?.nome + ' - ' : '') + getEnderecoFormatado(locacao?.imovel?.endereco)}</Label>
@@ -419,7 +439,8 @@ export const DetalhesLancamento = () => {
                     user?.permissions.includes("CREATE_LOCACAO_LANCAMENTO")
                   ) && (
 
-                      <Button size={'sm'}>
+                      <Button size={'sm'}
+                        className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
                         <Plus className="mr-2 h-4 w-4" /> Lançamento
                       </Button>
                     )}
@@ -539,8 +560,74 @@ export const DetalhesLancamento = () => {
                       />
                     </div>
 
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-2" : "grid grid-cols-1 gap-4 mt-2")}>
+                      <Label htmlFor="description">Número da Nota
+                        <Input
+                          type='text'
+                          disabled={disabled}
+                          placeholder="Nota fiscal"
+                          {...lancamentoMethods.register('numeroDocumento')}
+                          onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
+                        />
+                        {lancamentoMethods.formState?.errors?.numeroDocumento?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{lancamentoMethods.formState?.errors?.numeroDocumento?.message}</p>}
+                      </Label>
+                      <Label htmlFor="description">Série da Nota
+                        <Input
+                          type='text'
+                          disabled={disabled}
+                          placeholder="Série"
+                          {...lancamentoMethods.register('serieDocumento')}
+                          onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
+                        />
+                        {lancamentoMethods.formState?.errors?.serieDocumento?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{lancamentoMethods.formState?.errors?.serieDocumento?.message}</p>}
+                      </Label>
+                    </div>
+
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-2" : "grid grid-cols-1 gap-4 mt-2")}>
+                      <Label className="text-base">
+                        Data da Nota
+                        <Input
+                          type='date'
+                          className="mt-2"
+                          disabled={disabled}
+                          placeholder="Data da Nota"
+                          {...lancamentoMethods.register('dataDocumento')}
+                        />
+                        {lancamentoMethods.formState?.errors?.dataDocumento?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{lancamentoMethods.formState?.errors?.dataDocumento?.message}</p>}
+                      </Label>
+                    </div>
+
+                    <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-3" : "grid grid-cols-1 gap-4 mt-3")}>
+                      <Label className="text-base">
+                        Valor da nota
+                        <Input
+                          type="number"
+                          step={'any'}
+                          className="mt-1"
+                          disabled={disabled}
+                          placeholder="Valor da Nota"
+                          {...lancamentoMethods.register('valorDocumento')}
+                        />
+                        {lancamentoMethods.formState?.errors?.valorDocumento?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {lancamentoMethods.formState?.errors?.valorDocumento?.message}</p>}
+                      </Label>
+
+                      <Label className="text-base">
+                        Desconto da nota
+                        <Input
+                          type="number"
+                          step={'any'}
+                          className="mt-1"
+                          disabled={true}
+                          {...lancamentoMethods.register('descontoDocumento')}
+                        />
+                        {lancamentoMethods.formState?.errors?.descontoDocumento?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {lancamentoMethods.formState?.errors?.descontoDocumento?.message}</p>}
+                      </Label>
+                    </div>
+
                     <DialogFooter className='mt-2'>
-                      <Button size={"sm"} type='submit'>{titulo.includes('novo') ? 'Criar lançamento' : 'Confirmar Alteração'}</Button>
+                      <Button size={"sm"} type='submit'
+                        className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
+                        {titulo.includes('novo') ? 'Criar lançamento' : 'Confirmar Alteração'}</Button>
                     </DialogFooter>
                   </form>
                 </DialogContent>

@@ -247,7 +247,7 @@ export const DetalhesLocacaoForm = ({
       fiadores: locacao?.fiadores ? locacao?.fiadores?.map((fiador) => {
         return { nome: fiador.pessoa?.nome, id: fiador.pessoa?.id }
       }) : undefined,
-      imoveis: [{ nome: locacao?.imovel?.description, id: locacao?.imovel?.id }],
+      imoveis: [{ nome: (locacao?.imovel?.description && locacao?.imovel?.description.length > 0 ? locacao?.imovel?.description : locacao?.imovel?.endereco.complemento + ' ' + locacao?.imovel?.endereco.logradouro + ' ' + locacao?.imovel?.endereco.numero), id: locacao?.imovel?.id }],
       tituloCap: (locacao?.garantiaTituloCapitalizacao ? { numeroTitulo: locacao?.garantiaTituloCapitalizacao?.numeroTitulo } : undefined),
       seguroFianca: locacao?.garantiaSeguroFianca ? { numeroSeguro: locacao?.garantiaSeguroFianca?.numeroSeguro } : undefined,
       depCalcao: locacao?.garantiaDepositoCalcao ? { valorDeposito: locacao?.garantiaDepositoCalcao?.quantidadeMeses, quantidadeMeses: locacao?.garantiaDepositoCalcao?.valorDeposito } : undefined,

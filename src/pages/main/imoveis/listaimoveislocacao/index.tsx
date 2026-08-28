@@ -231,7 +231,7 @@ export default function ListarImoveisLocacao({
                 </div>
             </div>
 
-            <div className={(isBigScreen ? "grid gap-4 grid-cols-3" : isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
+            <div className="grid gap-4 grid-cols-1">
                 {/* Search Results & No Results Message */}
                 {hasSearchResults && (
                     <p className="text-center text-muted-foreground">Nenhum imóvel</p>

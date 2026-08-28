@@ -35,63 +35,11 @@ import { z } from 'zod'
 
 export const permissions: { value: Permission; label: string }[] = [
   { value: 'ALL', label: 'Todas as permissões' },
-  { value: 'CREATE_TIPO', label: 'Criar Tipo de imóvel' },
-  { value: 'UPDATE_TIPO', label: 'Atualizar Tipo de imóvel' },
-  { value: 'DELETE_TIPO', label: 'Excluir Tipo de imóvel' },
-  { value: 'VIEW_TIPOS', label: 'Ver Tipos de Imóvel' },
-  { value: 'CREATE_TIPO_LANC', label: 'Criar Tipo de Lançamento' },
-  { value: 'UPDATE_TIPO_LANC', label: 'Atualizar Tipo de Lançamento' },
-  { value: 'DELETE_TIPO_LANC', label: 'Excluir Tipo de Lançamento' },
-  { value: 'VIEW_TIPOS_LANC', label: 'Ver Tipos de Lançamento' },
-  { value: 'CREATE_CONDOMINIO', label: 'Criar Condomínio' },
-  { value: 'UPDATE_CONDOMINIO', label: 'Atualizar Condomínio' },
-  { value: 'DELETE_CONDOMINIO', label: 'Excluir Condomínio' },
-  { value: 'VIEW_CONDOMINIOS', label: 'Ver Condomínios' },
-  { value: 'CREATE_BLOCO', label: 'Criar Bloco' },
-  { value: 'UPDATE_BLOCO', label: 'Atualizar Bloco' },
-  { value: 'DELETE_BLOCO', label: 'Excluir Bloco' },
-  { value: 'VIEW_BLOCOS', label: 'Ver Blocos' },
-  { value: 'CREATE_IMOVEL', label: 'Criar Imóvel' },
-  { value: 'UPDATE_IMOVEL', label: 'Atualizar Imóvel' },
-  { value: 'DELETE_IMOVEL', label: 'Deletar Imóvel' },
-  { value: 'VIEW_IMOVELS', label: 'Visualizar Imóveis' },
-  { value: 'CREATE_LOCATARIO', label: 'Criar Locatário' },
-  { value: 'UPDATE_LOCATARIO', label: 'Atualizar locatário' },
-  { value: 'DELETE_LOCATARIO', label: 'Excluir Locatário' },
-  { value: 'VIEW_LOCATARIOS', label: 'Ver Locatários' },
-  { value: 'CREATE_PESSOA', label: 'Criar Pessoa' },
-  { value: 'UPDATE_PESSOA', label: 'Atualizar Pessoa' },
-  { value: 'DELETE_PESSOA', label: 'Excluir Pessoa' },
-  { value: 'VIEW_PESSOAS', label: 'Ver Pessoas' },
-  { value: 'CREATE_PROPRIETARIO', label: 'Criar Proprietário' },
-  { value: 'UPDATE_PROPRIETARIO', label: 'Atualizar Proprietário' },
-  { value: 'DELETE_PROPRIETARIO', label: 'Excluir Proprietário' },
-  { value: 'VIEW_PROPRIETARIOS', label: 'Ver Proprietários' },
-  { value: 'CREATE_LOCACAO', label: 'Criar Locação' },
-  { value: 'UPDATE_LOCACAO', label: 'Atualizar Locação' },
-  { value: 'DELETE_LOCACAO', label: 'Excluir Locação' },
-  { value: 'VIEW_LOCACOES', label: 'Ver Locações' },
-  { value: 'CREATE_LOCACAO_LANCAMENTO', label: 'Criar Lançamento' },
-  { value: 'UPDATE_LOCACAO_LANCAMENTO', label: 'Atualizar Lançamento' },
-  { value: 'DELETE_LOCACAO_LANCAMENTO', label: 'Excluir Lançamento' },
-  { value: 'VIEW_LOCACAO_LANCAMENTOS', label: 'Ver Lançamentos' },
-  { value: 'CREATE_CONDOMINIO_LANCAMENTO', label: 'Criar Lançamento de Condomínio' },
-  { value: 'UPDATE_CONDOMINIO_LANCAMENTO', label: 'Atualizar Lançamento de Condomínio' },
-  { value: 'DELETE_CONDOMINIO_LANCAMENTO', label: 'Excluir Lançamento de Condomínio' },
-  { value: 'VIEW_CONDOMINIO_LANCAMENTOS', label: 'Ver Lançamentos de Condomínio' },
-  { value: 'CREATE_PAGAMENTO', label: 'Criar Pagamento' },
-  { value: 'UPDATE_PAGAMENTO', label: 'Atualizar pagamento' },
-  { value: 'DELETE_PAGAMENTO', label: 'Excluir Pagamento' },
-  { value: 'VIEW_PAGAMENTOS', label: 'Ver Pagamentos' },
-  { value: 'CREATE_MORADOR', label: 'Criar Morador' },
-  { value: 'UPDATE_MORADOR', label: 'Atualizar Morador' },
-  { value: 'DELETE_MORADOR', label: 'Excluir Morador' },
-  { value: 'VIEW_MORADORES', label: 'Ver Moradores' },
-  //Tipo de alerta
-  { value: 'CREATE_TIPO_ALERTA', label: 'Criar Tipo de Alerta' },
-  { value: 'UPDATE_TIPO_ALERTA', label: 'Atualizar Tipo de Alerta' },
-  { value: 'DELETE_TIPO_ALERTA', label: 'Excluir Tipo de Alerta' },
-  { value: 'VIEW_TIPOS_ALERTA', label: 'Ver Tipo de Alerta' },
+
+  /*Empresa */
+  { value: 'UPDATE_EMPRESA', label: 'Atualizar Empresa' },
+  { value: 'VIEW_EMPRESAS', label: 'Ver Empresas' },
+
   //Alertas
   { value: 'CREATE_ALERTA', label: 'Criar Alertas' },
   { value: 'UPDATE_ALERTA', label: 'Atulizar Alertas' },
@@ -103,57 +51,158 @@ export const permissions: { value: Permission; label: string }[] = [
   { value: 'UPDATE_CONTA_CORRENTE', label: 'Atualizar Conta corrente' },
   { value: 'DELETE_CONTA_CORRENTE', label: 'Excluir Conta corrente' },
   { value: 'VIEW_CONTAS_CORRENTE', label: 'Ver Conta corrente' },
-  //Instrucao de cobrança
-  { value: 'CREATE_INSTRUCAO_COBRANCA', label: 'Criar Instrução de cobrança' },
-  { value: 'UPDATE_INSTRUCAO_COBRANCA', label: 'Atualizar Instrução de cobrança' },
-  { value: 'DELETE_INSTRUCAO_COBRANCA', label: 'Excluir Instrução de cobrança' },
-  { value: 'VIEW_INSTRUCOES_COBRANCA', label: 'Ver Instrução de cobrança' },
-  //Instrução de recebimento
-  { value: 'CREATE_INSTRUCAO_RECEBIMENTO', label: 'Criar Instrução de recebimentos' },
-  { value: 'UPDATE_INSTRUCAO_RECEBIMENTO', label: 'Atualizar Instrução de recebimentos' },
-  { value: 'DELETE_INSTRUCAO_RECEBIMENTO', label: 'Excluir Instrução de recebimentos' },
-  { value: 'VIEW_INSTRUCOES_RECEBIMENTO', label: 'Ver Instrução de recebimentos' },
-  //Carteira de cobrança
-  { value: 'CREATE_CARTEIRA_COBRANCA', label: 'Criar Carteira de cobrança' },
-  { value: 'UPDATE_CARTEIRA_COBRANCA', label: 'Atualizar Carteira de cobrança' },
-  { value: 'DELETE_CARTEIRA_COBRANCA', label: 'Excluir Carteira de cobrança' },
-  { value: 'VIEW_CARTEIRAS_COBRANCA', label: 'Ver Carteira de cobrança' },
-  //Espécie de cobrança
-  { value: 'CREATE_ESPECIE_COBRANCA', label: 'Criar Espécie de cobrança' },
-  { value: 'UPDATE_ESPECIE_COBRANCA', label: 'Atualizar Espécie de cobrança' },
-  { value: 'DELETE_ESPECIE_COBRANCA', label: 'Excluir Espécie de cobrança' },
-  { value: 'VIEW_ESPECIES_COBRANCA', label: 'Ver Espécie de cobrança' },
-  //Banco
-  { value: 'CREATE_BANCO', label: 'Criar Banco' },
-  { value: 'UPDATE_BANCO', label: 'Atualizar Banco' },
-  { value: 'DELETE_BANCO', label: 'Excluir Banco' },
-  { value: 'VIEW_BANCOS', label: 'Ver Banco' },
-  //Tipo de juros
-  { value: 'CREATE_TIPO_JUROS', label: 'Criar Tipo de Juros' },
-  { value: 'UPDATE_TIPO_JUROS', label: 'Atualizar Tipo de Juros' },
-  { value: 'DELETE_TIPO_JUROS', label: 'Excluir Tipo de Juros' },
-  { value: 'VIEW_TIPOS_JUROS', label: 'Ver Tipo de Juros' },
-  //Tipo de multa
-  { value: 'CREATE_TIPO_MULTA', label: 'Criar Tipo de Multa' },
-  { value: 'UPDATE_TIPO_MULTA', label: 'Atualizar Tipo de Multa' },
-  { value: 'DELETE_TIPO_MULTA', label: 'Excluir Tipo de Multa' },
-  { value: 'VIEW_TIPOS_MULTA', label: 'Ver Tipo de Multa' },
-  //Tipo de desconto
-  { value: 'CREATE_TIPO_DESCONTOS', label: 'Criar Tipo de Desconto' },
-  { value: 'UPDATE_TIPO_DESCONTOS', label: 'Atualizar Tipo de Desconto' },
-  { value: 'DELETE_TIPO_DESCONTOS', label: 'Excluir Tipo de Desconto' },
-  { value: 'VIEW_TIPOS_DESCONTOS', label: 'Ver Tipo de Desconto' },
-  //Tipo de AUTORIZACAO
-  { value: 'CREATE_TIPO_AUTORIZACAO', label: 'Criar Tipo de Autorização' },
-  { value: 'UPDATE_TIPO_AUTORIZACAO', label: 'Atualizar Tipo de Autorização' },
-  { value: 'DELETE_TIPO_AUTORIZACAO', label: 'Excluir Tipo de Autorização' },
-  { value: 'VIEW_TIPO_AUTORIZACAO', label: 'Ver Tipo de Autorização' },
+
+  /*Tipo de Lançamento */
+  { value: 'CREATE_TIPO_LANC', label: 'Criar Tipo de Lançamento' },
+  { value: 'UPDATE_TIPO_LANC', label: 'Atualizar Tipo de Lançamento' },
+  { value: 'DELETE_TIPO_LANC', label: 'Excluir Tipo de Lançamento' },
+  { value: 'VIEW_TIPOS_LANC', label: 'Ver Tipos de Lançamento' },
+
+  /*Tipo de Imóvel */
+  { value: 'CREATE_TIPO', label: 'Criar Tipo de imóvel' },
+  { value: 'UPDATE_TIPO', label: 'Atualizar Tipo de imóvel' },
+  { value: 'DELETE_TIPO', label: 'Excluir Tipo de imóvel' },
+  { value: 'VIEW_TIPOS', label: 'Ver Tipos de Imóvel' },
+
+  /*Condomínio */
+  { value: 'CREATE_CONDOMINIO', label: 'Criar Condomínio' },
+  { value: 'UPDATE_CONDOMINIO', label: 'Atualizar Condomínio' },
+  { value: 'DELETE_CONDOMINIO', label: 'Excluir Condomínio' },
+  { value: 'VIEW_CONDOMINIOS', label: 'Ver Condomínios' },
+
+  /*Bloco */
+  { value: 'CREATE_BLOCO', label: 'Criar Bloco' },
+  { value: 'UPDATE_BLOCO', label: 'Atualizar Bloco' },
+  { value: 'DELETE_BLOCO', label: 'Excluir Bloco' },
+  { value: 'VIEW_BLOCOS', label: 'Ver Blocos' },
+
+  /* Imóvel */
+  { value: 'CREATE_IMOVEL', label: 'Criar Imóvel' },
+  { value: 'UPDATE_IMOVEL', label: 'Atualizar Imóvel' },
+  { value: 'DELETE_IMOVEL', label: 'Deletar Imóvel' },
+  { value: 'VIEW_IMOVELS', label: 'Visualizar Imóveis' },
+
+  /* Locatários */
+  { value: 'CREATE_LOCATARIO', label: 'Criar Locatário' },
+  { value: 'UPDATE_LOCATARIO', label: 'Atualizar locatário' },
+  { value: 'DELETE_LOCATARIO', label: 'Excluir Locatário' },
+  { value: 'VIEW_LOCATARIOS', label: 'Ver Locatários' },
+
+  /* Clientes */
+  { value: 'CREATE_PESSOA', label: 'Criar Pessoa' },
+  { value: 'UPDATE_PESSOA', label: 'Atualizar Pessoa' },
+  { value: 'DELETE_PESSOA', label: 'Excluir Pessoa' },
+  { value: 'VIEW_PESSOAS', label: 'Ver Pessoas' },
+
+  /* Proprietários */
+  { value: 'CREATE_PROPRIETARIO', label: 'Criar Proprietário' },
+  { value: 'UPDATE_PROPRIETARIO', label: 'Atualizar Proprietário' },
+  { value: 'DELETE_PROPRIETARIO', label: 'Excluir Proprietário' },
+  { value: 'VIEW_PROPRIETARIOS', label: 'Ver Proprietários' },
+
+  /* Locações */
+  { value: 'CREATE_LOCACAO', label: 'Criar Locação' },
+  { value: 'UPDATE_LOCACAO', label: 'Atualizar Locação' },
+  { value: 'DELETE_LOCACAO', label: 'Excluir Locação' },
+  { value: 'VIEW_LOCACOES', label: 'Ver Locações' },
+
+  /* Lançamentos imóveis */
+  { value: 'CREATE_LANCAMENTO_IMOVEL', label: 'Criar Lançamento de Imóvel' },
+  { value: 'UPDATE_LANCAMENTO_IMOVEL', label: 'Atualizar Lançamento de Imóvel' },
+  { value: 'DELETE_LANCAMENTO_IMOVEL', label: 'Excluir Lançamento de Imóvel' },
+  { value: 'VIEW_LANCAMENTOS_IMOVEIS', label: 'Ver Lançamentos de Imóvel' },
+
+  /* Lançamentos locações */
+  { value: 'CREATE_LOCACAO_LANCAMENTO', label: 'Criar Lançamento' },
+  { value: 'UPDATE_LOCACAO_LANCAMENTO', label: 'Atualizar Lançamento' },
+  { value: 'DELETE_LOCACAO_LANCAMENTO', label: 'Excluir Lançamento' },
+  { value: 'VIEW_LOCACAO_LANCAMENTOS', label: 'Ver Lançamentos' },
+
+  /* Lançamentos condomínios */
+  { value: 'CREATE_CONDOMINIO_LANCAMENTO', label: 'Criar Lançamento de Condomínio' },
+  { value: 'UPDATE_CONDOMINIO_LANCAMENTO', label: 'Atualizar Lançamento de Condomínio' },
+  { value: 'DELETE_CONDOMINIO_LANCAMENTO', label: 'Excluir Lançamento de Condomínio' },
+  { value: 'VIEW_CONDOMINIO_LANCAMENTOS', label: 'Ver Lançamentos de Condomínio' },
+
+  /* Boletos */
+  { value: 'CREATE_PAGAMENTO', label: 'Criar Pagamento' },
+  { value: 'UPDATE_PAGAMENTO', label: 'Atualizar pagamento' },
+  { value: 'DELETE_PAGAMENTO', label: 'Excluir Pagamento' },
+  { value: 'VIEW_PAGAMENTOS', label: 'Ver Pagamentos' },
+
   //Boleto bancario
   { value: 'CREATE_BOLETO_BANCARIO', label: 'Criar Boleto bancário' },
   { value: 'UPDATE_BOLETO_BANCARIO', label: 'Atualizar Boleto bancário' },
   { value: 'DELETE_BOLETO_BANCARIO', label: 'Excluir Boleto bancário' },
   { value: 'VIEW_BOLETO_BANCARIO', label: 'Ver Boleto bancário' },
 
+  /* Moradores */
+  { value: 'CREATE_MORADOR', label: 'Criar Morador' },
+  { value: 'UPDATE_MORADOR', label: 'Atualizar Morador' },
+  { value: 'DELETE_MORADOR', label: 'Excluir Morador' },
+  { value: 'VIEW_MORADORES', label: 'Ver Moradores' },
+
+  //Tipo de alerta
+  { value: 'CREATE_TIPO_ALERTA', label: 'Criar Tipo de Alerta' },
+  { value: 'UPDATE_TIPO_ALERTA', label: 'Atualizar Tipo de Alerta' },
+  { value: 'DELETE_TIPO_ALERTA', label: 'Excluir Tipo de Alerta' },
+  { value: 'VIEW_TIPOS_ALERTA', label: 'Ver Tipo de Alerta' },
+
+  //Instrucao de cobrança
+  { value: 'CREATE_INSTRUCAO_COBRANCA', label: 'Criar Instrução de cobrança' },
+  { value: 'UPDATE_INSTRUCAO_COBRANCA', label: 'Atualizar Instrução de cobrança' },
+  { value: 'DELETE_INSTRUCAO_COBRANCA', label: 'Excluir Instrução de cobrança' },
+  { value: 'VIEW_INSTRUCOES_COBRANCA', label: 'Ver Instrução de cobrança' },
+
+  //Instrução de recebimento
+  { value: 'CREATE_INSTRUCAO_RECEBIMENTO', label: 'Criar Instrução de recebimentos' },
+  { value: 'UPDATE_INSTRUCAO_RECEBIMENTO', label: 'Atualizar Instrução de recebimentos' },
+  { value: 'DELETE_INSTRUCAO_RECEBIMENTO', label: 'Excluir Instrução de recebimentos' },
+  { value: 'VIEW_INSTRUCOES_RECEBIMENTO', label: 'Ver Instrução de recebimentos' },
+
+  //Carteira de cobrança
+  { value: 'CREATE_CARTEIRA_COBRANCA', label: 'Criar Carteira de cobrança' },
+  { value: 'UPDATE_CARTEIRA_COBRANCA', label: 'Atualizar Carteira de cobrança' },
+  { value: 'DELETE_CARTEIRA_COBRANCA', label: 'Excluir Carteira de cobrança' },
+  { value: 'VIEW_CARTEIRAS_COBRANCA', label: 'Ver Carteira de cobrança' },
+
+  //Espécie de cobrança
+  { value: 'CREATE_ESPECIE_COBRANCA', label: 'Criar Espécie de cobrança' },
+  { value: 'UPDATE_ESPECIE_COBRANCA', label: 'Atualizar Espécie de cobrança' },
+  { value: 'DELETE_ESPECIE_COBRANCA', label: 'Excluir Espécie de cobrança' },
+  { value: 'VIEW_ESPECIES_COBRANCA', label: 'Ver Espécie de cobrança' },
+
+  //Banco
+  { value: 'CREATE_BANCO', label: 'Criar Banco' },
+  { value: 'UPDATE_BANCO', label: 'Atualizar Banco' },
+  { value: 'DELETE_BANCO', label: 'Excluir Banco' },
+  { value: 'VIEW_BANCOS', label: 'Ver Banco' },
+
+  //Tipo de juros
+  { value: 'CREATE_TIPO_JUROS', label: 'Criar Tipo de Juros' },
+  { value: 'UPDATE_TIPO_JUROS', label: 'Atualizar Tipo de Juros' },
+  { value: 'DELETE_TIPO_JUROS', label: 'Excluir Tipo de Juros' },
+  { value: 'VIEW_TIPOS_JUROS', label: 'Ver Tipo de Juros' },
+
+  //Tipo de multa
+  { value: 'CREATE_TIPO_MULTA', label: 'Criar Tipo de Multa' },
+  { value: 'UPDATE_TIPO_MULTA', label: 'Atualizar Tipo de Multa' },
+  { value: 'DELETE_TIPO_MULTA', label: 'Excluir Tipo de Multa' },
+  { value: 'VIEW_TIPOS_MULTA', label: 'Ver Tipo de Multa' },
+
+  //Tipo de desconto
+  { value: 'CREATE_TIPO_DESCONTOS', label: 'Criar Tipo de Desconto' },
+  { value: 'UPDATE_TIPO_DESCONTOS', label: 'Atualizar Tipo de Desconto' },
+  { value: 'DELETE_TIPO_DESCONTOS', label: 'Excluir Tipo de Desconto' },
+  { value: 'VIEW_TIPOS_DESCONTOS', label: 'Ver Tipo de Desconto' },
+
+  //Tipo de AUTORIZACAO
+  { value: 'CREATE_TIPO_AUTORIZACAO', label: 'Criar Tipo de Autorização' },
+  { value: 'UPDATE_TIPO_AUTORIZACAO', label: 'Atualizar Tipo de Autorização' },
+  { value: 'DELETE_TIPO_AUTORIZACAO', label: 'Excluir Tipo de Autorização' },
+  { value: 'VIEW_TIPO_AUTORIZACAO', label: 'Ver Tipo de Autorização' },
+
+  /* Clientes */
   { value: 'CREATE_CLIENTE', label: 'Criar Cliente' },
   { value: 'UPDATE_CLIENTE', label: 'Atualizar Cliente' },
   { value: 'DELETE_CLIENTE', label: 'Excluir Cliente' },
@@ -250,6 +299,13 @@ const LancCondominioPermissions: { value: Permission; label: string }[] = [
   { value: 'UPDATE_CONDOMINIO_LANCAMENTO', label: 'Atualizar Lançamento' },
   { value: 'DELETE_CONDOMINIO_LANCAMENTO', label: 'Excluir Lançamento' },
   { value: 'VIEW_CONDOMINIO_LANCAMENTOS', label: 'Ver Lançamentos' }
+]
+
+const LancImovelPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_LANCAMENTO_IMOVEL', label: 'Criar Lançamento' },
+  { value: 'UPDATE_LANCAMENTO_IMOVEL', label: 'Atualizar Lançamento' },
+  { value: 'DELETE_LANCAMENTO_IMOVEL', label: 'Excluir Lançamento' },
+  { value: 'VIEW_LANCAMENTOS_IMOVEIS', label: 'Ver Lançamentos' }
 ]
 
 const moradorPermissions: { value: Permission; label: string }[] = [
@@ -811,6 +867,26 @@ export const ListarColaboradores = () => {
             return [...(prevPermissions || []), permission]
           } else {
             return prevPermissions.filter((p) => !p?.includes('CONDOMINIO_LANCAMENTO') || !p?.includes('CONDOMINIO_LANCAMENTOS'))
+          }
+        })
+      }
+    }
+
+    if (permission?.includes('LANCAMENTO_IMOVEL') || permission?.includes('LANCAMENTOS_IMOVEIS')) {
+      if (permission !== 'VIEW_LANCAMENTOS_IMOVEIS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_LANCAMENTOS_IMOVEIS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p?.includes('LANCAMENTO_IMOVEL') || !p?.includes('LANCAMENTOS_IMOVEIS'))
           }
         })
       }

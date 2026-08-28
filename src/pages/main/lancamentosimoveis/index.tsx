@@ -231,7 +231,7 @@ export default function ListarLancamentosImoveis({
   }
 
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]" style={{color:"#034869"}}>
       {/* Search & Filters */}
       {/* <div className="grid grid-cols-2 flex flex-col justify-end items-start gap-4 sm:flex-row sm:items-center"> */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
@@ -239,10 +239,10 @@ export default function ListarLancamentosImoveis({
           <h1 className="text-2xl font-bold">Lançamentos de Imóveis</h1>
         )}
       </div>
-      <div className='grid grid-cols-3'>
+      <div className='flex justify-end'>
         {showcard ?
-          (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />) :
-          (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />)
+          (<List onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />) :
+          (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />)
         }
       </div>
 
@@ -252,7 +252,7 @@ export default function ListarLancamentosImoveis({
           : "grid grid-cols-1 gap-4 sm:flex-row sm:items-center sm:justify-between border-b"}
       >
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4" />
           <Input
             onChange={handleSearchChange}
             value={search}
@@ -321,10 +321,10 @@ export default function ListarLancamentosImoveis({
               (
                 <>
                   {imoveis.map((imovel) => (
-                    <Card key={imovel.id} className="">
+                    <Card key={imovel.id} className="" style={{color:"#034869"}}>
                       <CardHeader className="flex flex-row justify-between">
                         <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
-                          <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                          <p className="line-clamp-2 flex gap-1 text-sm">
                             <MapPin className="inline-block h-4 w-4 cursor-pointer"
                               onClick={() => { handlerClickMaps(imovel.endereco) }}
                               color='green'
@@ -393,7 +393,9 @@ export default function ListarLancamentosImoveis({
 
                               <Button variant="secondary"
                                 onClick={() => handleClickVerDetalhes(imovel?.id)}
-                                size={"sm"}>
+                                size={"sm"}
+                                className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'>
+                                  
                                 <Pencil className='h4 w4' /> Lançamentos
                               </Button>
                             )}
@@ -477,7 +479,7 @@ export default function ListarLancamentosImoveis({
                                 <Button
                                   size="sm"
                                   onClick={() => { handleClickVerDetalhes(imovel.id) }}
-                                  className='hover:cursor-pointer hover:bg-gray-700'
+                                  className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                                 >
                                   Ver detalhes
                                 </Button>

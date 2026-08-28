@@ -164,7 +164,7 @@ export default function ListarClientes({
   console.log('url',glb_params.origin_url);
 
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]"  style={{color: "#034869"}}>
       {/* Search & Filters */}
       {/* <div className="grid grid-cols-2 flex flex-col justify-end items-start gap-4 sm:flex-row sm:items-center"> */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
@@ -174,8 +174,8 @@ export default function ListarClientes({
         <div className='grid grid-cols-3'>
           {(txtVinc === '' ?
             (showcard ?
-              (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />) :
-              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />)
+              (<List onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />)
             ) : (<></>))
           }
         </div>
@@ -183,7 +183,9 @@ export default function ListarClientes({
           user?.permissions.includes("ALL") ||
           user?.permissions.includes("CREATE_PESSOA")
         ) && (
-            <Button onClick={handleClickCreateCliente} size={"sm"} className='hover:cursor-pointer hover:bg-gray-700'>
+            <Button onClick={handleClickCreateCliente} size={"sm"} 
+            className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+            >
               <Plus className="h-4 w-4" />Criar Cliente
             </Button>
           )}
@@ -191,7 +193,7 @@ export default function ListarClientes({
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" style={{ color: "#034869" }}/>
           <Input
             onChange={handleSearchChange}
             value={search}
@@ -221,7 +223,7 @@ export default function ListarClientes({
               (
                 <>
                   {clientes?.map((cliente) => (
-                    <Card key={cliente.id} className="flex flex-col">
+                    <Card key={cliente.id} className="flex flex-col"  style={{color: "#034869"}}>
                       <CardHeader>
                         <CardTitle className="flex items-center justify-between">
                           <span className="truncate"
@@ -231,7 +233,7 @@ export default function ListarClientes({
                               }}
 
                           >{cliente?.nome}</span>
-                          <Badge variant="secondary">
+                          <Badge variant="secondary" className='bg-[#a7d9f2]'>
                             {(cliente?.locatarios?.length && cliente?.locatarios?.length > 0
                               ? 'Locatário'
                               : (cliente?.proprietarios?.length && cliente?.proprietarios?.length > 0
@@ -261,7 +263,7 @@ export default function ListarClientes({
                           <Button
                             variant="secondary"
                             size="sm"
-                            className="w-full hover:cursor-pointer hover:bg-gray-200"
+                            className="w-full hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]"
                             onClick={handleClickVerDetalhes(cliente.id)}
                             style={
                               {

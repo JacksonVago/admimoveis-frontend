@@ -231,7 +231,7 @@ export const AlertaFormContent = ({
             <label
               className="Label"
               htmlFor="boletos"
-              style={{ paddingRight: 15 }}
+              style={{ paddingRight: 15, color : "#034869" }}
             >
               Ativo/Desativado
             </label>
@@ -604,7 +604,6 @@ export const AlertaFormSubmitButton = ({
     <div className="">
       <Button
         type="submit"
-        className="mt-4"
         size={"sm"}
         disabled={
           disabled
@@ -612,6 +611,7 @@ export const AlertaFormSubmitButton = ({
           !createAlertaMethods.formState.isDirty ||
           !createAlertaMethods.formState.isValid
         }
+        className="mt-4 hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
       >
         Criar Alerta
       </Button>

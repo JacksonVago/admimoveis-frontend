@@ -192,14 +192,14 @@ export default function ListarBlocos({
 
   
   return (
-    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]" style={{color: "#034869"}}>
       {/* Search & Filters */}
-      <div className="flex flex-row items-start justify-between gap-2 sm:flex-row sm:items-center">
+      <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {!onSelectBloco && (
           <div className='grid grid-cols-3'>
             {showcard ?
-              (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer '/>) :
-              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer '/>)
+              (<List onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer '/>) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer '/>)
             }
             {/* <h1 className="col-span-2 text-2xl font-bold">Imoveis</h1> 
           <Button className='flex justify-center' style={{ 'backgroundColor': 'transparent'}}
@@ -214,7 +214,8 @@ export default function ListarBlocos({
           user?.permissions.includes("CREATE_BLOCO")
         ) && !onSelectBloco) && (
             <Button size={"sm"} onClick={handleClickCreateBloco}
-            className='hover:bg-gray-500 hover:cursor-pointer'>
+            className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+            >
               <Plus className="mr-2 h-4 w-4" /> Criar bloco
             </Button>
           )
@@ -222,7 +223,7 @@ export default function ListarBlocos({
       </div>
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" style={{color: "#034869"}} />
           <Input
             onChange={handleSearchChange}
             value={search}
@@ -240,7 +241,7 @@ export default function ListarBlocos({
       <div className={(isBigScreen ? "grid gap-4 grid-cols-3" : isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
         {/* Search Results & No Results Message */}
         {hasSearchResults && (
-          <p className="text-center text-muted-foreground">Nenhum bloco encontrado</p>
+          <p className="text-center">Nenhum bloco encontrado</p>
         )}
 
         {/* Blocos Cards */}
@@ -256,13 +257,13 @@ export default function ListarBlocos({
               (
                 <>
                   {blocos?.map((bloco) => (
-                    <Card key={bloco.id} className="">
+                    <Card key={bloco.id} className="" style={{color: "#034869"}}>
                       <CardHeader className="flex flex-row justify-between">
                         <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>{bloco?.name}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <p className='font-[Poppins-bold]'>{bloco.condominio.name}</p>
-                        <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                        <p className="line-clamp-2 flex gap-1 text-sm">
                           {getEnderecoFormatado(bloco?.condominio.endereco)}
                         </p>
                       </CardContent>
@@ -272,7 +273,8 @@ export default function ListarBlocos({
                             variant="secondary"
                             size="sm"
                             onClick={() => handleClickVerDetalhes(bloco?.id.toString())}
-                            className='hover:bg-gray-200 hover:cursor-pointer'
+                            className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
+                            style={{color: "#034869"}}
                           >
                             Ver detalhes
                           </Button>

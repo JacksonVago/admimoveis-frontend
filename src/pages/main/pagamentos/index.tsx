@@ -893,8 +893,7 @@ export default function ListarPagamentos({
         boleto.documentos = [];
 
         //let email = '';
-
-
+        console.log(selConta);
         //Envia dados ao banco
         const boletoBancario: BoletoBancario = {
           id: 0,
@@ -924,32 +923,34 @@ export default function ListarPagamentos({
           mensagemEmail2: '',
           mensagemEmail3: '',
 
-          tipoJurosCobCod: '',
-          valorJuros: 0,
-          percJuros: 0,
-          diasInicioJuros: 0,
+          tipoJurosCobCod: selConta.tipoJurosCob ? selConta.tipoJurosCob.codigo : '0',
+          valorJuros: selConta.valorJuros,
+          percJuros: selConta.percJuros,
+          diasInicioJuros: selConta.diasInicioJuros,
 
-          tipoMultaCobCod: '',
-          valorMulta: 0,
-          percMulta: 0,
-          diasInicioMulta: 0,
+          tipoMultaCobCod: selConta.tipoMultaCob ? selConta.tipoMultaCob.codigo : '0',
+          valorMulta: selConta.valorMulta,
+          percMulta: selConta.percMulta,
+          diasInicioMulta: selConta.diasInicioMulta,
 
-          tipoDescontoCobCod: '',
-          valorDesconto: 0,
-          percDesconto: 0,
-          diasInicioDesconto: 0,
+          tipoDescontoCobCod: selConta.tipoDescontoCob  ? selConta.tipoDescontoCob.codigo : '0',
+          valorDesconto: selConta.valorDesconto,
+          percDesconto: selConta.percDesconto,
+          diasInicioDesconto: selConta.diasInicioDesconto,
 
-          tipoAutorizacaoCobCod: '',
-          tipoRecebimentoDiv: '',
-          valorMinDiverg: 0,
-          valorMaxDiverg: 0,
-          percMinDiverg: 0,
-          percMaxDiverg: 0,
+          tipoAutorizacaoCobCod: selConta.tipoAutorizacaoCob ? selConta.tipoAutorizacaoCob.codigo : '0',
+          tipoRecebimentoDiv: selConta.tipoRecebimentoDiv,
+          valorMinDiverg: selConta.valorMinDiverg,
+          valorMaxDiverg: selConta.valorMaxDiverg,
+          percMinDiverg: selConta.percMinDiverg,
+          percMaxDiverg: selConta.percMaxDiverg,
 
-          protestar: false,
-          qtdeDiasProtesto: 0,
-          negativar: false,
-          qtdeDiasNegativar: 0,
+          protestar: (selConta.instrucaoCob1 && selConta.instrucaoCob1.descricao.toUpperCase().indexOf('PROTESTAR') > -1 &&
+            selConta.instrucaoCob1.descricao.toUpperCase().indexOf('NÃO') == -1) ? true : false,
+          qtdeDiasProtesto: selConta.qtdeDiasProtesto,
+          negativar: (selConta.instrucaoCob1 && selConta.instrucaoCob1.descricao.toUpperCase().indexOf('NEGATIVAR') > -1 &&
+            selConta.instrucaoCob1.descricao.toUpperCase().indexOf('NÃO') == -1) ? true : false,
+          qtdeDiasNegativar: selConta.qtdeDiasNegativar,
 
           instrucaoCobCod1: '',
           instrucaoCobCod2: '',
@@ -960,8 +961,8 @@ export default function ListarPagamentos({
           instrucaoRecCod3: '',
           instrucaoRecCod4: '',
 
-          carteiraCod: '',
-          especieCod: '',
+          carteiraCod: selConta.carteira ? selConta.carteira.carteira.toString() : '0',
+          especieCod: selConta.especie ? selConta.especie.codigo.toString() : '0',
           contaId: selConta ? selConta.id : 0
         }
         console.log('envio: ', boletoBancario)
@@ -979,26 +980,28 @@ export default function ListarPagamentos({
   }
 
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]" style={{ color: "#034869" }}>
       {/* Search & Filters */}
       {/* <div className="grid grid-cols-2 flex flex-col justify-end items-start gap-4 sm:flex-row sm:items-center"> */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {glb_params.origin_url.indexOf('lista') > -1 && (
           <h1 className="text-2xl font-bold">Cobranças</h1>
         )}
-        <div className='grid grid-cols-3'>
+        <div className='flex justify-end'>
           {
             showcard ?
-              (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />) :
-              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer hover:bg-gray-300' />)
+              (<List onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />)
           }
         </div>
         {(isAdmin ||
           user?.permissions.includes("ALL") ||
           user?.permissions.includes("CREATE_PAGAMENTO")
         ) && (
-            <Button size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'
-              onClick={() => { handlerNewBoleto(); }}>
+            <Button size={"sm"}
+              onClick={() => { handlerNewBoleto(); }}
+              className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+            >
               <Plus className="mr-2" /> Criar Previsão
             </Button>
           )}
@@ -1006,7 +1009,7 @@ export default function ListarPagamentos({
           open={isCreateDialogOpen}
           onOpenChange={(value) => {
             setIsCreateDialogOpen(value)
-          }}
+          }}                    
         >
           <DialogContent>
             <DialogHeader className='font-[Poppins-Regular]'>
@@ -1023,7 +1026,7 @@ export default function ListarPagamentos({
 
                   {/*seleção de imovel */}
                   {(!selImovel && (!selLocacao && locacao.fields.length === 0)) && (
-                    <div className='col-span-2'>
+                    <div>
                       {(imovel.fields.length > 0) ? (
                         <>
                           <Label className='text-base' >Imóvel</Label>
@@ -1046,8 +1049,9 @@ export default function ListarPagamentos({
                           </div>
                         </>
                       ) : (
-                        <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
-                          <Button type='button' size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'
+                        <div className="flex justify-center">
+                          <Button type='button' size={"sm"}
+                            className="w-full hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                             onClick={() => {
                               setSelImovel(true);
                             }}
@@ -1079,7 +1083,7 @@ export default function ListarPagamentos({
 
                   {/*seleção de locação */}
                   {((!selImovel && imovel.fields.length === 0) && !selLocacao) && (
-                    <div className='col-span-2'>
+                    <div>
                       {(locacao.fields.length > 0) ? (
                         <>
                           <Label className='text-base' >Locação</Label>
@@ -1102,8 +1106,8 @@ export default function ListarPagamentos({
                           </div>
                         </>
                       ) : (
-                        <div className={(isPortrait ? "grid grid-cols-2 gap-4 flex items-center" : "grid grid-cols-1 gap-4 flex items-center")}>
-                          <Button type='button' size={"sm"} className='hover:cursor-pointer hover:bg-gray-600'
+                        <div className="flex justify-center">
+                          <Button type='button' size={"sm"} className="w-full hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                             onClick={() => {
                               setSelLocacao(true);
                             }}
@@ -1231,7 +1235,9 @@ export default function ListarPagamentos({
                   )}
                 </div>
                 <DialogFooter>
-                  <Button size="sm" type='submit' className='hover:cursor-pointer hover:bg-gray-600'>Criar Previsão</Button>
+                  <Button size="sm" type='submit'
+                    className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+                  >Criar Previsão</Button>
                 </DialogFooter>
               </form>
             </div>
@@ -1289,7 +1295,9 @@ export default function ListarPagamentos({
             </SelectTrigger>
             <SelectContent>
               {STATUS_BOLETO_OPTIONS.map((value) => (
-                <SelectItem key={value.label} value={value.value}>
+                <SelectItem key={value.label} value={value.value}
+                  style={{ color: "#034869" }}
+                >
                   {value.value}
                 </SelectItem>
               ))}
@@ -1303,7 +1311,9 @@ export default function ListarPagamentos({
             </SelectTrigger>
             <SelectContent>
               {TIPO_BOLETO_OPTIONS.map((value) => (
-                <SelectItem key={value.label} value={value.value}>
+                <SelectItem key={value.label} value={value.value}
+                  style={{ color: "#034869" }}
+                >
                   {value.label}
                 </SelectItem>
               ))}
@@ -1339,18 +1349,18 @@ export default function ListarPagamentos({
             (
               <>
                 {boletos.map((boleto) => (
-                  <Card key={boleto.id} className="">
+                  <Card key={boleto.id} className="" style={{ color: "#034869" }}>
                     <CardHeader className="flex flex-row justify-between">
                       <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
                         <div className='grid grid-cols-2'>
                           {(boleto.locacao !== null ? (
-                            <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                            <p className="line-clamp-2 flex gap-1 text-sm ">
                               {boleto.locatario ? boleto.locatario.pessoa?.nome : ''} -
                               {boleto.locacao?.imovel?.endereco.complemento} -
                               {boleto.locacao?.imovel?.condominio ? boleto.locacao.imovel.condominio.name : ''}
                             </p>)
                             :
-                            (<p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                            (<p className="line-clamp-2 flex gap-1 text-sm ">
                               {boleto.imovel && boleto.imovel.proprietarios && boleto.imovel.proprietarios.length > 0 ? boleto.imovel.proprietarios[0]?.pessoa?.nome : ''} -
                               {boleto.imovel?.endereco.complemento} -
                               {boleto.imovel?.condominio ? boleto.imovel.condominio.name : ''}
@@ -1525,11 +1535,11 @@ export default function ListarPagamentos({
                         {(isAdmin ||
                           user?.permissions.includes("ALL") ||
                           user?.permissions.includes("UPDATE_PAGAMENTO")
-                          
+
                         ) && (
 
                             <Button variant="secondary"
-                              className='hover:cursor-pointer hover:bg-gray-200'
+                              className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                               onClick={() => handleClickVerDetalhes(boleto.id ? boleto.id : 0)}
                               size={"sm"}>
                               Detalhes
@@ -1542,27 +1552,32 @@ export default function ListarPagamentos({
                             <>
                               <Button variant="destructive"
                                 onClick={() => handleExcluirBoleto(boleto.id)}
-                                size={"sm"}>
+                                size={"sm"}
+
+                              >
                                 <Trash className="h-4 w-4" />Excluir
                               </Button>
                               <Button variant="secondary"
                                 onClick={() => handleConfirmarBoleto(boleto)}
-                                size={"sm"}>
+                                size={"sm"}
+                                className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
+                              >
                                 <Receipt className="h-4 w-4" />Emitir Boleto
                               </Button>
                             </>
                           )}
                         {(boleto.documentos && boleto.documentos.length > 0) && (
                           <Button variant="secondary"
-                            className='hover:cursor-pointer hover:bg-gray-200'
+                            className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                             onClick={() => handleClickVerComprovante(boleto)}
-                            size={"sm"}>
+                            size={"sm"}
+                          >
                             Comprovante
                           </Button>
                         )}
                         {(boleto.status === BoletoStatus.PENDENTE || boleto.status === BoletoStatus.CONFIRMADO) && (
                           <Button variant="secondary"
-                            className='hover:cursor-pointer hover:bg-gray-200'
+                            className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                             onClick={() => handlerEnviaEmail(boleto)}
                             size={"sm"}>
                             <Mail></Mail>
@@ -1732,7 +1747,8 @@ export default function ListarPagamentos({
         <Dialog
           open={isBancoDialogOpen}
           onOpenChange={(value) => {
-            setIsBancoDialogOpen(value)
+            setIsBancoDialogOpen(value);
+            boletoMethods.reset();
           }}
         >
           <DialogContent>

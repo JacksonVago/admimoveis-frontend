@@ -140,14 +140,14 @@ export default function ListarContasCorrentes({
 
   
   return (
-    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]">
+    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]" style={{color: "#034869"}}>
       {/* Search & Filters */}
-      <div className="flex flex-row items-start justify-between gap-2 sm:flex-row sm:items-center">
+      <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {!onSelectContaCorrente && (
           <div className='grid grid-cols-3'>
             {showcard ?
-              (<List onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer '/>) :
-              (<IdCard onClick={() => { setShowCard(!showcard) }} color='black' className='hover:cursor-pointer '/>)
+              (<List onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer '/>) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer '/>)
             }
             {/* <h1 className="col-span-2 text-2xl font-bold">Imoveis</h1> 
           <Button className='flex justify-center' style={{ 'backgroundColor': 'transparent'}}
@@ -162,19 +162,19 @@ export default function ListarContasCorrentes({
           user?.permissions.includes("CREATE_ALERTA")
         ) && !onSelectContaCorrente) && (
             <Button size={"sm"} onClick={handleClickCreateContaCorrente}
-            className='hover:bg-gray-500 hover:cursor-pointer'>
-              <Plus className="mr-2 h-4 w-4" /> Criar alerta
+            className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
+              <Plus className="mr-2 h-4 w-4" /> Criar Conta
             </Button>
           )
         }
       </div>
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between" >
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-2 top-2.5 h-4 w-4" style={{ color: "#034869" }} />
           <Input
             onChange={handleSearchChange}
             value={search}
-            placeholder="Buscar alertas"
+            placeholder="Buscar contas"
             className="pl-8"
           />
         </div>
@@ -185,7 +185,7 @@ export default function ListarContasCorrentes({
       </div>
 
       {/* Contas Grid */}
-      <div className={(isBigScreen ? "grid gap-4 grid-cols-3" : isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
+      <div className={(isBigScreen ? "grid gap-4 grid-cols-3" : isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")} >
         {/* Search Results & No Results Message */}
         {hasSearchResults && (
           <p className="text-center text-muted-foreground">Conta corente não encontrada</p>
@@ -203,26 +203,27 @@ export default function ListarContasCorrentes({
               (
                 <>
                   {contascorrentes?.map((conta) => (
-                    <Card key={conta.id} className="">
+                    <Card key={conta.id} className="" style={{color: "#034869"}}>
                       <CardHeader className="flex flex-row justify-between">
                         <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>{conta?.descricao}</CardTitle>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent style={{color: "#034869"}}>
                         <p className='font-[Poppins-bold]'>{conta.banco.nome}</p>
-                        <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                        <p className="line-clamp-2 flex gap-1 text-sm">
                           Agencia: {conta.agencia}
                         </p>
-                        <p className="line-clamp-2 flex gap-1 text-sm text-muted-foreground">
+                        <p className="line-clamp-2 flex gap-1 text-sm">
                           Conta: {conta.conta + '-' + conta.digito}
                         </p>
                       </CardContent>
-                      <CardFooter className="flex justify-between">
+                      <CardFooter className="flex justify-between" style={{color: "#034869"}}>
                         <div className='grid grid-cols-2 gap-10'>
                           <Button
                             variant="secondary"
                             size="sm"
                             onClick={() => handleClickVerDetalhes(conta.id.toString())}
-                            className='hover:bg-gray-200 hover:cursor-pointer'
+                            className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
+                            style={{color: "#034869"}}
                           >
                             Ver detalhes
                           </Button>

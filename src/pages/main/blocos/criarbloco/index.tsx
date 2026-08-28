@@ -8,6 +8,7 @@ import { useGlobalParams } from '@/globals/GlobalParams'
 import { blocoSchema, BlocoSchema } from '@/schemas/bloco.schema'
 import { BlocoForm } from './components/bloco-form'
 import api from '@/services/axios/api'
+import { useEffect } from 'react'
 
 
 //TODO: create a interface for created imovel
@@ -32,6 +33,18 @@ export const CriarBloco = () => {
   //by priority, react query imovel is the updated imovel data
   const blocoData = bloco || createdBloco*/
 
+  useEffect(() => {
+    glb_params.updTitle_form('Blocos');
+
+    if (glb_params.pastaOrig === '') {
+      glb_params.updPastaOrig('bloco-create');
+    }
+    else {
+      //setActiveTab(glb_params.pastaOrig);
+    }
+
+  }, []);
+  
   const createBlocoMethods = useForm<BlocoSchema>({
     resolver: zodResolver(blocoSchema),
     defaultValues: {
@@ -114,7 +127,7 @@ export const CriarBloco = () => {
       <div className="mb-8 flex w-full items-center justify-between">
       </div>
       <div className="mx-auto w-full rounded-md">
-        <Card>
+        <Card style={{color: "#034869"}}>
           <CardContent>
             <h2 className="mb-4 mt-8 text-xl font-bold">Criar um novo bloco</h2>
             {/* ======bloco====== */}

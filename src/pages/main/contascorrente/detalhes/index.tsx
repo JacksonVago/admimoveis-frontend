@@ -167,6 +167,7 @@ export const DetalhesContaCorrente = () => {
     //form data
     const form = new FormData()
 
+    console.log('data:',data);
     if (data.agencia) {
       form.append('agencia', data.agencia)
     }
@@ -253,7 +254,7 @@ export const DetalhesContaCorrente = () => {
     if (data.percJuros){
       form.append('percJuros', data.percJuros.toString());
     }
-    if (data.diasInicioJuros){
+    if (data.diasInicioJuros !== undefined && data.diasInicioJuros !== null && data.diasInicioJuros > 0){
       form.append('diasInicioJuros', data.diasInicioJuros.toString());
     }
   
@@ -266,7 +267,7 @@ export const DetalhesContaCorrente = () => {
     if (data.percMulta){
       form.append('percMulta', data.percMulta.toString());
     }
-    if (data.diasInicioMulta){
+    if (data.diasInicioMulta !== undefined && data.diasInicioMulta !== null && data.diasInicioMulta > 0){
       form.append('diasInicioMulta', data.diasInicioMulta.toString());
     }
 
@@ -279,7 +280,7 @@ export const DetalhesContaCorrente = () => {
     if (data.percDesconto){
       form.append('percDesconto', data.percDesconto.toString());
     }
-    if (data.diasInicioDesconto){
+    if (data.diasInicioDesconto !== undefined && data.diasInicioDesconto !== null && data.diasInicioDesconto > 0){
       form.append('diasInicioDesconto', data.diasInicioDesconto.toString());
     }
 
@@ -381,16 +382,16 @@ export const DetalhesContaCorrente = () => {
 
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <TabsList>
-          <TabsTrigger value="alerta-info" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Dados do alerta</TabsTrigger>
+          <TabsTrigger value="alerta-info" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200' style={{color: "#034869"}}>Dados da Conta</TabsTrigger>
           {/*<TabsTrigger value="imoveis" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Imóveis</TabsTrigger>
           <TabsTrigger value="lancamentos" className='text-[0.7rem] hover:cursor-pointer hover:bg-gray-200'>Lançamentos</TabsTrigger>*/}
         </TabsList>
 
         <TabsContent value="alerta-info" className="space-y-4 font-[Poppins-regular]">
-          <Card>
+          <Card style={{color: "#034869"}}>
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-1xl">
-                <span>Informações do Alerta</span>
+                <span>Informações da Conta corrente</span>
                 {(isAdmin ||
                   user?.permissions.includes("ALL") ||
                   user?.permissions.includes("UPDATE_ALERTA")
@@ -400,7 +401,7 @@ export const DetalhesContaCorrente = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setIsEditingPersonalInfo(!isEditingPersonalInfo)}
-                      className='hover:cursor-pointer hover:bg-gray-200'
+                      className='hover:bg-[#81cbef] hover:cursor-pointer bg-[#a7d9f2]'
                     >
                       <Edit className="mr-2 h-4 w-4" />
                       {isEditingPersonalInfo ? 'Cancelar' : 'Editar'}
@@ -424,6 +425,7 @@ export const DetalhesContaCorrente = () => {
                         !contaCorrenteMethods.formState.isDirty || !contaCorrenteMethods.formState.isValid
                       }
                       type="submit"
+                      className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                     >
                       Salvar Alterações
                     </Button>

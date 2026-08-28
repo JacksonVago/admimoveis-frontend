@@ -36,6 +36,18 @@ export const CriarCliente = () => {
     mode: 'all'
   })
 
+  useEffect(() => {
+    glb_params.updTitle_form('Clientes');
+
+    if (glb_params.pastaOrig === '') {
+      glb_params.updPastaOrig('cliente-create');
+    }
+    else {
+      //setActiveTab(glb_params.pastaOrig);
+    }
+
+  }, [])
+
   /*
   const createClienteMutation = useMutation({
     mutationFn: async (data: FormData) => {
@@ -181,8 +193,8 @@ export const CriarCliente = () => {
     console.log('valid', clienteMethods.formState.isValid);
     console.log('valid', clienteMethods.getValues());
   return (
-    <div className="mx-auto max-w-screen-xl">
-      <Card className='py-10'>
+    <div className="mx-auto max-w-screen-xl" style={{color: "#034869"}}>
+      <Card className='py-10' style={{color: "#034869"}}>
         <CardContent>
           <h2 className="mb-4 mt-8 text-xl font-bold">Criar um novo Cliente</h2>
           <ClienteFormRoot

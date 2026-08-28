@@ -78,7 +78,7 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
   };
 
   return (
-    <div className="mb-6 w-full space-y-4">
+    <div className="mb-6 w-full space-y-4" >
       <div className="flex items-center justify-between">
         <h3 className="text-2xlg font-semibold">Imagens do Imóvel</h3>
         {!disabled && (
@@ -138,7 +138,7 @@ export function PropertyImageUpload({ disabled }: { disabled?: boolean }) {
         </Carousel>
       ) : (
         <div className="rounded-md bg-muted py-8 text-center">
-          <p className="text-muted-foreground">Nenhuma imagem adicionada</p>
+          <p>Nenhuma imagem adicionada</p>
         </div>
       )}
     </div>

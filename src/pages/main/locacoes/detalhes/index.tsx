@@ -243,7 +243,7 @@ export const DetalhesLocacaoForm = ({
       fiadores: locacao?.fiadores ? locacao?.fiadores?.map((fiador) => {
         return { nome: fiador.pessoa?.nome, id: fiador.pessoa?.id }
       }) : undefined,
-      imoveis: [{ nome: locacao?.imovel?.description, id: locacao?.imovel?.id }],
+      imoveis: [{ nome: (locacao?.imovel?.description && locacao?.imovel?.description.length > 0 ? locacao?.imovel?.description : locacao?.imovel?.endereco.complemento + ' ' + locacao?.imovel?.endereco.logradouro + ' ' + locacao?.imovel?.endereco.numero), id: locacao?.imovel?.id }],
       tituloCap: (locacao?.garantiaTituloCapitalizacao ? { numeroTitulo: locacao?.garantiaTituloCapitalizacao?.numeroTitulo } : undefined),
       seguroFianca: locacao?.garantiaSeguroFianca ? { numeroSeguro: locacao?.garantiaSeguroFianca?.numeroSeguro } : undefined,
       depCalcao: locacao?.garantiaDepositoCalcao ? { valorDeposito: locacao?.garantiaDepositoCalcao?.quantidadeMeses, quantidadeMeses: locacao?.garantiaDepositoCalcao?.valorDeposito, localDeposito: locacao?.garantiaDepositoCalcao.localDeposito } : undefined,
@@ -277,7 +277,7 @@ export const DetalhesLocacaoForm = ({
   const hasLocatario = !!locacao?.locatarios?.length;
 
   return (
-    <Card>
+    <Card style={{color:"#034869"}}>
       <CardHeader>
         <CardTitle className="flex items-center justify-between text-1xl">
           <span>
@@ -314,7 +314,7 @@ export const DetalhesLocacaoForm = ({
             {disabled && (
               <Button
 
-                className={(isPortrait ? "" : "w-full")}
+                className={(isPortrait ? "hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white" : "w-full hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white")}
                 disabled={
                   !locacaoMethods.formState.isDirty
                   //|| !locacaoMethods.formState.isValid
@@ -912,7 +912,7 @@ export default function DetalhesLocacao() {
               fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '1rem' : '1rem'),
             }}
 
-        >{`${(locacao?.locatarios ? locacao?.locatarios[0]?.pessoa?.nome : '')} - ${locacao?.imovel?.endereco.complemento} ${locacao?.imovel?.condominio.name}`}</span>
+        >{`${(locacao?.locatarios ? locacao?.locatarios[0]?.pessoa?.nome : '')} - ${locacao?.imovel?.endereco.complemento} ${locacao?.imovel?.condominio ? locacao?.imovel?.condominio.name : ''}`}</span>
         {activeTab === 'personal-info' && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -947,12 +947,12 @@ export default function DetalhesLocacao() {
       </div>
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <TabsList>
-          <TabsTrigger value="personal-info" className='text-[0.8rem]'>Dados Locação</TabsTrigger>
-          <TabsTrigger value="locatarios" className='text-[0.8rem]'>Locatários</TabsTrigger>
-          <TabsTrigger value="fiadores" className='text-[0.8rem]'>Fiadores</TabsTrigger>
-          <TabsTrigger value="moradores" className='text-[0.8rem]'>Moradores</TabsTrigger>
-          <TabsTrigger value="lancamentos" className='text-[0.8rem]'>Lançamentos</TabsTrigger>
-          <TabsTrigger value="boletos" className='text-[0.8rem]'>Boletos</TabsTrigger>
+          <TabsTrigger value="personal-info" style={{color:"#034869"}} className='text-[0.8rem]'>Dados Locação</TabsTrigger>
+          <TabsTrigger value="locatarios" style={{color:"#034869"}} className='text-[0.8rem]'>Locatários</TabsTrigger>
+          <TabsTrigger value="fiadores" style={{color:"#034869"}} className='text-[0.8rem]'>Fiadores</TabsTrigger>
+          <TabsTrigger value="moradores" style={{color:"#034869"}} className='text-[0.8rem]'>Moradores</TabsTrigger>
+          <TabsTrigger value="lancamentos" style={{color:"#034869"}} className='text-[0.8rem]'>Lançamentos</TabsTrigger>
+          <TabsTrigger value="boletos" style={{color:"#034869"}}className='text-[0.8rem]'>Boletos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="personal-info" className="space-y-4">
@@ -967,7 +967,7 @@ export default function DetalhesLocacao() {
 
           <div className={(isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
             {locacao?.locatarios?.map((locatario) => (
-              <Card key={locatario.id}>
+              <Card key={locatario.id} style={{color:"#034869"}}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>{locatario.pessoa?.nome}</span>
@@ -996,7 +996,7 @@ export default function DetalhesLocacao() {
                   ) && (
                       <div className="grid grid-cols-2 gap-3 flex items-end mt-2">
                         <Button
-                          className='col-start-3'
+                          className='col-start-3 hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                           variant="secondary"
                           size="sm"
                           onClick={() => { handlerDetailLocatario(locatario.pessoa?.id ? locatario.pessoa?.id : 0) }}
@@ -1022,7 +1022,7 @@ export default function DetalhesLocacao() {
           </div>
 
           {locacao?.fiadores?.map((fiador) => (
-            <Card key={fiador.pessoaId}>
+            <Card key={fiador.pessoaId}  style={{color:"#034869"}}>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>{fiador.pessoa?.nome}</span>
@@ -1047,7 +1047,7 @@ export default function DetalhesLocacao() {
                 </div>
                 <div className="grid grid-cols-3 gap-4 flex items-end mt-2">
                   <Button
-                    className='col-start-3'
+                    className='col-start-3 hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                     variant="secondary"
                     size="sm"
                     onClick={() => { handlerDetailLocatario(fiador.pessoaId ? fiador.pessoaId : 0) }}
@@ -1073,7 +1073,8 @@ export default function DetalhesLocacao() {
               user?.permissions.includes("DELETE_IMOVEL")
             ) && (
 
-                <Button onClick={handlerNewMorador} size={"sm"}>
+                <Button onClick={handlerNewMorador} size={"sm"}
+                className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
                   <Plus className="mr-2 h-4 w-4" />
                   Novo Morador
                 </Button>
@@ -1084,7 +1085,7 @@ export default function DetalhesLocacao() {
                   {!selPessoa && (
                     <>
                       <DialogTitle>Adicionar Novo Morador</DialogTitle>
-                      <DialogDescription>
+                      <DialogDescription style={{color:"#034869"}}>
                         Preencha os detalhes do novo morador para esta locação.
                       </DialogDescription>
                     </>
@@ -1149,7 +1150,7 @@ export default function DetalhesLocacao() {
 
           <div className={(isPortrait ? "grid gap-4 grid-cols-3" : isTablet ? "grid gap-4 grid-cols-2" : isMobile ? "grid gap-4 grid-cols-1" : "grid gap-4 grid-cols-1")}>
             {locacao?.moradores?.map((morador) => (
-              <Card key={morador.id}>
+              <Card key={morador.id} style={{color:"#034869"}}>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>{morador.pessoa?.nome}</span>
@@ -1215,7 +1216,7 @@ export default function DetalhesLocacao() {
         </TabsContent>
 
         {/* Lançamentos */}
-        <TabsContent value="lancamentos" className="space-y-4 font-[Poppins-regular]">
+        <TabsContent value="lancamentos" className="space-y-4 font-[Poppins-regular]" style={{color:"#034869"}}>
           <div className="flex items-center justify-between">
             <div className=
               {(isPortrait || isTablet || isBigScreen)
@@ -1267,7 +1268,7 @@ export default function DetalhesLocacao() {
 
           {/* lancamentos Grid */}
           <div className="mx-auto w-full rounded-md">
-            <Card className='font-[Poppins-regular]'>
+            <Card className='font-[Poppins-regular]' style={{color:"#034869"}}>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <Label className="ml-1 mb-4 mt-8 font-bold">{(locacao?.locatarios ? locacao?.locatarios[0].pessoa?.nome + ' - ' : '') + getEnderecoFormatado(locacao?.imovel?.endereco)}</Label>
@@ -1287,7 +1288,8 @@ export default function DetalhesLocacao() {
                         user?.permissions.includes("CREATE_LOCACAO_LANCAMENTO")
                       ) && (
 
-                          <Button size={'sm'}>
+                          <Button size={'sm'}
+                          className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
                             <Plus className="mr-2 h-4 w-4" /> Lançamento
                           </Button>
                         )}
@@ -1295,7 +1297,7 @@ export default function DetalhesLocacao() {
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>{titulo}</DialogTitle>
-                        <DialogDescription>{titulo.includes('novo') ? 'Preencha os dados do novo lançamento abaixo.' : ''}</DialogDescription>
+                        <DialogDescription style={{color:"#034869"}}>{titulo.includes('novo') ? 'Preencha os dados do novo lançamento abaixo.' : ''}</DialogDescription>
                       </DialogHeader>
                       <form onSubmit={lancamentoMethods.handleSubmit(onSubmitLancamentoDataLan)}>
                         <div className='mt-2 mr-5'>
@@ -1408,7 +1410,8 @@ export default function DetalhesLocacao() {
                         </div>
 
                         <DialogFooter className='mt-2'>
-                          <Button size={"sm"} type='submit'>{titulo.includes('novo') ? 'Criar lançamento' : 'Confirmar Alteração'}</Button>
+                          <Button size={"sm"} type='submit'
+                          className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">{titulo.includes('novo') ? 'Criar lançamento' : 'Confirmar Alteração'}</Button>
                         </DialogFooter>
                       </form>
                     </DialogContent>
@@ -1501,7 +1504,7 @@ export default function DetalhesLocacao() {
         </TabsContent>
 
         {/* Boletos */}
-        <TabsContent value="boletos" className="space-y-4 font-[Poppins-regular]">
+        <TabsContent value="boletos" className="space-y-4 font-[Poppins-regular]" style={{color:"#034869"}}>
           {/*<div className="flex items-center justify-between">
             <div className=
               {(isPortrait || isTablet || isBigScreen)
@@ -1537,7 +1540,7 @@ export default function DetalhesLocacao() {
 
           {/* boletos Grid */}
           <div className="mx-auto w-full rounded-md">
-            <Card className='font-[Poppins-regular]'>
+            <Card className='font-[Poppins-regular]' style={{color:"#034869"}}>
               <CardContent>
                 {(locacao?.boletos && locacao.boletos.length > 0) ? (
                   <div className=''>
