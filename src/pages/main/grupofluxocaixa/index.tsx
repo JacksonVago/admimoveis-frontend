@@ -12,10 +12,6 @@ import axios from 'axios'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 import { useGlobalParams } from '@/globals/GlobalParams'
-import { lancamentoTipo } from '@/enums/locacao/enums-locacao'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { TIPO_LANCAMENTO_OPTIONS } from '@/constants/lancamento-tipo'
-import { Switch, Thumb } from '@radix-ui/react-switch'
 import { GrupoFluxoCaixa } from '@/interfaces/grupo-fluxo-caixa'
 
 

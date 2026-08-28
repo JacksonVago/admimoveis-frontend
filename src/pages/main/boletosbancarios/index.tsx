@@ -22,7 +22,6 @@ import { generatePaginationLinks } from '@/components/ui/generate-pages'
 import { Label } from '@/components/ui/label'
 import moment from 'moment'
 import { toast } from '@/hooks/use-toast'
-import { Boleto } from '@/interfaces/boleto'
 import { cn } from '@/lib/utils'
 import { BoletoStatus } from '@/enums/locacao/enums-locacao'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -240,6 +239,9 @@ export default function ListarBoletosBancarios({
 
   const handleSubmitEmail = async (data: JobSchema) => {
     try {
+      if (data){
+        console.log('handleSubmitEmail data:', data);
+      }
       const formData = new FormData();
 
       if (selBoleto?.id) {
@@ -349,6 +351,9 @@ export default function ListarBoletosBancarios({
       console.log(boletoBancarioId);
       if (boletoBancarioId) {
         let resp = DownloadPdf(boletoBancarioId, true);
+        if (resp){
+          console.log('DownloadPdf response:', resp);
+        }
         /*
         api.get('/boleto-bancario/download/' + boletoBancarioId)
           .then(result => {
