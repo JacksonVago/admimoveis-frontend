@@ -40,17 +40,11 @@ export const permissions: { value: Permission; label: string }[] = [
   { value: 'UPDATE_EMPRESA', label: 'Atualizar Empresa' },
   { value: 'VIEW_EMPRESAS', label: 'Ver Empresas' },
 
-  //Alertas
-  { value: 'CREATE_ALERTA', label: 'Criar Alertas' },
-  { value: 'UPDATE_ALERTA', label: 'Atulizar Alertas' },
-  { value: 'DELETE_ALERTA', label: 'Excluir Alertas' },
-  { value: 'VIEW_ALERTAS', label: 'Ver Alertas' },
-
-  //Conta corrente
-  { value: 'CREATE_CONTA_CORRENTE', label: 'Criar Conta corrente' },
-  { value: 'UPDATE_CONTA_CORRENTE', label: 'Atualizar Conta corrente' },
-  { value: 'DELETE_CONTA_CORRENTE', label: 'Excluir Conta corrente' },
-  { value: 'VIEW_CONTAS_CORRENTE', label: 'Ver Conta corrente' },
+  /*Grupo Fluxo de caixa */
+  { value: 'CREATE_GRUPO_FLUXO_CAIXA', label: 'Criar Grupo de Fluxo de Caixa' },
+  { value: 'UPDATE_GRUPO_FLUXO_CAIXA', label: 'Atualizar Grupo de Fluxo de Caixa' },
+  { value: 'DELETE_GRUPO_FLUXO_CAIXA', label: 'Excluir Grupo de Fluxo de Caixa' },
+  { value: 'VIEW_GRUPO_FLUXO_CAIXA', label: 'Ver Grupos de Fluxo de Caixa' },
 
   /*Tipo de Lançamento */
   { value: 'CREATE_TIPO_LANC', label: 'Criar Tipo de Lançamento' },
@@ -63,6 +57,18 @@ export const permissions: { value: Permission; label: string }[] = [
   { value: 'UPDATE_TIPO', label: 'Atualizar Tipo de imóvel' },
   { value: 'DELETE_TIPO', label: 'Excluir Tipo de imóvel' },
   { value: 'VIEW_TIPOS', label: 'Ver Tipos de Imóvel' },
+
+  //Alertas
+  { value: 'CREATE_ALERTA', label: 'Criar Alertas' },
+  { value: 'UPDATE_ALERTA', label: 'Atulizar Alertas' },
+  { value: 'DELETE_ALERTA', label: 'Excluir Alertas' },
+  { value: 'VIEW_ALERTAS', label: 'Ver Alertas' },
+
+  //Conta corrente
+  { value: 'CREATE_CONTA_CORRENTE', label: 'Criar Conta corrente' },
+  { value: 'UPDATE_CONTA_CORRENTE', label: 'Atualizar Conta corrente' },
+  { value: 'DELETE_CONTA_CORRENTE', label: 'Excluir Conta corrente' },
+  { value: 'VIEW_CONTAS_CORRENTE', label: 'Ver Conta corrente' },
 
   /*Condomínio */
   { value: 'CREATE_CONDOMINIO', label: 'Criar Condomínio' },
@@ -82,17 +88,17 @@ export const permissions: { value: Permission; label: string }[] = [
   { value: 'DELETE_IMOVEL', label: 'Deletar Imóvel' },
   { value: 'VIEW_IMOVELS', label: 'Visualizar Imóveis' },
 
-  /* Locatários */
-  { value: 'CREATE_LOCATARIO', label: 'Criar Locatário' },
-  { value: 'UPDATE_LOCATARIO', label: 'Atualizar locatário' },
-  { value: 'DELETE_LOCATARIO', label: 'Excluir Locatário' },
-  { value: 'VIEW_LOCATARIOS', label: 'Ver Locatários' },
-
   /* Clientes */
   { value: 'CREATE_PESSOA', label: 'Criar Pessoa' },
   { value: 'UPDATE_PESSOA', label: 'Atualizar Pessoa' },
   { value: 'DELETE_PESSOA', label: 'Excluir Pessoa' },
   { value: 'VIEW_PESSOAS', label: 'Ver Pessoas' },
+
+  /* Locatários */
+  { value: 'CREATE_LOCATARIO', label: 'Criar Locatário' },
+  { value: 'UPDATE_LOCATARIO', label: 'Atualizar locatário' },
+  { value: 'DELETE_LOCATARIO', label: 'Excluir Locatário' },
+  { value: 'VIEW_LOCATARIOS', label: 'Ver Locatários' },
 
   /* Proprietários */
   { value: 'CREATE_PROPRIETARIO', label: 'Criar Proprietário' },
@@ -208,6 +214,13 @@ export const permissions: { value: Permission; label: string }[] = [
   { value: 'DELETE_CLIENTE', label: 'Excluir Cliente' },
   { value: 'VIEW_CLIENTES', label: 'Ver Clientes' },
 
+]
+
+const GrupoFluxoCaixaPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_GRUPO_FLUXO_CAIXA', label: 'Criar Grupo de Fluxo de Caixa' },
+  { value: 'UPDATE_GRUPO_FLUXO_CAIXA', label: 'Atualizar Grupo de Fluxo de Caixa' },
+  { value: 'DELETE_GRUPO_FLUXO_CAIXA', label: 'Excluir Grupo de Fluxo de Caixa' },
+  { value: 'VIEW_GRUPO_FLUXO_CAIXA', label: 'Ver Grupos de Fluxo de Caixa' }
 ]
 
 const condominioPermissions: { value: Permission; label: string }[] = [
@@ -588,11 +601,11 @@ export const ListarColaboradores = () => {
       }
     }
 
-    if (permission?.includes('CONTA_CORRENTE')) {
-      if (permission !== 'VIEW_CONTAS_CORRENTE') {
+    if (permission?.endsWith('_GRUPO_FLUXO_CAIXA')) {
+      if (permission !== 'VIEW_GRUPO_FLUXO_CAIXA') {
         setUserPermissions((prevPermissions) => {
           if (checked) {
-            return [...(prevPermissions || []), permission, 'VIEW_CONTAS_CORRENTE']
+            return [...(prevPermissions || []), permission, 'VIEW_GRUPO_FLUXO_CAIXA']
           } else {
             return prevPermissions.filter((p) => p !== permission)
           }
@@ -602,27 +615,8 @@ export const ListarColaboradores = () => {
           if (checked) {
             return [...(prevPermissions || []), permission]
           } else {
-            return prevPermissions.filter((p) => !p.includes('CONTA_CORRENTE'))
-          }
-        })
-      }
-    }
+            return prevPermissions.filter((p) => !p?.endsWith('_GRUPO_FLUXO_CAIXA'))
 
-    if (permission?.includes('ALERTA')) {
-      if (permission !== 'VIEW_ALERTAS') {
-        setUserPermissions((prevPermissions) => {
-          if (checked) {
-            return [...(prevPermissions || []), permission, 'VIEW_ALERTAS']
-          } else {
-            return prevPermissions.filter((p) => p !== permission)
-          }
-        })
-      } else {
-        setUserPermissions((prevPermissions) => {
-          if (checked) {
-            return [...(prevPermissions || []), permission]
-          } else {
-            return prevPermissions.filter((p) => !p.includes('ALERTA'))
           }
         })
       }
@@ -664,6 +658,46 @@ export const ListarColaboradores = () => {
             return [...(prevPermissions || []), permission]
           } else {
             return prevPermissions.filter((p) => !p.includes('TIPO_LANC'))
+          }
+        })
+      }
+    }
+
+    if (permission?.includes('CONTA_CORRENTE')) {
+      if (permission !== 'VIEW_CONTAS_CORRENTE') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_CONTAS_CORRENTE']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p.includes('CONTA_CORRENTE'))
+          }
+        })
+      }
+    }
+
+    if (permission?.includes('ALERTA')) {
+      if (permission !== 'VIEW_ALERTAS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_ALERTAS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p.includes('ALERTA'))
           }
         })
       }
@@ -1014,7 +1048,7 @@ export const ListarColaboradores = () => {
               <Plus className="mr-2 h-4 w-4" /> Criar colaborador
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent onInteractOutside={(e) => e.preventDefault()}>
             <DialogHeader>
               <DialogTitle>Criar novo colaborador</DialogTitle>
               <DialogDescription>Preencha os dados do novo colaborador abaixo.</DialogDescription>
@@ -1145,6 +1179,28 @@ export const ListarColaboradores = () => {
               <h2 className="text-lg font-semibold">Permissões de {selectedUser.name}</h2>
               <ScrollArea className="h-full max-h-[500px] rounded-md border p-4">
                 <div className="grid grid-cols-2 gap-1">
+
+                  <div className='grid grid-cols-1 gap-1  mt-2'>
+                    <h3 className="text-lg font-semibold">Grupo Fluco de Caixa</h3>
+                    {GrupoFluxoCaixaPermissions.map((permission) => (
+                      <div key={permission.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={permission.value}
+                          checked={userPermissions.includes(permission.value)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(checked as boolean, permission.value)
+                          }
+                          style={{ 'border': '1px solid black' }}
+                        />
+                        <label
+                          htmlFor={permission.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                   <div className='grid grid-cols-1 gap-1  mt-2'>
                     <h3 className="text-lg font-semibold">Alertas</h3>
                     {alertaPermissions.map((permission) => (
@@ -1378,7 +1434,7 @@ export const ListarColaboradores = () => {
                   </div>
 
                   <div className='grid grid-cols-1 gap-1 mt-2'>
-                    <h3 className="text-lg font-semibold">Lançamentos Locação/Imóvel</h3>
+                    <h3 className="text-lg font-semibold">Lançamentos Locação</h3>
                     {lancamentoPermissions.map((permission) => (
                       <div key={permission.value} className="flex items-center space-x-2">
                         <Checkbox
@@ -1422,7 +1478,7 @@ export const ListarColaboradores = () => {
                   </div>
 
                   <div className='grid grid-cols-1 gap-1 mt-2'>
-                    <h3 className="text-lg font-semibold">Lançamentos Condomínios</h3>
+                    <h3 className="text-lg font-semibold">Lançamentos Imóveis</h3>
                     {LancImovelPermissions.map((permission) => (
                       <div key={permission.value} className="flex items-center space-x-2">
                         <Checkbox
@@ -1508,7 +1564,7 @@ export const ListarColaboradores = () => {
           setIsEditDialogOpen(value)
         }}
       >
-        <DialogContent>
+        <DialogContent onInteractOutside={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>Editar colaborador</DialogTitle>
             <DialogDescription>Edite os dados do colaborador abaixo.</DialogDescription>

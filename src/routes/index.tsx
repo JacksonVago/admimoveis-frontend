@@ -78,6 +78,7 @@ export const MainLayout = () => {
 
   const handlerBackNav = () => {
     glb_params.updPastaOrig("");
+    console.log('origin:',glb_params.origin_url);
     navigate(`${glb_params.origin_url}`);
   }
 

@@ -853,7 +853,7 @@ export default function DetalhesCliente() {
                 </Button>
               )}
             <Dialog open={openImovel} onOpenChange={setOpenImovel} >
-              <DialogContent>
+              <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                 <DialogHeader>
                   <DialogTitle>Adicionar Nova Propriedade</DialogTitle>
                   <DialogDescription>
@@ -991,7 +991,7 @@ export default function DetalhesCliente() {
                           </Button>
                         )}
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                       <DialogHeader>
                         <DialogTitle>Alterar Propriedade</DialogTitle>
                         <DialogDescription style={{ color: "#034869" }}>
@@ -1141,7 +1141,7 @@ export default function DetalhesCliente() {
                               </Button>
                             )}
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                           <DialogHeader>
                             <DialogTitle>Alterar Locação</DialogTitle>
                             <DialogDescription>
@@ -1435,7 +1435,7 @@ export default function DetalhesCliente() {
                       Editar
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                     <DialogHeader>
                       <DialogTitle>Alterar Propriedade</DialogTitle>
                       <DialogDescription>

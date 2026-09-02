@@ -581,7 +581,7 @@ export default function DetalhesProprietario() {
 </div> */
 }
 {
-  /* <DialogContent>
+  /* <DialogContent onInteractOutside={(e) => e.preventDefault()}>
       <DialogHeader>
         <DialogTitle>Adicionar Novo Imóvel</DialogTitle>
         <DialogDescription>

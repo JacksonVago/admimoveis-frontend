@@ -511,7 +511,7 @@ export default function DetalhesLocatario({ defaultId }: { defaultId: { id: stri
                   Nova Locação
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                 <DialogHeader>
                   <DialogTitle>Adicionar Nova Locação</DialogTitle>
                   <DialogDescription>
@@ -595,7 +595,7 @@ export default function DetalhesLocatario({ defaultId }: { defaultId: { id: stri
                       Editar
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                     <DialogHeader>
                       <DialogTitle>Alterar Locação</DialogTitle>
                       <DialogDescription>

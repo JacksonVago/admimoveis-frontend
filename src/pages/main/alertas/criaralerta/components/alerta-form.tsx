@@ -292,7 +292,7 @@ export const AlertaFormContent = ({
               setIsOpenConfig(value);
             }}
           >
-            <DialogContent>
+            <DialogContent onInteractOutside={(e) => e.preventDefault()}>
               <DialogHeader>
                 <DialogTitle>{titulo}</DialogTitle>
                 <DialogDescription>{titulo.includes('novo') ? 'Selecione um campo abaixo.' : ''}</DialogDescription>

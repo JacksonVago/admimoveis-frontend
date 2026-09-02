@@ -32,21 +32,6 @@ const data = {
       icon: Notebook,
       items: [
         {
-          title: 'Alertas',
-          url: ROUTE.ALERTAS,
-          icon: OctagonAlert
-        },
-        {
-          title: 'Conta Corrente',
-          url: ROUTE.CONTA_CORRENTE,
-          icon: Landmark
-        },
-        {
-          title: 'Clientes',
-          url: ROUTE.CLIENTES,
-          icon: Users
-        },
-        {
           title: 'Grupo Fluxo de Caixa',
           url: ROUTE.GRUPO_FLUXO_CAIXA,
           icon: Boxes,
@@ -60,6 +45,21 @@ const data = {
           title: 'Tipo de Imóvel',
           url: ROUTE.TIPOIMOVEL,
           icon: Shapes
+        },
+        {
+          title: 'Alertas',
+          url: ROUTE.ALERTAS,
+          icon: OctagonAlert
+        },
+        {
+          title: 'Conta Corrente',
+          url: ROUTE.CONTA_CORRENTE,
+          icon: Landmark
+        },
+        {
+          title: 'Clientes',
+          url: ROUTE.CLIENTES,
+          icon: Users
         },
         {
           title: 'Condomínios',

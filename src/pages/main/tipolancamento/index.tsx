@@ -377,7 +377,7 @@ export default function ListarTiposLancamento() {
               <div className='mt-2'>
                 <Label className="text-base">
                   Tipo de Lançamento
-                  <div className='mt-2'>
+                  <div className='mt-2 border rounded-md pr-6'>
                     <Controller
                       name="tipo"
                       control={tipoMethods.control}
@@ -408,7 +408,7 @@ export default function ListarTiposLancamento() {
                 </Label>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center" }}>
+              <div className='flex items-center mt-6'>
                 <label
                   className="Label"
                   htmlFor="airplane-mode"
@@ -424,8 +424,8 @@ export default function ListarTiposLancamento() {
                 </Switch>
               </div>
 
-              <div className="grid gap-4 font-[Poppins-regular]">
-                <div className="grid grid-cols-1 items-center gap-4">
+              <div className="grid gap-4 font-[Poppins-regular] mt-4">
+                <div className="grid grid-cols-1 items-center gap-2">
                   <Label className='text-base'>
                     Parcelas
                   </Label>
@@ -443,7 +443,7 @@ export default function ListarTiposLancamento() {
               </div>
 
               <div className="grid gap-4 font-[Poppins-regular]">
-                <div className="grid grid-cols-1 items-center gap-4">
+                <div className="grid grid-cols-1 items-center gap-2 mt-4">
                   <Label className='text-base'>
                     Valor Fixo
                   </Label>
@@ -463,7 +463,7 @@ export default function ListarTiposLancamento() {
               <div className='mt-2'>
                 <Label className="text-base">
                   Grupo Fluxo de caixa
-                  <div className='mt-2'>
+                  <div className='mt-2 border rounded-md pr-6'>
                     <Controller
                       name="grupofluxoId"
                       control={tipoMethods.control}
@@ -494,7 +494,7 @@ export default function ListarTiposLancamento() {
                 </Label>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center" }}>
+              <div className='flex items-center mt-6'>
                 <label
                   className="Label"
                   htmlFor="airplane-mode"

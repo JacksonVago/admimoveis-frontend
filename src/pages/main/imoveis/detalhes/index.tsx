@@ -1460,7 +1460,7 @@ export const DetalhesImovel = () => {
                 </Button>
               )}
             <Dialog open={openCli} onOpenChange={setOpenCli}>
-              <DialogContent>
+              <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                 <DialogHeader>
                   {!selPessoa && (
                     <>
@@ -2444,7 +2444,7 @@ export const DetalhesImovel = () => {
                           </Button>
                         )}
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                       <DialogHeader>
                         <DialogTitle>{titulo}</DialogTitle>
                         <DialogDescription>{titulo.includes('novo') ? 'Preencha os dados do novo lançamento abaixo.' : ''}</DialogDescription>

@@ -1080,7 +1080,7 @@ export default function DetalhesLocacao() {
                 </Button>
               )}
             <Dialog open={openCli} onOpenChange={setOpenCli}>
-              <DialogContent>
+              <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                 <DialogHeader>
                   {!selPessoa && (
                     <>
@@ -1294,7 +1294,7 @@ export default function DetalhesLocacao() {
                           </Button>
                         )}
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                       <DialogHeader>
                         <DialogTitle>{titulo}</DialogTitle>
                         <DialogDescription style={{color:"#034869"}}>{titulo.includes('novo') ? 'Preencha os dados do novo lançamento abaixo.' : ''}</DialogDescription>

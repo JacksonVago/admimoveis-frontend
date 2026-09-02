@@ -80,7 +80,12 @@ export function NavMain({
                         <SidebarMenuSubItem key={subItem.title} onClick={useSidebar().toggleSidebar}>
                           <SidebarMenuSubButton asChild>
                             <Link to={subItem.url}
-                              onClick={() => setActiveItem(subItem.title)}
+                              onClick={() => {
+                                setActiveItem(subItem.title);
+                                handlerNavItemClick(subItem.url);
+
+                              }
+                              }
                               style={activeItem === subItem.title ? {
                                 backgroundColor: "#f7941e",
                                 fontWeight: "bold",

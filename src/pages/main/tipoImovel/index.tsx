@@ -236,7 +236,7 @@ export default function ListarTipos() {
               </Button>
             </div>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent onInteractOutside={(e) => e.preventDefault()}>
             <DialogHeader>
               <DialogTitle>Criar novo Tipo de Imóvel</DialogTitle>
               <DialogDescription style={{ color: "#034869" }}>Preencha os dados do novo Tipo de Imóvel abaixo.</DialogDescription>
@@ -338,7 +338,7 @@ export default function ListarTipos() {
           setIsEditDialogOpen(value)
         }}
       >
-        <DialogContent>
+        <DialogContent onInteractOutside={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>Editar Tipo de Imóvel</DialogTitle>
             <DialogDescription style={{ color: "#034869" }}>Edite os dados do colaborador abaixo.</DialogDescription>

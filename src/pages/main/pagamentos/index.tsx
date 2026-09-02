@@ -912,7 +912,7 @@ export default function ListarPagamentos({
           emvPIX: '', //Código EMV para pagamento via PIX
           metodoPagamento: '', //Método de pagamento utilizado
           status: '', //Status do boleto
-          observacao: '',
+          observacao: boleto.observacao, //Observação do boleto
 
           pagtoParcial: false, //Indica se o alerta está ativo ou não
           qtdeMaxParcial: 0, //Quantide de pagamentos parcial 1..99
@@ -1011,7 +1011,7 @@ export default function ListarPagamentos({
             setIsCreateDialogOpen(value)
           }}                    
         >
-          <DialogContent>
+          <DialogContent onInteractOutside={(e) => e.preventDefault()}>
             <DialogHeader className='font-[Poppins-Regular]'>
               <DialogTitle>Criar nova Previsão</DialogTitle>
               <DialogDescription>Preencha os dados do nova Previsão abaixo.</DialogDescription>
@@ -1662,7 +1662,7 @@ export default function ListarPagamentos({
             setIsEmailDialogOpen(value)
           }}
         >
-          <DialogContent>
+          <DialogContent onInteractOutside={(e) => e.preventDefault()}>
             <DialogHeader className='font-[Poppins-Regular]'>
               <DialogTitle>Envio de e-mail</DialogTitle>
               <DialogDescription>Preencha os dados para envio do alerta.</DialogDescription>
@@ -1751,7 +1751,7 @@ export default function ListarPagamentos({
             boletoMethods.reset();
           }}
         >
-          <DialogContent>
+          <DialogContent onInteractOutside={(e) => e.preventDefault()}>
             <DialogHeader className='font-[Poppins-Regular]'>
               <DialogTitle>Geração de Boletos/Envio ao banco</DialogTitle>
               <DialogDescription>Preencha os dados para confirmação do boleto.</DialogDescription>

@@ -770,7 +770,7 @@ export const DetalhesBloco = () => {
                               </Button>
                             )}
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                           <DialogHeader>
                             <DialogTitle>{titulo}</DialogTitle>
                             <DialogDescription>{titulo.includes('novo') ? 'Preencha os dados do novo lançamento abaixo.' : ''}</DialogDescription>

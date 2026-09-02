@@ -445,16 +445,16 @@ export const DetalhesLancamento = () => {
                       </Button>
                     )}
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                   <DialogHeader>
                     <DialogTitle>{titulo}</DialogTitle>
                     <DialogDescription>{titulo.includes('novo') ? 'Preencha os dados do novo lançamento abaixo.' : ''}</DialogDescription>
                   </DialogHeader>
                   <form onSubmit={lancamentoMethods.handleSubmit(onSubmitLancamentoData)}>
-                    <div className='mt-2 mr-5'>
+                    <div>
                       <Label className='text-base font-[Poppins-Regular]'>
                         Tipo de Lançamento
-                        <div className='mt-2 border rounded-md'>
+                        <div className='mt-2 border rounded-md pr-6'>
                           <Controller
                             name="tipoId"
                             control={lancamentoMethods.control}
@@ -468,7 +468,7 @@ export const DetalhesLancamento = () => {
                                 }}
                                 value={String(field.value)}
                               >
-                                <SelectTrigger className='h-4'>
+                                <SelectTrigger className='col-start-1 row-start-1 appearance-none border-blue-50 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full'>
                                   <SelectValue placeholder="IPTU, CONDOMÍNIO,..." />
                                 </SelectTrigger>
                                 <SelectContent>

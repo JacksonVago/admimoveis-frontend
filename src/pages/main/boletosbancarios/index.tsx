@@ -910,7 +910,7 @@ export default function ListarBoletosBancarios({
             setIsEmailDialogOpen(value)
           }}
         >
-          <DialogContent>
+          <DialogContent onInteractOutside={(e) => e.preventDefault()}>
             <DialogHeader className='font-[Poppins-Regular]'>
               <DialogTitle>Envio de e-mail</DialogTitle>
               <DialogDescription>Preencha os dados para envio do alerta.</DialogDescription>
@@ -999,7 +999,7 @@ export default function ListarBoletosBancarios({
             setIsBancoDialogOpen(value)
           }}
         >
-          <DialogContent>
+          <DialogContent onInteractOutside={(e) => e.preventDefault()}>
             <DialogHeader className='font-[Poppins-Regular]'>
               <DialogTitle>Geração de Boletos/Envio ao banco</DialogTitle>
               <DialogDescription>Preencha os dados para confirmação do boleto.</DialogDescription>
