@@ -111,6 +111,7 @@ export default function ListarLocacoes({
   const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 100 : (isMobile && limitView > 2) ? 2 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || '';
   const status = searchParams.get('status') || undefined
+  const [locacaoList, setLocacaoList] = useState<Locacao[]>([]);
 
   const { data, isLoading } = useQuery(
     useGetLocacoesQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {
@@ -145,12 +146,100 @@ export default function ListarLocacoes({
     }
   }, [isMobile])
 
+  useEffect(() => {
+    setLocacaoList(locacoes);
+  }, [locacoes])
+
   // Event Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const search = e.target.value
     setSearchTerm({ search })
   }
 
+  const handleOrderbyChange = (e: React.MouseEvent<HTMLTableCellElement>) => {
+    const column_sel = e.currentTarget.textContent || '';
+    let new_array: Locacao[] = [];
+
+    setLocacaoList([]);
+    console.log('column_sel:', column_sel);
+    console.log('setlist:', locacaoList);
+    switch (column_sel) {
+      case "Locação":
+        var sortedArray: Locacao[] = locacaoList.sort((a, b) => {
+          if (a.locatarios && a.locatarios.length > 0 &&
+            a.locatarios[0].pessoa &&
+            b.locatarios && b.locatarios.length > 0 &&
+            b.locatarios[0].pessoa) {
+            if (a.locatarios[0].pessoa.nome < b.locatarios[0].pessoa.nome) {
+              return -1;
+            }
+            if (a.locatarios[0].pessoa.nome > b.locatarios[0].pessoa.nome) {
+              return 1;
+            }
+          }
+
+          return 0;
+        });
+
+        console.log('sortedArray:', sortedArray);
+        setLocacaoList(sortedArray);
+        break;
+
+      case "Perído":
+        var sortedArray: Locacao[] = locacaoList.sort((a, b) => {
+          if (a.locatarios && a.locatarios.length > 0 &&
+            a.locatarios[0].pessoa &&
+            b.locatarios && b.locatarios.length > 0 &&
+            b.locatarios[0].pessoa) {
+            if (a.locatarios[0].pessoa.nome < b.locatarios[0].pessoa.nome) {
+              return -1;
+            }
+            if (a.locatarios[0].pessoa.nome > b.locatarios[0].pessoa.nome) {
+              return 1;
+            }
+          }
+
+          return 0;
+        });
+
+        setLocacaoList(sortedArray);
+        break;
+
+        case "Vencimento":
+        var sortedArray: Locacao[] = locacaoList.sort((a, b) => {
+            if (a.diaVencimento < b.diaVencimento) {
+              return -1;
+            }
+            if (a.diaVencimento > b.diaVencimento) {
+              return 1;
+            }
+          return 0;
+        });
+
+        console.log('sortedArray:', sortedArray);
+        setLocacaoList(sortedArray);
+        console.log('locacaoList:', locacaoList);
+        break;
+
+      case "Valor Aluguel":
+        var sortedArray: Locacao[] = locacaoList.sort((a, b) => {
+            if (a.valorAluguel < b.valorAluguel) {
+              return -1;
+            }
+            if (a.valorAluguel > b.valorAluguel) {
+              return 1;
+            }
+          return 0;
+        });
+
+        setLocacaoList(sortedArray);
+        console.log('locacaoList:', locacaoList);
+        break;
+    }
+
+  }
+
+  useEffect(() => {console.log('locacaoList:', locacaoList)}),[locacaoList]
   /*const handlePageChange = (newpage: number) => {
     // Check if the new page is within the total pages
     // const canGoNext = !!totalPages && newpage <= totalPages ||
@@ -199,11 +288,11 @@ export default function ListarLocacoes({
 
   console.log(locacoes);
 
-  
+
 
 
   return (
-    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]" style={{color:"#034869"}}>
+    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]" style={{ color: "#034869" }}>
       {/* Search & Filters */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         <div className='grid grid-cols-3'>
@@ -218,8 +307,8 @@ export default function ListarLocacoes({
           user?.permissions.includes("ALL") ||
           user?.permissions.includes("CREATE_LOCACAO")
         ) && (
-            <Button onClick={handleClickCreateLocacao} size={"sm"} 
-            className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
+            <Button onClick={handleClickCreateLocacao} size={"sm"}
+              className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
               <Plus className="h-4 w-4" />Criar Locação
             </Button>
           )}
@@ -237,7 +326,7 @@ export default function ListarLocacoes({
             />
           </div>
         </div>
-        
+
         <div>
           <Select onValueChange={(value) => { handlerChangeStatus(value) }}>
             <SelectTrigger className="w-[160px] h-6 hover:cursor-pointer hover:outline">
@@ -245,7 +334,7 @@ export default function ListarLocacoes({
             </SelectTrigger>
             <SelectContent>
               {STATUS_LOCACAO_OPTIONS.map((value) => (
-                <SelectItem key={value.label} value={value.label} style={{color:"#034869"}}>
+                <SelectItem key={value.label} value={value.label} style={{ color: "#034869" }}>
                   {value.label}
                 </SelectItem>
               ))}
@@ -275,8 +364,8 @@ export default function ListarLocacoes({
             showcard ?
               (
                 <>
-                  {locacoes?.map((locacao) => (
-                    <Card key={locacao.id} className="flex flex-col" style={{color:"#034869"}}>
+                  {locacaoList?.map((locacao) => (
+                    <Card key={locacao.id} className="flex flex-col" style={{ color: "#034869" }}>
                       <CardHeader>
                         <CardTitle className="flex items-center justify-between">
                           <span className="text-wrap"
@@ -352,6 +441,10 @@ export default function ListarLocacoes({
                       <tr>
                         <th className="border-b p-2 text-left">Locação</th>
                         <th className="border-b p-2 text-left">Período</th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                        onClick={(e) => handleOrderbyChange(e)}
+                        >
+                          Vencimento</th>
                         <th className="border-b p-2 text-left">Valor Aluguel</th>
                         <th className="border-b p-2 text-left"></th>
                       </tr>
@@ -360,7 +453,7 @@ export default function ListarLocacoes({
                   <div className='h-[500px] flex-1 overflow-y-auto'>
                     <table className='w-full table-fixed'>
                       <tbody>
-                        {locacoes?.map((locacao) => (
+                        {locacaoList?.map((locacao) => (
                           <tr key={locacao.id} className="hover:bg-gray-300">
                             <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
                               {(locacao.locatarios ? locacao?.locatarios[0].pessoa?.nome : '') + (locacao?.imovel?.condominio ? ' - ' + locacao?.imovel?.condominio.name : '') + ' - ' + locacao?.imovel?.endereco?.complemento}
@@ -371,7 +464,10 @@ export default function ListarLocacoes({
                               </div>
                             </td>
                             <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
-                              {locacao.valorAluguel}
+                              {locacao.diaVencimento}
+                            </td>
+                            <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
+                              {locacao.valorAluguel.toLocaleString('pt-BR')}
                             </td>
                             <td className="border-b p-2">
                               <div className="flex space-x-2 ">
@@ -414,3 +510,4 @@ export default function ListarLocacoes({
     </div>
   )
 }
+

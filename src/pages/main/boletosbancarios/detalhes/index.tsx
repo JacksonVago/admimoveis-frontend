@@ -12,45 +12,23 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
 import moment from "moment";
 import { toast } from '@/hooks/use-toast'
 import api from '@/services/axios/api'
 import { queryClient } from '@/services/react-query/query-client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { CircleCheck, Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import * as React from 'react'
-import { useForm, Controller, FormProvider } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { LancamentoStatus, BoletoStatus } from '@/enums/locacao/enums-locacao'
 import { useGlobalParams } from '@/globals/GlobalParams';
-//import { boolean } from 'zod';
 import { useMediaQuery } from 'react-responsive';
 import { TipoLancamento } from '@/interfaces/lancamentotipo'
-import axios from 'axios'
 import { useParams } from 'react-router-dom'
 import { boletoSchema, BoletoSchema } from '@/schemas/boleto.schema'
-import { Boleto } from '@/interfaces/boleto'
 import { usdFormatter } from '@/utils/format-money'
-import { STATUS_BOLETO_OPTIONS } from '@/constants/status-boletos'
-import { DocumentUpload } from '../../imoveis/criarImovel/components/document-upload'
 import { BoletoBancario } from '@/interfaces/boletobancario'
 //import { ROUTE } from '@/enums/routes.enum'
 //import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
@@ -59,7 +37,7 @@ export const getTipos = async () => {
   return await api.get<TipoLancamento[]>('tipolancamento')
 }
 
-const fetchDocumentFiles = async (documents: Boleto['documentos']) => {
+/*const fetchDocumentFiles = async (documents: Boleto['documentos']) => {
   const documentFilesPromises =
     documents?.map(async (doc) => {
       try {
@@ -86,18 +64,17 @@ const fetchDocumentFiles = async (documents: Boleto['documentos']) => {
     }) || []
   const resolvedFiles = await Promise.all(documentFilesPromises)
   return resolvedFiles.filter(Boolean)
-}
+}*/
 
 
 export const DetalhesBoletoBancario = () => {
-  const isPortrait = useMediaQuery({ query: '(max-width: 1224px)' })
+  //const isPortrait = useMediaQuery({ query: '(max-width: 1224px)' })
   const isMobile = useMediaQuery({ query: '(max-width: 420px)' })
 
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
+  //const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
 
-  const [isEditing, setIsEditing] = React.useState(false)
-  const [titulo, setTitulo] = React.useState("Dados Pagamento")
-  const disabled = isEditing
+  //const [isEditing, setIsEditing] = React.useState(false)
+  //const [titulo, setTitulo] = React.useState("Dados Pagamento")
 
   const dataParams = useParams<{ id: string }>();
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
@@ -126,7 +103,7 @@ export const DetalhesBoletoBancario = () => {
 
   console.log('boleto detalhes:', boleto);
 
-  const updateBoleto = useMutation({
+  /*const updateBoleto = useMutation({
     mutationFn: async (data: FormData) => {
       return await api.put<Boleto>(`/Pagamentos/${id}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
@@ -137,7 +114,7 @@ export const DetalhesBoletoBancario = () => {
         queryClient.invalidateQueries({ queryKey: [key] })
       })
     }
-  })
+  })*/
 
   const deleteBoleto = useMutation({
     mutationFn: async (boletoId: number) => {
@@ -155,7 +132,7 @@ export const DetalhesBoletoBancario = () => {
     }
   })
 
-  const onSubmitBoletoData = async (data: BoletoSchema) => {
+  /*const onSubmitBoletoData = async (data: BoletoSchema) => {
     try {
       
       const form = new FormData()
@@ -231,13 +208,13 @@ export const DetalhesBoletoBancario = () => {
 
       await updateBoleto.mutateAsync(form)
       setIsEditing(false);
-      /*
-      if (titulo === "Criar novo pagamento") {
-        await createPagamento.mutateAsync(form)
+      
+      //if (titulo === "Criar novo pagamento") {
+      //  await createPagamento.mutateAsync(form)
+      //}
+      //else {
+      //  await updatePagamento.mutateAsync(form)
       }
-      else {
-        await updatePagamento.mutateAsync(form)
-      }*/
 
       toast({
         title: 'Pagamento atualizado com sucesso',
@@ -270,7 +247,7 @@ export const DetalhesBoletoBancario = () => {
         })
       }
     }
-  }
+  }*/
 
   //default values
   const defaultValues = React.useMemo(

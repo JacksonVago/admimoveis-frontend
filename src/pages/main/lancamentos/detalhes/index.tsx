@@ -39,7 +39,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Info, Pencil, Plus, Trash2 } from 'lucide-react'
 import * as React from 'react'
-import { useForm, Controller, set } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { LancamentoStatus } from '@/enums/locacao/enums-locacao'
 import { Locacao } from '@/interfaces/locacao'
 import { useGlobalParams } from '@/globals/GlobalParams';

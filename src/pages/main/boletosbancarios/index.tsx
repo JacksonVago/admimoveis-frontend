@@ -37,7 +37,6 @@ import { jobSchema, JobSchema } from '@/schemas/job.schema'
 import { JobsStatus } from '@/enums/alertas/JobsStatus'
 import { getAlertasPag } from '../alertas/requests'
 import { BoletoBancario } from '@/interfaces/boletobancario'
-import { ConfiguracaoAlerta } from '@/interfaces/configuracaoalerta'
 
 // Types
 interface GetBoletosParams {
@@ -110,7 +109,7 @@ export default function ListarBoletosBancarios({
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
   const [showcard, setShowCard] = useState((isMobile ? false : true));
   const [selBoleto, setSelBoleto] = useState<BoletoBancario>();
-  const [selAlerta, setSelAlerta] = useState<ConfiguracaoAlerta>();
+  //const [selAlerta, setSelAlerta] = useState<ConfiguracaoAlerta>();
 
   const navigate = useNavigate();
 
@@ -164,6 +163,8 @@ export default function ListarBoletosBancarios({
       str_start_time: new Date().toISOString(),
       str_end_time: new Date().toISOString(),
       status: JobsStatus.WAITING_TO_START,
+      str_email: '',
+      str_email_cc: '',
       userId: user?.id
     },
     mode: 'all'
@@ -265,7 +266,9 @@ export default function ListarBoletosBancarios({
             const blob = new Blob([typedArray], { type: 'application/pdf' });
 
             formData.append('email', jobMethods.getValues("str_email"))
-            formData.append('email_cc', jobMethods.getValues("str_email_cc"))
+            if (data.str_email_cc) {
+              formData.append('email_cc', data.str_email_cc)
+            }
             formData.append('subject', jobMethods.getValues("descAlerta"))
             formData.append('text', jobMethods.getValues("str_message"));
             formData.append('pdf', blob, 'boleto.pdf');
@@ -316,6 +319,7 @@ export default function ListarBoletosBancarios({
     }
   }
 
+  /*
   const handlerSendMail = async () => {
     try {
       const result = await api.post<string>('/emails/send-email/' + selBoleto?.boleto?.empresaId,
@@ -349,7 +353,7 @@ export default function ListarBoletosBancarios({
     }
 
 
-  }
+  }*/
 
   const handlerDownloadBoleto = async (boletoBancarioId: number) => {
 
@@ -434,7 +438,7 @@ export default function ListarBoletosBancarios({
 
   const handlerChangeAlerta = (value: string) => {
     let alerta = alertas?.data.filter(x => x.id === Number(value));
-    setSelAlerta(alerta && alerta.length > 0 ? alerta[0] : undefined);
+    //setSelAlerta(alerta && alerta.length > 0 ? alerta[0] : undefined);
 
     jobMethods.setValue("descAlerta", alerta ? alerta[0].alerta.descricao : "");
     jobMethods.setValue("str_email_cc", alerta ? alerta[0].emailCopia : "");
@@ -926,6 +930,7 @@ export default function ListarBoletosBancarios({
         <Dialog
           open={isEmailDialogOpen}
           onOpenChange={(value) => {
+            jobMethods.reset();
             setIsEmailDialogOpen(value)
           }}
         >
