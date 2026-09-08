@@ -132,7 +132,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       //we need to persist  token and refresh tokens event if user refresh the page, so we can use local storage, cookies, sessionStorage, zustand persist etc
       setCookie(null, STORAGE_ACCESS_TOKEN_KEY, access_token, {
-        maxAge: 60 * 60 * 24 * 1, // 1 day
+        //maxAge: 60 * 60 * 24 * 1, // 1 day
+        maxAge: 60 * 60 * 24 * 7, // 7 day
         path: '/' //used to especicy what paths can access the cookie, in this case all paths
       })
 

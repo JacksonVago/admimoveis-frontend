@@ -255,6 +255,35 @@ export const AlertaFormContent = ({
           />
         </div>
 
+        <div className='mt-2'>
+          <Label htmlFor="emailDestinatario">Destinatário</Label>
+          <Input
+            className="mt-2"
+            type="text"
+            disabled={disabled}
+            placeholder="Destinatário"
+            {...createAlertaMethods.register('emailDestinatario')}
+          />
+            {createAlertaMethods.formState.errors.emailDestinatario?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createAlertaMethods.formState.errors.emailDestinatario.message}
+              </p>)}
+        </div>
+
+        <div className='mt-2'>
+          <Label htmlFor="emailCopia">Email cópia</Label>
+          <Input
+            className="mt-2"
+            type="text"
+            disabled={disabled}
+            placeholder="Email cópia"
+            {...createAlertaMethods.register('emailCopia')}
+          />
+            {createAlertaMethods.formState.errors.emailCopia?.message &&
+              (<p className='mt-2' style={{ color: '#ed535d', fontSize: '0.8rem' }}>*
+                {createAlertaMethods.formState.errors.emailCopia.message}
+              </p>)}
+        </div>
 
         <div className='mt-2'>
           <div className='grid grid-cols-2'>

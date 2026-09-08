@@ -140,8 +140,12 @@ export const CriarAlerta = () => {
       form.append('dataFinalEnvio', data.dataFinalEnvio.toString())
     }
 
-    if (data.horarioFinal) {
-      form.append('dataFinalEnvio', data.horarioFinal.toString())
+    if (data.emailDestinatario) {
+      form.append('emailDestinatario', data.emailDestinatario)
+    }
+
+    if (data.emailCopia) {
+      form.append('emailCopia', data.emailCopia)
     }
 
     form.append('alertaId', data.alertaId ? data.alertaId.toString() : '0');

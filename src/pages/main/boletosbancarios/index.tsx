@@ -37,6 +37,7 @@ import { jobSchema, JobSchema } from '@/schemas/job.schema'
 import { JobsStatus } from '@/enums/alertas/JobsStatus'
 import { getAlertasPag } from '../alertas/requests'
 import { BoletoBancario } from '@/interfaces/boletobancario'
+import { ConfiguracaoAlerta } from '@/interfaces/configuracaoalerta'
 
 // Types
 interface GetBoletosParams {
@@ -109,6 +110,7 @@ export default function ListarBoletosBancarios({
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
   const [showcard, setShowCard] = useState((isMobile ? false : true));
   const [selBoleto, setSelBoleto] = useState<BoletoBancario>();
+  const [selAlerta, setSelAlerta] = useState<ConfiguracaoAlerta>();
 
   const navigate = useNavigate();
 
@@ -226,6 +228,9 @@ export default function ListarBoletosBancarios({
       if (boleto?.boleto.imovel?.proprietarios) {
         jobMethods.setValue('str_email', boleto?.boleto.imovel.proprietarios[0].pessoa ? boleto?.boleto.imovel.proprietarios.map(loc => loc.pessoa ? loc.pessoa.email : "").join(";") : "");
       }
+      else {
+        jobMethods.setValue('str_email', "");
+      }
     }
     else {
       if (boleto?.boleto?.locacaoId && boleto?.boleto?.locacaoId > 0) {
@@ -239,7 +244,7 @@ export default function ListarBoletosBancarios({
 
   const handleSubmitEmail = async (data: JobSchema) => {
     try {
-      if (data){
+      if (data) {
         console.log('handleSubmitEmail data:', data);
       }
       const formData = new FormData();
@@ -260,6 +265,7 @@ export default function ListarBoletosBancarios({
             const blob = new Blob([typedArray], { type: 'application/pdf' });
 
             formData.append('email', jobMethods.getValues("str_email"))
+            formData.append('email_cc', jobMethods.getValues("str_email_cc"))
             formData.append('subject', jobMethods.getValues("descAlerta"))
             formData.append('text', jobMethods.getValues("str_message"));
             formData.append('pdf', blob, 'boleto.pdf');
@@ -351,7 +357,7 @@ export default function ListarBoletosBancarios({
       console.log(boletoBancarioId);
       if (boletoBancarioId) {
         let resp = DownloadPdf(boletoBancarioId, true);
-        if (resp){
+        if (resp) {
           console.log('DownloadPdf response:', resp);
         }
         /*
@@ -428,7 +434,11 @@ export default function ListarBoletosBancarios({
 
   const handlerChangeAlerta = (value: string) => {
     let alerta = alertas?.data.filter(x => x.id === Number(value));
+    setSelAlerta(alerta && alerta.length > 0 ? alerta[0] : undefined);
+
     jobMethods.setValue("descAlerta", alerta ? alerta[0].alerta.descricao : "");
+    jobMethods.setValue("str_email_cc", alerta ? alerta[0].emailCopia : "");
+
     let descAlerta = alerta ? alerta[0].alerta.descricao : "";
     let textoAlerta = alerta ? alerta[0].textoAlerta : "";
     let int_pos: number = 0;
@@ -710,7 +720,7 @@ export default function ListarBoletosBancarios({
                         <div className='grid grid-cols-2'>
                           {((boleto.boleto && boleto.boleto.locacao) ? (
                             <p className="line-clamp-2 flex gap-1 text-sm ">
-                              {boleto.boleto.locatario ? boleto.boleto.locatario.pessoa?.nome : ''} -
+                              {boleto.boleto.locacao && boleto.boleto.locacao.locatarios ? boleto.boleto.locacao.locatarios[0]?.pessoa?.nome : ''} -
                               {boleto.boleto.locacao?.imovel?.endereco.complemento} -
                               {boleto.boleto.locacao?.imovel?.condominio ? boleto.boleto.locacao.imovel.condominio.name : ''}
                             </p>)
@@ -759,12 +769,15 @@ export default function ListarBoletosBancarios({
                       <Label className="font-bold flex justify-start mt-2" style={{ fontSize: '0.7rem' }}>
                         Linha Digitável :  {boleto.linhaDigitavel}
                       </Label>
+                      {/*<Label className="font-bold flex justify-start mt-2" style={{ fontSize: '0.7rem' }}>
+                        Obs :  {boleto.linhaDigitavel}
+                      </Label>*/}
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <div className=
                         {cn('grid gap-10', {
-                          'grid-cols-3': boleto.status === BoletoStatus.PENDENTE,
-                          'grid-cols-2': boleto.status === BoletoStatus.ATRASADO || boleto.status === BoletoStatus.PAGO,
+                          'grid-cols-3': boleto.boleto?.status === BoletoStatus.PENDENTE || boleto.status === 'REGISTRADO',
+                          'grid-cols-2': boleto.boleto?.status === BoletoStatus.ATRASADO || boleto.boleto?.status === BoletoStatus.PAGO,
                         })}
                       >
                         {(isAdmin ||
@@ -775,19 +788,21 @@ export default function ListarBoletosBancarios({
                             <Button variant="secondary"
                               className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
                               onClick={() => handleClickVerDetalhes(boleto.id ? boleto.id : 0)}
-                              size={"sm"}>
+                              size={"sm"}
+                              style={{ fontSize: "0.7rem" }}>
                               Detalhes
                             </Button>
                           )}
                         {((isAdmin ||
                           user?.permissions.includes("ALL") ||
                           user?.permissions.includes("DELETE_PAGAMENTO")
-                        ) && (boleto.status === BoletoStatus.CONFIRMADO)) && (
+                        ) && (boleto.status === 'REGISTRADO')) && (
                             <>
-                              <Button variant="destructive"
+                              <Button variant="secondary"
                                 onClick={() => handlerBaixarBoleto(boleto.id)}
                                 size={"sm"}
                                 className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
+                                style={{ fontSize: "0.7rem" }}
                               >
                                 <Trash className="h-4 w-4" />Baixar do banco
                               </Button>
@@ -798,10 +813,11 @@ export default function ListarBoletosBancarios({
                           user?.permissions.includes("DELETE_PAGAMENTO")
                         ) && (boleto.status === "REGISTRADO")) && (
                             <>
-                              <Button variant="destructive"
+                              <Button variant="secondary"
                                 onClick={() => handlerValidarBoleto(boleto.id)}
                                 size={"sm"}
                                 className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
+                                style={{ fontSize: "0.7rem" }}
                               >
                                 <RefreshCcw className="h-4 w-4" />Atualizar Boleto
                               </Button>
@@ -810,7 +826,7 @@ export default function ListarBoletosBancarios({
                         {((isAdmin ||
                           user?.permissions.includes("ALL") ||
                           user?.permissions.includes("VIEW_BOLETO_BANCARIO")
-                        ) && (boleto.status === BoletoStatus.CONFIRMADO ||
+                        ) && (boleto.boleto?.status === BoletoStatus.CONFIRMADO ||
                           boleto.status === "REGISTRADO"
                           )) && (
                             <>
@@ -818,16 +834,19 @@ export default function ListarBoletosBancarios({
                                 onClick={() => handlerDownloadBoleto(boleto.id)}
                                 size={"sm"}
                                 className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
+                                style={{ fontSize: "0.7rem" }}
+
                               >
                                 <Download className="h-4 w-4" />Download Boleto
                               </Button>
                             </>
                           )}
-                        {(boleto.status === BoletoStatus.CONFIRMADO || boleto.status === "REGISTRADO") && (
+                        {(boleto.boleto?.status === BoletoStatus.CONFIRMADO || boleto.status === "REGISTRADO") && (
                           <Button variant="secondary"
                             className='hover:cursor-pointer hover:bg-gray-200'
                             onClick={() => handlerEnviaEmail(boleto)}
-                            size={"sm"}>
+                            size={"sm"}
+                            style={{ fontSize: "0.7rem" }}>
                             <Mail></Mail>
                           </Button>
                         )}
@@ -968,6 +987,16 @@ export default function ListarBoletosBancarios({
                   </Label>
 
                   <Label className="text-base font-[Poppins-Regular]">
+                    Cópia
+                    <Input
+                      type='text'
+                      className="mt-2"
+                      placeholder="Cópia"
+                      {...jobMethods.register('str_email_cc')}
+                    />
+                  </Label>
+
+                  <Label className="text-base font-[Poppins-Regular]">
                     Mensagem
                     <Textarea
                       rows={10}
@@ -982,9 +1011,15 @@ export default function ListarBoletosBancarios({
                   </Label>
                 </div>
                 <DialogFooter>
+                  {/*<Button size="sm" type='submit'
+                    className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
+                    onClick={() => handlerSendMail()}
+                    >
+                    Enviar email</Button>*/}
+
                   <Button size="sm" type='submit'
                     className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
-                    onClick={() => handlerSendMail()}>
+                  >
                     Enviar email</Button>
                 </DialogFooter>
               </form>

@@ -14,6 +14,7 @@ export const jobSchema = z.object({
     locacaoId: z.coerce.number().optional(),
 
     str_email: z.string(),
+    str_email_cc: z.string().optional(),
 
     str_message: z.string(),
 

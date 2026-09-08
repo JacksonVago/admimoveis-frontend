@@ -46,6 +46,9 @@ export interface ConfiguracaoAlerta {
   horarioInicial:string; //Horário inicial para envio dos alertas (ex: "09:00", "18:00", etc.) quando for recorrente e mais de uma vez ao dia
   horarioFinal:string; //Horário final para envio dos alertas (ex: "17:00", "23:00", etc.) quando for recorrente e mais de uma vez ao dia
 
+  emailDestinatario:string; //Email destinatário do alerta (quando necessário)
+  emailCopia:string; //Email de cópia do alerta (quando necessário)
+
   dataInicioEnvio:string; //Data e hora de início do envio dos alertas quando for recorrente
   dataFinalEnvio:string; //Data e hora de finalização do envio dos alertas quando for recorrente sem data será enviado indefinidamente
 }

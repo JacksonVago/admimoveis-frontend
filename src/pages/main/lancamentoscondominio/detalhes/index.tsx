@@ -37,7 +37,7 @@ import api from '@/services/axios/api'
 import { queryClient } from '@/services/react-query/query-client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Info, Pencil, Plus, Trash2 } from 'lucide-react'
 import * as React from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { LancamentoStatus } from '@/enums/locacao/enums-locacao'
@@ -69,9 +69,8 @@ export const DetalhesLancamentoCondominio = () => {
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
 
-  const [isEditing, setIsEditing] = React.useState(false)
+  const [isEditing, setIsEditing] = React.useState(true)
   const [titulo, setTitulo] = React.useState("Criar novo lançamento")
-  const disabled = isEditing
 
   const dataParams = useParams<{ id: string }>();
   const id = dataParams.id ? parseInt(dataParams.id) : undefined;
@@ -323,13 +322,26 @@ export const DetalhesLancamentoCondominio = () => {
   });
 
   const handleEditLancamento = (lancamento: LancamentoCondominio) => {
-    setTitulo("Alterar lançamento")
+    if (lancamento.status === LancamentoStatus.CONFIRMADO) {
+      setTitulo("Visualizar lançamento");
+      setIsEditing(false);
+    }
+    else {
+      setTitulo("Alterar lançamento");
+      setIsEditing(true);
+    }
+
     setIsCreateDialogOpen(true);
     lancamentoMethods.setValue("id", lancamento.id);
     lancamentoMethods.setValue("dataLancamento", moment.utc(lancamento.dataLancamento).format("YYYY-MM-DD"));
     lancamentoMethods.setValue("vencimentoLancamento", moment.utc(lancamento.vencimentoLancamento).format("YYYY-MM-DD"));
     lancamentoMethods.setValue("valorLancamento", lancamento.valorLancamento);
     lancamentoMethods.setValue("observacao", lancamento.observacao);
+    lancamentoMethods.setValue("numeroDocumento", lancamento.numeroDocumento);
+    lancamentoMethods.setValue("serieDocumento", lancamento.serieDocumento);
+    lancamentoMethods.setValue("dataDocumento", moment.utc(lancamento.dataDocumento).format("YYYY-MM-DD"));
+    lancamentoMethods.setValue("valorDocumento", lancamento.valorDocumento);
+    lancamentoMethods.setValue("descontoDocumento", lancamento.descontoDocumento);
     lancamentoMethods.setValue("rateia", lancamento.rateia);
     lancamentoMethods.setValue("status", lancamento.status);
     lancamentoMethods.setValue("tipoId", lancamento.tipoId);
@@ -463,7 +475,7 @@ export const DetalhesLancamentoCondominio = () => {
 
                             render={({ field }) => (
                               <Select
-                                disabled={disabled}
+                                disabled={!isEditing}
                                 onValueChange={(value) => {
                                   field.onChange(value);
                                   handleChangeTipo(value);
@@ -497,7 +509,7 @@ export const DetalhesLancamentoCondominio = () => {
                       <Label htmlFor="description">Código de Barras
                         <Input
                           type='text'
-                          disabled={disabled}
+                          disabled={!isEditing}
                           placeholder="Código de barras "
                           {...lancamentoMethods.register('linhaDigitavel')}
                           onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
@@ -512,7 +524,7 @@ export const DetalhesLancamentoCondominio = () => {
                         <Input
                           type='date'
                           className="mt-2"
-                          disabled={disabled}
+                          disabled={!isEditing}
                           placeholder="Data do lançamento"
                           {...lancamentoMethods.register('dataLancamento')}
                         />
@@ -524,7 +536,7 @@ export const DetalhesLancamentoCondominio = () => {
                         <Input
                           className="mt-2"
                           type="date"
-                          disabled={disabled}
+                          disabled={!isEditing}
                           placeholder="Data Vencimento"
                           {...lancamentoMethods.register('vencimentoLancamento')}
                         />
@@ -539,7 +551,7 @@ export const DetalhesLancamentoCondominio = () => {
                           type="number"
                           step={'any'}
                           className="mt-1"
-                          disabled={disabled}
+                          disabled={!isEditing}
                           placeholder="Valor do Lançamento"
                           {...lancamentoMethods.register('valorLancamento')}
                         />
@@ -550,7 +562,7 @@ export const DetalhesLancamentoCondominio = () => {
                         <Input
                           type="number"
                           className="mt-1"
-                          disabled={true}
+                          disabled={!isEditing}
                           {...lancamentoMethods.register('parcela')}
                         />
                         {lancamentoMethods.formState?.errors?.parcela?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {lancamentoMethods.formState?.errors?.parcela?.message}</p>}
@@ -567,7 +579,7 @@ export const DetalhesLancamentoCondominio = () => {
 
                             render={({ field }) => (
                               <Select
-                                disabled={disabled}
+                                disabled={!isEditing}
                                 onValueChange={(value) => {
                                   field.onChange(value);
                                 }}
@@ -605,7 +617,7 @@ export const DetalhesLancamentoCondominio = () => {
                       <Label htmlFor="description">Número da Nota
                         <Input
                           type='text'
-                          disabled={disabled}
+                          disabled={!isEditing}
                           placeholder="Nota fiscal"
                           {...lancamentoMethods.register('numeroDocumento')}
                           onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
@@ -615,7 +627,7 @@ export const DetalhesLancamentoCondominio = () => {
                       <Label htmlFor="description">Série da Nota
                         <Input
                           type='text'
-                          disabled={disabled}
+                          disabled={!isEditing}
                           placeholder="Série"
                           {...lancamentoMethods.register('serieDocumento')}
                           onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
@@ -630,7 +642,7 @@ export const DetalhesLancamentoCondominio = () => {
                         <Input
                           type='date'
                           className="mt-2"
-                          disabled={disabled}
+                          disabled={!isEditing}
                           placeholder="Data da Nota"
                           {...lancamentoMethods.register('dataDocumento')}
                         />
@@ -645,7 +657,7 @@ export const DetalhesLancamentoCondominio = () => {
                           type="number"
                           step={'any'}
                           className="mt-1"
-                          disabled={disabled}
+                          disabled={!isEditing}
                           placeholder="Valor da Nota"
                           {...lancamentoMethods.register('valorDocumento')}
                         />
@@ -658,7 +670,7 @@ export const DetalhesLancamentoCondominio = () => {
                           type="number"
                           step={'any'}
                           className="mt-1"
-                          disabled={true}
+                          disabled={!isEditing}
                           {...lancamentoMethods.register('descontoDocumento')}
                         />
                         {lancamentoMethods.formState?.errors?.descontoDocumento?.message && <p style={{ color: '#f26871', fontSize: '0.8rem' }}>* {lancamentoMethods.formState?.errors?.descontoDocumento?.message}</p>}
@@ -666,10 +678,12 @@ export const DetalhesLancamentoCondominio = () => {
                     </div>
 
                     <DialogFooter className='mt-2'>
+                      {(isEditing || titulo.includes('novo')) && (
                       <Button size={"sm"} type='submit'
                         className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white"
                       >
                         {titulo.includes('novo') ? 'Criar lançamento' : 'Confirmar Alteração'}</Button>
+                        )}
                     </DialogFooter>
                   </form>
                 </DialogContent>
@@ -746,6 +760,24 @@ export const DetalhesLancamentoCondominio = () => {
                                 </AlertDialog>
                               </>
                             )}
+                          {(lancamento.status === LancamentoStatus.CONFIRMADO) && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleEditLancamento(lancamento);
+                                  //setSelectedTipo(tipo)
+                                  //setIsEditDialogOpen(true)
+                                }}
+                              >
+                                <Info className="h-4 w-4" />
+                              </Button>
+
+                            </>
+                          )}
+
                         </div>
                       </>
                     ))}

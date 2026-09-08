@@ -222,6 +222,14 @@ export const DetalhesAlerta = () => {
       form.append('dataFinalEnvio', data.dataFinalEnvio.toString())
     }
 
+    if (data.emailDestinatario) {
+      form.append('emailDestinatario', data.emailDestinatario)
+    }
+
+    if (data.emailCopia) {
+      form.append('emailCopia', data.emailCopia)
+    }
+
     form.append('alertaId', data.alertaId ? data.alertaId.toString() : '0');
     form.append('empresaId', glb_params.id_empresa ? glb_params.id_empresa : "0");
 

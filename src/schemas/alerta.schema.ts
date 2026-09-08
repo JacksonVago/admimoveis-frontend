@@ -29,6 +29,8 @@ export const alertaSchema = z.object({
         const data: string = val;
         return moment(data.substring(0, 10)).format("YYYY-MM-DD");
     }).optional(),
+    emailDestinatario: z.string().email("Email inválido").optional(),
+    emailCopia: z.string().email("Email inválido").optional(),
     empresaId: z.number(),
     alertaId: z.coerce.number(),
 

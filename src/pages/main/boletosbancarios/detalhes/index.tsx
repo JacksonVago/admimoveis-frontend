@@ -51,6 +51,7 @@ import { Boleto } from '@/interfaces/boleto'
 import { usdFormatter } from '@/utils/format-money'
 import { STATUS_BOLETO_OPTIONS } from '@/constants/status-boletos'
 import { DocumentUpload } from '../../imoveis/criarImovel/components/document-upload'
+import { BoletoBancario } from '@/interfaces/boletobancario'
 //import { ROUTE } from '@/enums/routes.enum'
 //import { Calc_DIG_Modulo } from '@/utils/pagseguro-ecrypt'
 
@@ -108,20 +109,20 @@ export const DetalhesBoletoBancario = () => {
   const { data: boleto } = useQuery({
     queryKey: ['boleto', id],
     queryFn: async () => {
-      const { data } = await api.get<Boleto>(`/pagamentos/findbyid/${id}`)
+      const { data } = await api.get<BoletoBancario>(`/boleto-bancario/findbyid/${id}`)
       return data
     },
     enabled: !!id
   })
 
 
-  const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
+  /*const { data: documentFilesData = [], isSuccess: isSuccessDocuments } = useQuery({
     queryKey: ['documentFiles', id, boleto?.documentos],
     queryFn: () => fetchDocumentFiles(boleto?.documentos),
     enabled: !!boleto?.documentos?.length
   })
 
-  const documentFiles = React.useMemo(() => documentFilesData, [isSuccessDocuments])
+  const documentFiles = React.useMemo(() => documentFilesData, [isSuccessDocuments])*/
 
   console.log('boleto detalhes:', boleto);
 
@@ -275,19 +276,19 @@ export const DetalhesBoletoBancario = () => {
   const defaultValues = React.useMemo(
     () => ({
       id: 0,
-      locacaoId: boleto?.locacaoId,
-      imovelId: boleto?.imovelId,
-      dataEmissao: moment.utc(boleto?.dataEmissao).format("YYYY-MM-DD"),
-      dataPagamento: moment.utc(boleto?.dataPagamento).format("YYYY-MM-DD"),
-      dataVencimento: moment.utc(boleto?.dataVencimento).format("YYYY-MM-DD"),
-      valorOriginal: boleto?.valorOriginal || 0,
-      valorPago: boleto?.valorPago || boleto?.valorOriginal || 0,
-      locatarioId: boleto?.locatario?.id || 0,
-      status: boleto?.status || BoletoStatus.PENDENTE,
-      documentos: documentFiles?.filter((doc) => doc !== null),
-      empresaId: boleto?.empresaId
+      locacaoId: boleto?.boleto?.locacaoId,
+      imovelId: boleto?.boleto?.imovelId,
+      dataEmissao: moment.utc(boleto?.boleto?.dataEmissao).format("YYYY-MM-DD"),
+      dataPagamento: moment.utc(boleto?.boleto?.dataPagamento).format("YYYY-MM-DD"),
+      dataVencimento: moment.utc(boleto?.boleto?.dataVencimento).format("YYYY-MM-DD"),
+      valorOriginal: boleto?.boleto?.valorOriginal || 0,
+      valorPago: boleto?.boleto?.valorPago || boleto?.boleto?.valorOriginal || 0,
+      locatarioId: boleto?.boleto?.locatario?.id || 0,
+      status: boleto?.boleto?.status || BoletoStatus.PENDENTE,
+      //documentos: documentFiles?.filter((doc) => doc !== null),
+      empresaId: boleto?.boleto?.empresaId
     }),
-    [boleto, documentFiles]
+    [boleto]
   )
 
 
@@ -298,7 +299,7 @@ export const DetalhesBoletoBancario = () => {
     }
 
     if (localStorage) boletoMethods.reset(defaultValues)
-  }, [boleto, documentFiles])
+  }, [boleto])
 
   //react hook form
 
@@ -425,22 +426,22 @@ export const DetalhesBoletoBancario = () => {
                   <Label className="font-normal">{boleto?.id}</Label>
                 </div>
 
-                {(boleto?.locacao !== null ? (
+                {(boleto?.boleto?.locacao !== null ? (
                   <div className='flex flex-direction-row'>
-                    <Label className="font-bold mt-2">Locação : &nbsp;</Label>
+                    <Label className="font-bold mt-2">Locatário : &nbsp;</Label>
                     <Label className="font-normal mt-2">
-                      {boleto?.locatario ? boleto.locatario.pessoa?.nome : ''} -
-                      {boleto?.locacao?.imovel?.endereco.complemento} -
-                      {boleto?.locacao?.imovel?.condominio ? boleto.locacao.imovel.condominio.name : ''}
+                      {boleto?.boleto?.locacao?.locatarios ? boleto.boleto?.locacao.locatarios[0].pessoa?.nome + ' - ' : ''}
+                      {boleto?.boleto?.locacao?.imovel?.endereco.complemento}
+                      {boleto?.boleto?.locacao?.imovel?.condominio ? ' - ' + boleto.boleto?.locacao.imovel.condominio.name : ''}
                     </Label>
                   </div>
                 ) : (
                   <div className='flex flex-direction-row'>
-                    <Label className="font-bold mt-2">Imóvel : &nbsp;</Label>
+                    <Label className="font-bold mt-2">Proprietário : &nbsp;</Label>
                     <Label className="font-normal mt-2">
-                      {boleto?.imovel && boleto.imovel.proprietarios && boleto.imovel.proprietarios.length > 0 ? boleto.imovel.proprietarios[0]?.pessoa?.nome : ''} -
-                      {boleto?.imovel?.endereco.complemento} -
-                      {boleto?.imovel?.condominio ? boleto.imovel.condominio.name : ''}
+                      {boleto?.boleto?.imovel && boleto.boleto.imovel.proprietarios && boleto.boleto.imovel.proprietarios.length > 0 ? boleto.boleto.imovel.proprietarios[0]?.pessoa?.nome : ''}
+                      {boleto?.boleto?.imovel?.endereco.complemento ? ' - ' + boleto?.boleto?.imovel?.endereco.complemento : ''}
+                      {boleto?.boleto?.imovel?.condominio && boleto.boleto?.imovel.condominio.name ? ' - ' + boleto.boleto?.imovel.condominio.name : ''}
                     </Label>
                   </div>
                 ))}
@@ -449,7 +450,7 @@ export const DetalhesBoletoBancario = () => {
                 <div className='grid grid-cols-3'>
                   <div className='flex flex-direction-row'>
                     <Label className="font-bold mt-2">Emissão : &nbsp;</Label>
-                    <Label className="font-normal mt-2">{moment.utc(boleto?.dataEmissao).format("DD/MM/YYYY")}</Label>
+                    <Label className="font-normal mt-2">{moment.utc(boleto?.dataBoleto).format("DD/MM/YYYY")}</Label>
                   </div>
                   <div className='flex flex-direction-row'>
                     <Label className="font-bold mt-2">Vencimento : &nbsp;</Label>
@@ -464,7 +465,7 @@ export const DetalhesBoletoBancario = () => {
                 <div className='grid grid-cols-3'>
                   <div className='flex flex-direction-row'>
                     <Label className="font-bold mt-2">Valor Original : &nbsp;</Label>
-                    <Label className="font-normal mt-2">{usdFormatter.format(boleto?.valorOriginal ? boleto.valorOriginal : 0)}</Label>
+                    <Label className="font-normal mt-2">{usdFormatter.format(boleto?.valor ? boleto.valor : 0)}</Label>
                   </div>
                   <div className='flex flex-direction-row'>
                     <Label className="font-bold mt-2">Valor Pago : &nbsp;</Label>
@@ -483,8 +484,8 @@ export const DetalhesBoletoBancario = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {(boleto?.locacao !== null ?
-              (boleto?.lanctoLocacao && boleto.lanctoLocacao.length > 0) ? (
+            {(boleto?.boleto?.locacao !== null ?
+              (boleto?.boleto?.lanctoLocacao && boleto.boleto?.lanctoLocacao.length > 0) ? (
                 <div className=''>
 
                   <Label className='ml-2' style={{ 'fontSize': '1rem' }}> Lançamentos </Label>
@@ -498,7 +499,7 @@ export const DetalhesBoletoBancario = () => {
                     </div>
 
                     <div className='grid grid-cols-5 m-2' >
-                      {boleto.lanctoLocacao?.map((lancamento) => (
+                      {boleto.boleto?.lanctoLocacao?.map((lancamento) => (
                         <>
                           <Label className={!isMobile ? 'flex items-center mb-1' : 'flex items-center col-span-2 mb-1'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
                           {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>) : (<></>)}
@@ -556,15 +557,15 @@ export const DetalhesBoletoBancario = () => {
                       <Label className={!isMobile ? 'flex items-center mb-1' : 'flex items-center col-span-2 mb-1'} style={{ 'fontSize': '0.7rem' }}>Aluguel</Label>
                       {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}></Label>) : (<></>)}
                       <Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}></Label>
-                      <Label className='flex justify-end items-center' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(boleto.locacao ? boleto.locacao?.valorAluguel : 0)}</Label>
+                      <Label className='flex justify-end items-center' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(boleto.boleto?.locacao ? boleto.boleto?.locacao?.valorAluguel : 0)}</Label>
                     </div>
                   </div>
 
                   <div className='grid grid-cols-5 m-2' >
                     <Label className={!isMobile ? 'flex items-center mb-1 font-bold' : 'flex items-center col-span-2 mb-1 font-bold'} style={{ 'fontSize': '0.7rem' }}>Valor do Pagamento</Label>
                     {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}></Label>) : (<></>)}
-                    <Label className='flex items-center font-bold' style={{ 'fontSize': '0.7rem' }}>{moment.utc(boleto.dataVencimento).format('DD/MM/YYYY')}</Label>
-                    <Label className='flex justify-end items-center font-bold' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(boleto.valorOriginal)}</Label>
+                    <Label className='flex items-center font-bold' style={{ 'fontSize': '0.7rem' }}>{moment.utc(boleto.boleto?.dataVencimento).format('DD/MM/YYYY')}</Label>
+                    <Label className='flex justify-end items-center font-bold' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(boleto.boleto?.valorOriginal)}</Label>
                   </div>
                 </div>
 
@@ -574,7 +575,7 @@ export const DetalhesBoletoBancario = () => {
                 </p>
               )
               :
-              (boleto?.lancamentoImovels && boleto.lancamentoImovels.length > 0) ? (
+              (boleto?.boleto?.lancamentoImovels && boleto.boleto?.lancamentoImovels.length > 0) ? (
                 <div className=''>
 
                   <Label className='ml-2' style={{ 'fontSize': '1rem' }}> Lançamentos </Label>
@@ -588,7 +589,7 @@ export const DetalhesBoletoBancario = () => {
                     </div>
 
                     <div className='grid grid-cols-5 m-2' >
-                      {boleto.lancamentoImovels?.map((lancamento) => (
+                      {boleto.boleto?.lancamentoImovels?.map((lancamento) => (
                         <>
                           <Label className={!isMobile ? 'flex items-center mb-1' : 'flex items-center col-span-2 mb-1'} style={{ 'fontSize': '0.7rem' }}>{lancamento.lancamentotipo.name}</Label>
                           {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>) : (<></>)}
@@ -648,19 +649,19 @@ export const DetalhesBoletoBancario = () => {
                     <Label className={!isMobile ? 'flex items-center mb-1 font-bold' : 'flex items-center col-span-2 mb-1 font-bold'} style={{ 'fontSize': '0.7rem' }}>Valor do Pagamento</Label>
                     {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}></Label>) : (<></>)}
                     <Label className='flex items-center font-bold' style={{ 'fontSize': '0.7rem' }}>{moment.utc(boleto.dataVencimento).format('DD/MM/YYYY')}</Label>
-                    <Label className='flex justify-end items-center font-bold' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(boleto.valorOriginal)}</Label>
+                    <Label className='flex justify-end items-center font-bold' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(boleto.valor)}</Label>
                   </div>
                 </div>
 
               ) : (
                 <p className="text-center text-muted-foreground">
-                  Nenhum lançamento para esse pagamento nesse período.
+                  Nenhum lançamento para esse boleto bancário.
                 </p>
               ))
             }
           </CardContent>
           <CardFooter>
-            {boleto?.status !== BoletoStatus.PAGO && (
+            {/*boleto?.status !== BoletoStatus.PAGO && (
               <Dialog
                 open={isCreateDialogOpen}
                 onOpenChange={(value) => {
@@ -685,21 +686,6 @@ export const DetalhesBoletoBancario = () => {
                     <DocumentUpload disabled={disabled} downloadDocuments={disabled} />
                   </FormProvider>
                   <form onSubmit={boletoMethods.handleSubmit(onSubmitBoletoData)}>
-
-                    {/*<div className='mt-2'>
-                      <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-2" : "grid grid-cols-1 gap-4 mt-2")}>
-                        <Label htmlFor="description">Código de Barras
-                          <Input
-                            type='text'
-                            disabled={disabled}
-                            placeholder="Código de barras "
-                            {...boletoMethods.register('linhaDigitavel')}
-                            onBlur={(e) => { handlerValidaLinhaDig(e.target.value) }}
-                          />
-                          {boletoMethods.formState?.errors?.linhaDigitavel?.message && <p style={{ color: 'red', fontSize: '0.8rem' }}>*{boletoMethods.formState?.errors?.linhaDigitavel?.message}</p>}
-                        </Label>
-                      </div>
-                    </div>*/}
 
                     <div className={(isPortrait ? "grid grid-cols-2 gap-4 mt-2" : "grid grid-cols-1 gap-4 mt-2")}>
                       <Label className="text-base">
@@ -797,7 +783,7 @@ export const DetalhesBoletoBancario = () => {
                   </form>
                 </DialogContent>
               </Dialog>
-            )}
+            )*/}
           </CardFooter>
         </Card>
       </div>
