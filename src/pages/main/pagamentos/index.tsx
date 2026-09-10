@@ -933,7 +933,7 @@ export default function ListarPagamentos({
           percMulta: selConta.percMulta,
           diasInicioMulta: selConta.diasInicioMulta,
 
-          tipoDescontoCobCod: selConta.tipoDescontoCob  ? selConta.tipoDescontoCob.codigo : '0',
+          tipoDescontoCobCod: selConta.tipoDescontoCob ? selConta.tipoDescontoCob.codigo : '0',
           valorDesconto: selConta.valorDesconto,
           percDesconto: selConta.percDesconto,
           diasInicioDesconto: selConta.diasInicioDesconto,
@@ -970,7 +970,12 @@ export default function ListarPagamentos({
         //Altera Status do boleto
         console.log('retorno envio: ', retornoBanco)
         if (retornoBanco) {
-          //confirmarBoleto.mutateAsync(boleto);
+          if (retornoBanco.data.boletosbancarios && retornoBanco.data.boletosbancarios.length > 0) {
+            if (retornoBanco.data.boletosbancarios[0].status === 'ERRO') {
+              toast({ title: 'Erro ao ewnviar ao banco.' });
+              return;
+            }
+          }
         }
 
         toast({ title: 'Envio ao banco efetuada com sucesso.' });
@@ -1009,7 +1014,7 @@ export default function ListarPagamentos({
           open={isCreateDialogOpen}
           onOpenChange={(value) => {
             setIsCreateDialogOpen(value)
-          }}                    
+          }}
         >
           <DialogContent onInteractOutside={(e) => e.preventDefault()}>
             <DialogHeader className='font-[Poppins-Regular]'>
@@ -1398,11 +1403,29 @@ export default function ListarPagamentos({
                         </Label>
                       </div>
                       <Label className="font-bold flex justify-start mt-2" style={{ fontSize: '0.7rem' }}>
-                        Situação :  {boleto.status}
+                        Situação :  {boleto.boletosBancarios && boleto.boletosBancarios.length > 0 ? boleto.boletosBancarios[0].status === 'ERRO' ? boleto.boletosBancarios[0].status : boleto.status : boleto.status}
                       </Label>
                       {(boleto.boletosBancarios && boleto.boletosBancarios.length > 0) && (
-                        <Label className="font-bold flex justify-start mt-2" style={{ fontSize: '0.7rem' }}>
-                          Linha Digitável :  {boleto.boletosBancarios[0].linhaDigitavel}
+                        <Label className="font-bold flex justify-start mt-2"
+                          style={{
+                            fontSize: '0.7rem',
+                            color:
+                              ((boleto.boletosBancarios && boleto.boletosBancarios.length > 0) ?
+                                (boleto.boletosBancarios[0].status === 'ERRO' ?
+                                  'red' :
+                                  'black'
+                                ) :
+                                'black'
+                              )
+                          }}
+                        >
+                          {(boleto.boletosBancarios && boleto.boletosBancarios.length > 0) ?
+                            (boleto.boletosBancarios[0].status === 'ERRO' ?
+                              `Erro : ${boleto.boletosBancarios[0].linhaDigitavel}` :
+                              `Linha Digitável : ${boleto.boletosBancarios[0].linhaDigitavel}`
+                            ) :
+                            `Linha Digitável : ${boleto.boletosBancarios[0].linhaDigitavel}`}
+
                         </Label>
 
                       )

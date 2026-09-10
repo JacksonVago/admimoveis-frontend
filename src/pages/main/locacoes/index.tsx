@@ -19,8 +19,8 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { IdCard, List, Plus, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, IdCard, List, Plus, Search } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
 //import { Pessoa } from '@/interfaces/pessoa'
@@ -111,7 +111,10 @@ export default function ListarLocacoes({
   const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 100 : (isMobile && limitView > 2) ? 2 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || '';
   const status = searchParams.get('status') || undefined
-  const [locacaoList, setLocacaoList] = useState<Locacao[]>([]);
+
+
+  const [sortField, setSortField] = useState<string>("id");
+  const [order, setOrder] = useState<string>("");
 
   const { data, isLoading } = useQuery(
     useGetLocacoesQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {
@@ -146,100 +149,91 @@ export default function ListarLocacoes({
     }
   }, [isMobile])
 
-  useEffect(() => {
-    setLocacaoList(locacoes);
-  }, [locacoes])
-
   // Event Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const search = e.target.value
     setSearchTerm({ search })
   }
 
-  const handleOrderbyChange = (e: React.MouseEvent<HTMLTableCellElement>) => {
-    const column_sel = e.currentTarget.textContent || '';
-    let new_array: Locacao[] = [];
-
-    setLocacaoList([]);
+  const handleOrderbyChange = (column_sel: string) => {
     console.log('column_sel:', column_sel);
-    console.log('setlist:', locacaoList);
+
     switch (column_sel) {
-      case "Locação":
-        var sortedArray: Locacao[] = locacaoList.sort((a, b) => {
-          if (a.locatarios && a.locatarios.length > 0 &&
-            a.locatarios[0].pessoa &&
-            b.locatarios && b.locatarios.length > 0 &&
-            b.locatarios[0].pessoa) {
-            if (a.locatarios[0].pessoa.nome < b.locatarios[0].pessoa.nome) {
-              return -1;
-            }
-            if (a.locatarios[0].pessoa.nome > b.locatarios[0].pessoa.nome) {
-              return 1;
-            }
-          }
-
-          return 0;
-        });
-
-        console.log('sortedArray:', sortedArray);
-        setLocacaoList(sortedArray);
+      case "locatarios.0.pessoa.nome":
+        const sortOrderLoc = sortField === "locatarios.0.pessoa.nome" && order === "asc" ? "desc" : "asc";
+        setSortField("locatarios.0.pessoa.nome");
+        setOrder(sortOrderLoc);
         break;
 
-      case "Perído":
-        var sortedArray: Locacao[] = locacaoList.sort((a, b) => {
-          if (a.locatarios && a.locatarios.length > 0 &&
-            a.locatarios[0].pessoa &&
-            b.locatarios && b.locatarios.length > 0 &&
-            b.locatarios[0].pessoa) {
-            if (a.locatarios[0].pessoa.nome < b.locatarios[0].pessoa.nome) {
-              return -1;
-            }
-            if (a.locatarios[0].pessoa.nome > b.locatarios[0].pessoa.nome) {
-              return 1;
-            }
-          }
-
-          return 0;
-        });
-
-        setLocacaoList(sortedArray);
+      case "dataInicio":
+        const sortOrderPer = sortField === "dataInicio" && order === "asc" ? "desc" : "asc";
+        setSortField("dataInicio");
+        setOrder(sortOrderPer);
         break;
 
-        case "Vencimento":
-        var sortedArray: Locacao[] = locacaoList.sort((a, b) => {
-            if (a.diaVencimento < b.diaVencimento) {
-              return -1;
-            }
-            if (a.diaVencimento > b.diaVencimento) {
-              return 1;
-            }
-          return 0;
-        });
+      case "diaVencimento":
+        const sortOrder = sortField === "diaVencimento" && order === "asc" ? "desc" : "asc";
+        setSortField("diaVencimento");
+        setOrder(sortOrder);
 
-        console.log('sortedArray:', sortedArray);
-        setLocacaoList(sortedArray);
-        console.log('locacaoList:', locacaoList);
         break;
 
-      case "Valor Aluguel":
-        var sortedArray: Locacao[] = locacaoList.sort((a, b) => {
-            if (a.valorAluguel < b.valorAluguel) {
-              return -1;
-            }
-            if (a.valorAluguel > b.valorAluguel) {
-              return 1;
-            }
-          return 0;
-        });
-
-        setLocacaoList(sortedArray);
-        console.log('locacaoList:', locacaoList);
+      case "valorAluguel":
+        const sortOrderValor = sortField === "valorAluguel" && order === "asc" ? "desc" : "asc";
+        setSortField("valorAluguel");
+        setOrder(sortOrderValor);
         break;
     }
 
   }
 
-  useEffect(() => {console.log('locacaoList:', locacaoList)}),[locacaoList]
+  const sortedData = [...locacoes].sort((a, b) => {
+    console.log('a:', a[sortField as keyof Locacao], 'b', b[sortField as keyof Locacao]);
+    if (a[sortField as keyof Locacao] === b[sortField as keyof Locacao]) return 0;
+    if (a[sortField as keyof Locacao] !== undefined && b[sortField as keyof Locacao] !== undefined) {
+      var aValue = a[sortField as keyof Locacao];
+      var bValue = b[sortField as keyof Locacao];
+      console.log('aValue:', aValue, 'bValue:', bValue);
+      if (aValue && bValue) {
+        if (aValue < bValue) {
+          return order === "asc" ? -1 : 1;
+        }
+      }
+    }
+    return order === "asc" ? 1 : -1;
+  });
+
+  const getNestedValue = (obj: any, path: string) => {
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
+  };
+
+  const sortedData2 = useMemo(() => {
+    if (!sortField) return locacoes;
+
+    return [...locacoes].sort((a, b) => {
+      // Resolve the nested values safely
+      const valA = getNestedValue(a, sortField);
+      const valB = getNestedValue(b, sortField);
+
+      // Handle undefined or null values gracefully
+      if (valA === undefined || valA === null) return 1;
+      if (valB === undefined || valB === null) return -1;
+      if (valA === valB) return 0;
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return order === 'asc'
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      }
+
+      if (valA < valB) return order === 'asc' ? -1 : 1;
+      return order === 'asc' ? 1 : -1;
+    });
+  }, [locacoes, sortField, order]);
+
+  console.log('sortedData2:', sortedData2);
   /*const handlePageChange = (newpage: number) => {
     // Check if the new page is within the total pages
     // const canGoNext = !!totalPages && newpage <= totalPages ||
@@ -286,9 +280,7 @@ export default function ListarLocacoes({
     })
   }
 
-  console.log(locacoes);
-
-
+  console.log(sortedData);
 
 
   return (
@@ -364,7 +356,7 @@ export default function ListarLocacoes({
             showcard ?
               (
                 <>
-                  {locacaoList?.map((locacao) => (
+                  {sortedData2?.map((locacao) => (
                     <Card key={locacao.id} className="flex flex-col" style={{ color: "#034869" }}>
                       <CardHeader>
                         <CardTitle className="flex items-center justify-between">
@@ -439,13 +431,34 @@ export default function ListarLocacoes({
                   <table className="w-full table-fixed">
                     <thead className="sticky top-0">
                       <tr>
-                        <th className="border-b p-2 text-left">Locação</th>
-                        <th className="border-b p-2 text-left">Período</th>
                         <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
-                        onClick={(e) => handleOrderbyChange(e)}
+                          onClick={() => handleOrderbyChange("locatarios.0.pessoa.nome")}
                         >
-                          Vencimento</th>
-                        <th className="border-b p-2 text-left">Valor Aluguel</th>
+                          <div className="flex items-center">
+                            <span>Locação&nbsp;&nbsp;</span> {sortField === "locatarios.0.pessoa.nome" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("dataInicio")}
+                        >
+                          <div className="flex items-center">
+                            <span>Período&nbsp;&nbsp;</span> {sortField === "dataInicio" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("diaVencimento")}
+                        >
+                          <div className="flex items-center">
+                            <span>Vencimento&nbsp;&nbsp;</span> {sortField === "diaVencimento" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("valorAluguel")}
+                        >
+                          <div className="flex items-center">
+                            <span>Valur Aluguel&nbsp;&nbsp;</span> {sortField === "valorAluguel" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
                         <th className="border-b p-2 text-left"></th>
                       </tr>
                     </thead>
@@ -453,7 +466,7 @@ export default function ListarLocacoes({
                   <div className='h-[500px] flex-1 overflow-y-auto'>
                     <table className='w-full table-fixed'>
                       <tbody>
-                        {locacaoList?.map((locacao) => (
+                        {sortedData2?.map((locacao) => (
                           <tr key={locacao.id} className="hover:bg-gray-300">
                             <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
                               {(locacao.locatarios ? locacao?.locatarios[0].pessoa?.nome : '') + (locacao?.imovel?.condominio ? ' - ' + locacao?.imovel?.condominio.name : '') + ' - ' + locacao?.imovel?.endereco?.complemento}
