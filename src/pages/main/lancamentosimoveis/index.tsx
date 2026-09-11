@@ -11,8 +11,8 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { IdCard, List, MapPin, Pencil, Receipt, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, IdCard, List, MapPin, Pencil, Receipt, Search } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
 import { useMediaQuery } from 'react-responsive'
@@ -124,6 +124,9 @@ export default function ListarLancamentosImoveis({
   const [dataInicial, setdataInicial] = useState(moment(new Date()).format("YYYY-MM-DD"));
   const [dataFinal, setdataFinal] = useState(moment(new Date()).format("YYYY-MM-DD"));
 
+  const [sortField, setSortField] = useState<string>("id");
+  const [order, setOrder] = useState<string>("");
+
   const { data, isLoading } = useQuery(
     useGetLancamentosQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {
       page,
@@ -230,6 +233,43 @@ export default function ListarLancamentosImoveis({
     }
   }
 
+  const handleOrderbyChange = (column_sel: string) => {
+    console.log('column_sel:', column_sel);
+    const sortOrder = sortField === column_sel && order === "asc" ? "desc" : "asc";
+    setSortField(column_sel);
+    setOrder(sortOrder);
+  }
+
+  const getNestedValue = (obj: any, path: string) => {
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
+  };
+
+  const sortedData = useMemo(() => {
+    if (!sortField) return imoveis;
+
+    return [...imoveis].sort((a, b) => {
+      // Resolve the nested values safely
+      const valA = getNestedValue(a, sortField);
+      const valB = getNestedValue(b, sortField);
+
+      // Handle undefined or null values gracefully
+      if (valA === undefined || valA === null) return 1;
+      if (valB === undefined || valB === null) return -1;
+      if (valA === valB) return 0;
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return order === 'asc'
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      }
+
+      if (valA < valB) return order === 'asc' ? -1 : 1;
+      return order === 'asc' ? 1 : -1;
+    });
+  }, [imoveis, sortField, order]);
+
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]" style={{color:"#034869"}}>
       {/* Search & Filters */}
@@ -320,7 +360,7 @@ export default function ListarLancamentosImoveis({
             showcard ?
               (
                 <>
-                  {imoveis.map((imovel) => (
+                  {sortedData.map((imovel) => (
                     <Card key={imovel.id} className="" style={{color:"#034869"}}>
                       <CardHeader className="flex flex-row justify-between">
                         <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
@@ -444,10 +484,35 @@ export default function ListarLancamentosImoveis({
                   <table className="w-full table-fixed">
                     <thead className="sticky top-0">
                       <tr>
-                        <th className="border-b p-2 text-left">Imóvel</th>
-                        <th className="border-b p-2 text-left">Telefone</th>
-                        <th className="border-b p-2 text-left">Documento</th>
-                        <th className="border-b p-2 text-left">Email</th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("proprietarios.0.pessoa.nome")}
+                        >
+                          <div className="flex items-center">
+                            <span>Imóvel&nbsp;&nbsp;</span> {sortField === "proprietarios.0.pessoa.nome" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
+
+                         <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("proprietarios.0.pessoa.telefone")}
+                        >
+                          <div className="flex items-center">
+                            <span>Telefone&nbsp;&nbsp;</span> {sortField === "proprietarios.0.pessoa.telefone" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
+                         <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("proprietarios.0.pessoa.documento")}
+                        >
+                          <div className="flex items-center">
+                            <span>Documento&nbsp;&nbsp;</span> {sortField === "proprietarios.0.pessoa.documento" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
+                         <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("proprietarios.0.pessoa.email")}
+                        >
+                          <div className="flex items-center">
+                            <span>Email&nbsp;&nbsp;</span> {sortField === "proprietarios.0.pessoa.email" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
                         <th className="border-b p-2 text-left"></th>
                       </tr>
                     </thead>
@@ -455,7 +520,7 @@ export default function ListarLancamentosImoveis({
                   <div className='h-[500px] flex-1 overflow-y-auto'>
                     <table className='w-full table-fixed'>
                       <tbody>
-                        {imoveis?.map((imovel) => (
+                        {sortedData?.map((imovel) => (
                           <tr key={imovel.id} className="hover:bg-gray-300">
                             <td className="border-b p-2">
                               {(imovel.proprietarios && imovel.proprietarios.length > 0 ? (imovel.proprietarios[0].pessoa ? imovel.proprietarios[0].pessoa.nome : 'Sem locatário') : 'Sem locatário')

@@ -3,10 +3,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import api from '@/services/axios/api'
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { Pencil, Plus, Recycle, Trash2 } from 'lucide-react'
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, Pencil, Plus, Recycle, Trash2 } from 'lucide-react'
 import { TipoImovel } from '@/interfaces/tipoimovel'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/services/react-query/query-client'
 import axios from 'axios'
@@ -81,6 +81,10 @@ export default function ListarTipos() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
   const [newTipo, setNewTipo] = React.useState({ name: '', empresaId: 0 })
+
+  const [sortField, setSortField] = useState<string>("id");
+  const [order, setOrder] = useState<string>("");
+
   //Globals
   const glb_params = useGlobalParams();
 
@@ -92,7 +96,7 @@ export default function ListarTipos() {
     useGetTiposQueryOptions(Number(glb_params.id_empresa))
   )
 
-  const tipos = data?.data;
+  const tipos = data?.data || [];
 
   const createTipoMutation = useMutation({
     mutationFn: createTipo,
@@ -217,6 +221,44 @@ export default function ListarTipos() {
     }
   }
 
+  const handleOrderbyChange = (column_sel: string) => {
+    console.log('column_sel:', column_sel);
+    const sortOrder = sortField === column_sel && order === "asc" ? "desc" : "asc";
+    setSortField(column_sel);
+    setOrder(sortOrder);
+  }
+
+  const getNestedValue = (obj: any, path: string) => {
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
+  };
+
+  const sortedData = useMemo(() => {
+    if (!sortField) return tipos;
+
+    return [...tipos].sort((a, b) => {
+      // Resolve the nested values safely
+      const valA = getNestedValue(a, sortField);
+      const valB = getNestedValue(b, sortField);
+
+      // Handle undefined or null values gracefully
+      if (valA === undefined || valA === null) return 1;
+      if (valB === undefined || valB === null) return -1;
+      if (valA === valB) return 0;
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return order === 'asc'
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      }
+
+      if (valA < valB) return order === 'asc' ? -1 : 1;
+      return order === 'asc' ? 1 : -1;
+    });
+  }, [tipos, sortField, order]);
+
+  console.log('sortedData:', sortedData);
 
   return (
     <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]" style={{ color: "#034869" }}>
@@ -262,21 +304,27 @@ export default function ListarTipos() {
           </DialogContent>
         </Dialog>
       </div>
-      {tipos && tipos.length === 0 && !isLoading && (
+      {sortedData && sortedData.length === 0 && !isLoading && (
         <p className="text-center text-muted-foreground">
           Nenhum tipo de imóvel encontrado.
         </p>
       )}
-      {tipos && tipos.length > 0 && !isLoading && (
+      {sortedData && sortedData.length > 0 && !isLoading && (
         <table className="w-full">
           <thead>
             <tr>
-              <th className="border-b p-2 text-left">Nome</th>
+              <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                onClick={() => handleOrderbyChange("name")}
+              >
+                <div className="flex items-center">
+                  <span>Nome&nbsp;&nbsp;</span> {sortField === "name" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                </div>
+              </th>
               <th className="border-b p-2 text-left"></th>
             </tr>
           </thead>
           <tbody>
-            {tipos.map((tipo) => (
+            {sortedData.map((tipo) => (
               <tr key={tipo.id} className="hover:bg-gray-100">
                 <td className={tipo.status === PessoaStatus.CANCELADA ? "border-b p-2 text-red-600" : "border-b p-2"}>{tipo.name}</td>
                 <td className="border-b p-2">

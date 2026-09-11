@@ -187,29 +187,13 @@ export default function ListarLocacoes({
 
   }
 
-  const sortedData = [...locacoes].sort((a, b) => {
-    console.log('a:', a[sortField as keyof Locacao], 'b', b[sortField as keyof Locacao]);
-    if (a[sortField as keyof Locacao] === b[sortField as keyof Locacao]) return 0;
-    if (a[sortField as keyof Locacao] !== undefined && b[sortField as keyof Locacao] !== undefined) {
-      var aValue = a[sortField as keyof Locacao];
-      var bValue = b[sortField as keyof Locacao];
-      console.log('aValue:', aValue, 'bValue:', bValue);
-      if (aValue && bValue) {
-        if (aValue < bValue) {
-          return order === "asc" ? -1 : 1;
-        }
-      }
-    }
-    return order === "asc" ? 1 : -1;
-  });
-
   const getNestedValue = (obj: any, path: string) => {
     return path.split('.').reduce((current, key) => {
       return current && current[key] !== undefined ? current[key] : undefined;
     }, obj);
   };
 
-  const sortedData2 = useMemo(() => {
+  const sortedData = useMemo(() => {
     if (!sortField) return locacoes;
 
     return [...locacoes].sort((a, b) => {
@@ -233,7 +217,7 @@ export default function ListarLocacoes({
     });
   }, [locacoes, sortField, order]);
 
-  console.log('sortedData2:', sortedData2);
+  console.log('sortedData:', sortedData);
   /*const handlePageChange = (newpage: number) => {
     // Check if the new page is within the total pages
     // const canGoNext = !!totalPages && newpage <= totalPages ||
@@ -279,8 +263,6 @@ export default function ListarLocacoes({
       search: `?page=1&limit=${limit}&search=${search}&status=${(tipo_aux !== null ? tipo_aux : '')}`
     })
   }
-
-  console.log(sortedData);
 
 
   return (
@@ -356,7 +338,7 @@ export default function ListarLocacoes({
             showcard ?
               (
                 <>
-                  {sortedData2?.map((locacao) => (
+                  {sortedData?.map((locacao) => (
                     <Card key={locacao.id} className="flex flex-col" style={{ color: "#034869" }}>
                       <CardHeader>
                         <CardTitle className="flex items-center justify-between">
@@ -466,7 +448,7 @@ export default function ListarLocacoes({
                   <div className='h-[500px] flex-1 overflow-y-auto'>
                     <table className='w-full table-fixed'>
                       <tbody>
-                        {sortedData2?.map((locacao) => (
+                        {sortedData?.map((locacao) => (
                           <tr key={locacao.id} className="hover:bg-gray-300">
                             <td className={locacao.status === LocacaoStatus.ENCERRADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
                               {(locacao.locatarios ? locacao?.locatarios[0].pessoa?.nome : '') + (locacao?.imovel?.condominio ? ' - ' + locacao?.imovel?.condominio.name : '') + ' - ' + locacao?.imovel?.endereco?.complemento}

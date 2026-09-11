@@ -12,8 +12,8 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { IdCard, List, Plus, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, IdCard, List, Plus, Search } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
 import { Pessoa } from '@/interfaces/pessoa'
@@ -98,6 +98,9 @@ export default function ListarClientes({
   const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 100 : isMobile ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || '';
 
+  const [sortField, setSortField] = useState<string>("id");
+  const [order, setOrder] = useState<string>("");
+
   const { data, isLoading } = useQuery(
     useGetClientesQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {
       page,
@@ -161,7 +164,43 @@ export default function ListarClientes({
   // UI Logic
   const hasSearchResults = Boolean(!isLoading && search && clientes?.length === 0)
 
-  console.log('url',glb_params.origin_url);
+  const handleOrderbyChange = (column_sel: string) => {
+    console.log('column_sel:', column_sel);
+    const sortOrder = sortField === column_sel && order === "asc" ? "desc" : "asc";
+    setSortField(column_sel);
+    setOrder(sortOrder);
+  }
+
+  const getNestedValue = (obj: any, path: string) => {
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
+  };
+
+  const sortedData = useMemo(() => {
+    if (!sortField) return clientes;
+
+    return [...clientes].sort((a, b) => {
+      // Resolve the nested values safely
+      const valA = getNestedValue(a, sortField);
+      const valB = getNestedValue(b, sortField);
+
+      // Handle undefined or null values gracefully
+      if (valA === undefined || valA === null) return 1;
+      if (valB === undefined || valB === null) return -1;
+      if (valA === valB) return 0;
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return order === 'asc'
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      }
+
+      if (valA < valB) return order === 'asc' ? -1 : 1;
+      return order === 'asc' ? 1 : -1;
+    });
+  }, [clientes, sortField, order]);
+
 
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]"  style={{color: "#034869"}}>
@@ -222,7 +261,7 @@ export default function ListarClientes({
             showcard ?
               (
                 <>
-                  {clientes?.map((cliente) => (
+                  {sortedData?.map((cliente) => (
                     <Card key={cliente.id} className="flex flex-col"  style={{color: "#034869"}}>
                       <CardHeader>
                         <CardTitle className="flex items-center justify-between">
@@ -300,10 +339,34 @@ export default function ListarClientes({
                   <table className="w-full table-fixed">
                     <thead className="sticky top-0">
                       <tr>
-                        <th className="border-b p-2 text-left">Cliente</th>
-                        <th className="border-b p-2 text-left">Telefone</th>
-                        <th className="border-b p-2 text-left">Documento</th>
-                        <th className="border-b p-2 text-left">Email</th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("nome")}
+                        >
+                          <div className="flex items-center">
+                            <span>Nome&nbsp;&nbsp;</span> {sortField === "nome" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("telefone")}
+                        >
+                          <div className="flex items-center">
+                            <span>Telefone&nbsp;&nbsp;</span> {sortField === "telefone" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("documento")}
+                        >
+                          <div className="flex items-center">
+                            <span>Documento&nbsp;&nbsp;</span> {sortField === "documento" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("email")}
+                        >
+                          <div className="flex items-center">
+                            <span>Email&nbsp;&nbsp;</span> {sortField === "email" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
                         <th className="border-b p-2 text-left"></th>
                       </tr>
                     </thead>
@@ -311,7 +374,7 @@ export default function ListarClientes({
                   <div className='h-[450px] flex-1 overflow-y-auto'>
                     <table className='w-full table-fixed'>
                       <tbody>
-                        {clientes?.map((cliente) => (
+                        {sortedData?.map((cliente) => (
                           <tr key={cliente.id} className="hover:bg-gray-300">
                             <td className={cliente.status === PessoaStatus.CANCELADA ? "border-b p-2 text-red-600" : "border-b p-2"}>
                               {cliente.nome}

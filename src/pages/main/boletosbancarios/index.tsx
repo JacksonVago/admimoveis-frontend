@@ -12,8 +12,8 @@ import {
 import { ROUTE } from '@/enums/routes.enum'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { Download, IdCard, List, Mail, RefreshCcw, Search, Trash } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, Download, IdCard, List, Mail, RefreshCcw, Search, Trash } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { BasePaginationData } from '../imoveis/listarImoveis'
 import { useMediaQuery } from 'react-responsive'
@@ -126,6 +126,9 @@ export default function ListarBoletosBancarios({
   const [dataFinal, setdataFinal] = useState(searchParams.get('dataFinal') || moment.utc(new Date()).format("YYYY-MM-DD"));
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false)
   const [isBancoDialogOpen, setIsBancoDialogOpen] = useState(false)
+
+  const [sortField, setSortField] = useState<string>("id");
+  const [order, setOrder] = useState<string>("");
 
   //Consulta alertas configurados
   const {
@@ -612,8 +615,45 @@ export default function ListarBoletosBancarios({
     } catch (error) {
       console.error('Download failed:', error);
     }
-
   }
+
+  const handleOrderbyChange = (column_sel: string) => {
+    console.log('column_sel:', column_sel);
+    const sortOrder = sortField === column_sel && order === "asc" ? "desc" : "asc";
+    setSortField(column_sel);
+    setOrder(sortOrder);
+  }
+
+  const getNestedValue = (obj: any, path: string) => {
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
+  };
+
+  const sortedData = useMemo(() => {
+    if (!sortField) return boletosBancario;
+
+    return [...boletosBancario].sort((a, b) => {
+      // Resolve the nested values safely
+      const valA = getNestedValue(a, sortField);
+      const valB = getNestedValue(b, sortField);
+
+      // Handle undefined or null values gracefully
+      if (valA === undefined || valA === null) return 1;
+      if (valB === undefined || valB === null) return -1;
+      if (valA === valB) return 0;
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return order === 'asc'
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      }
+
+      if (valA < valB) return order === 'asc' ? -1 : 1;
+      return order === 'asc' ? 1 : -1;
+    });
+  }, [boletosBancario, sortField, order]);
+
   return (
     <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]" style={{ color: "#034869" }}>
       {/* Search & Filters */}
@@ -717,7 +757,7 @@ export default function ListarBoletosBancarios({
           (showcard ?
             (
               <>
-                {boletosBancario.map((boleto) => (
+                {sortedData.map((boleto) => (
                   <Card key={boleto.id} className="" style={{ color: "#034869" }}>
                     <CardHeader className="flex flex-row justify-between">
                       <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>
@@ -866,10 +906,35 @@ export default function ListarBoletosBancarios({
                 <table className="w-full table-fixed">
                   <thead className="sticky top-0">
                     <tr>
-                      <th className="border-b p-2 text-left">Locação/Imóvel</th>
-                      <th className="border-b p-2 text-left">Vencimento</th>
-                      <th className="border-b p-2 text-left">Valor</th>
-                      <th className="border-b p-2 text-left">Situacao</th>
+                      <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                        onClick={() => handleOrderbyChange("boleto.locatario.pessoa.nome")}
+                      >
+                        <div className="flex items-center">
+                          <span>Locação/Imóvel&nbsp;&nbsp;</span> {sortField === "boleto.locatario.pessoa.nome" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                        </div>
+                      </th>
+
+                      <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                        onClick={() => handleOrderbyChange("dataVencimento")}
+                      >
+                        <div className="flex items-center">
+                          <span>Vencimento&nbsp;&nbsp;</span> {sortField === "dataVencimento" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                        </div>
+                      </th>
+                      <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                        onClick={() => handleOrderbyChange("valor")}
+                      >
+                        <div className="flex items-center">
+                          <span>Valor&nbsp;&nbsp;</span> {sortField === "valor" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                        </div>
+                      </th>
+                      <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                        onClick={() => handleOrderbyChange("status")}
+                      >
+                        <div className="flex items-center">
+                          <span>Situacao&nbsp;&nbsp;</span> {sortField === "status" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                        </div>
+                      </th>
                       <th className="border-b p-2 text-left"></th>
                     </tr>
                   </thead>
@@ -877,7 +942,7 @@ export default function ListarBoletosBancarios({
                 <div className='h-[400px] flex-1 overflow-y-auto'>
                   <table className='w-full table-fixed'>
                     <tbody>
-                      {boletosBancario?.map((boleto) => (
+                      {sortedData?.map((boleto) => (
                         <tr key={boleto.id} className="hover:bg-gray-300">
                           {(boleto.boleto && boleto.boleto.locacao ? (
                             <td className={boleto.boleto.status === BoletoStatus.ATRASADO ? "border-b p-2 text-red-600" : "border-b p-2"}>

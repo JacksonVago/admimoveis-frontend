@@ -3,9 +3,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import api from '@/services/axios/api'
 import { queryOptions, useMutation, useQuery } from '@tanstack/react-query'
-import { Pencil, Plus, Recycle, Trash2 } from 'lucide-react'
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, Pencil, Plus, Recycle, Trash2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/services/react-query/query-client'
 import axios from 'axios'
@@ -86,7 +86,10 @@ export default function ListarGruposFluxoCaixa() {
       status: PessoaStatus.ATIVA,
       empresaId: 0,
     }
-  )
+  );
+  const [sortField, setSortField] = useState<string>("id");
+  const [order, setOrder] = useState<string>("");
+
   //Globals
   const glb_params = useGlobalParams();
 
@@ -94,7 +97,7 @@ export default function ListarGruposFluxoCaixa() {
     useGetGruposQueryOptions(Number(glb_params.id_empresa))
   )
 
-  const grupos = data?.data;
+  const grupos = data?.data || [];
 
   const createGrupoMutation = useMutation({
     mutationFn: createGrupo,
@@ -228,6 +231,57 @@ export default function ListarGruposFluxoCaixa() {
 
   console.log(selectedGrupo);
 
+  const handleOrderbyChange = (column_sel: string) => {
+    console.log('column_sel:', column_sel);
+
+    switch (column_sel) {
+      case "descricao":
+        const sortOrderLoc = sortField === "descricao" && order === "asc" ? "desc" : "asc";
+        setSortField("descricao");
+        setOrder(sortOrderLoc);
+        break;
+
+      case "cor":
+        const sortOrderPer = sortField === "cor" && order === "asc" ? "desc" : "asc";
+        setSortField("cor");
+        setOrder(sortOrderPer);
+        break;
+    }
+
+  }
+
+  const getNestedValue = (obj: any, path: string) => {
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
+  };
+
+  const sortedData = useMemo(() => {
+    if (!sortField) return grupos;
+
+    return [...grupos].sort((a, b) => {
+      // Resolve the nested values safely
+      const valA = getNestedValue(a, sortField);
+      const valB = getNestedValue(b, sortField);
+
+      // Handle undefined or null values gracefully
+      if (valA === undefined || valA === null) return 1;
+      if (valB === undefined || valB === null) return -1;
+      if (valA === valB) return 0;
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return order === 'asc'
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      }
+
+      if (valA < valB) return order === 'asc' ? -1 : 1;
+      return order === 'asc' ? 1 : -1;
+    });
+  }, [grupos, sortField, order]);
+
+  console.log('sortedData:', sortedData);
+
   return (
     <div className="container mx-auto p-4 font-[Poppins-regular] " style={{ color: "#034869" }}>
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -292,22 +346,35 @@ export default function ListarGruposFluxoCaixa() {
           </DialogContent>
         </Dialog>
       </div>
-      {grupos && grupos.length === 0 && !isLoading && (
+      {sortedData && sortedData.length === 0 && !isLoading && (
         <p className="text-center text-muted-foreground mt-2">
           Nenhum grupo de fluxo de caixa encontrado.
         </p>
       )}
-      {grupos && grupos.length > 0 && !isLoading && (
+      {sortedData && sortedData.length > 0 && !isLoading && (
         <table className="w-full">
           <thead>
             <tr>
-              <th className="border-b p-2 text-left">Descrição</th>
-              <th className="border-b p-2 text-left">Cor</th>
+              <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                onClick={() => handleOrderbyChange("descricao")}
+              >
+                <div className="flex items-center">
+                  <span>Descrição&nbsp;&nbsp;</span> {sortField === "descricao" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                </div>
+              </th>
+              <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                onClick={() => handleOrderbyChange("cor")}
+              >
+                <div className="flex items-center">
+                  <span>Cor&nbsp;&nbsp;</span> {sortField === "cor" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                </div>
+              </th>
+
               <th className="border-b p-2 text-left"></th>
             </tr>
           </thead>
           <tbody>
-            {grupos.map((grupo) => (
+            {sortedData.map((grupo) => (
               <tr key={grupo.id} className="hover:bg-gray-100">
                 <td className={grupo.status === PessoaStatus.CANCELADA ? "border-b p-2 text-red-600" : "border-b p-2"}>{grupo.descricao}</td>
                 <td className={grupo.status === PessoaStatus.CANCELADA ? "border-b p-2 text-red-600" : "border-b p-2"}>

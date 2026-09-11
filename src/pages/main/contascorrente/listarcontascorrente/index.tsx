@@ -14,8 +14,8 @@ import { ROUTE } from '@/enums/routes.enum'
 import { useGlobalParams } from '@/globals/GlobalParams'
 import { useAuth } from '@/hooks/auth/use-auth'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { IdCard, List, Plus, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, IdCard, List, Plus, Search } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { getContasCorrentes } from '../requests'
@@ -27,7 +27,7 @@ import { ContaCorrente } from '@/interfaces/contacorrente'
 
 
 // API & Query Logic
-export const useGetContasCorrentesQueryOptions = (empresaId:number, {
+export const useGetContasCorrentesQueryOptions = (empresaId: number, {
   search,
   page,
   limit,
@@ -65,7 +65,7 @@ export default function ListarContasCorrentes({
   const navigate = useNavigate()
   //Globals
   const glb_params = useGlobalParams();
-  
+
 
   const [showcard, setShowCard] = useState(!!onSelectContaCorrente);
 
@@ -74,8 +74,11 @@ export default function ListarContasCorrentes({
   const limit = ((isPortrait || isTablet || isBigScreen) && limitView > 1 ? 3 : (isMobile && limitView > 2) ? 1 : limitView > 0 ? limitView : limitView || Number(searchParams.get('limit')) || 3);
   const search = searchParams.get('search') || ''
 
+  const [sortField, setSortField] = useState<string>("id");
+  const [order, setOrder] = useState<string>("");
+
   const { data, isLoading } = useQuery(
-    useGetContasCorrentesQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,{
+    useGetContasCorrentesQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {
       page,
       limit,
       search,
@@ -104,7 +107,7 @@ export default function ListarContasCorrentes({
   }, [totalPages, page, limit, search])
 
   useEffect(() => {
-    if (isMobile){
+    if (isMobile) {
       setShowCard(true);
     }
   }, [isMobile])
@@ -138,16 +141,53 @@ export default function ListarContasCorrentes({
     navigate(`${ROUTE.CONTA_CORRENTE}/${id}`)
   }
 
-  
+  const handleOrderbyChange = (column_sel: string) => {
+    console.log('column_sel:', column_sel);
+    const sortOrder = sortField === column_sel && order === "asc" ? "desc" : "asc";
+    setSortField(column_sel);
+    setOrder(sortOrder);
+  }
+
+  const getNestedValue = (obj: any, path: string) => {
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
+  };
+
+  const sortedData = useMemo(() => {
+    if (!sortField) return contascorrentes;
+
+    return [...contascorrentes].sort((a, b) => {
+      // Resolve the nested values safely
+      const valA = getNestedValue(a, sortField);
+      const valB = getNestedValue(b, sortField);
+
+      // Handle undefined or null values gracefully
+      if (valA === undefined || valA === null) return 1;
+      if (valB === undefined || valB === null) return -1;
+      if (valA === valB) return 0;
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return order === 'asc'
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      }
+
+      if (valA < valB) return order === 'asc' ? -1 : 1;
+      return order === 'asc' ? 1 : -1;
+    });
+  }, [contascorrentes, sortField, order]);
+
+
   return (
-    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]" style={{color: "#034869"}}>
+    <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]" style={{ color: "#034869" }}>
       {/* Search & Filters */}
       <div className="flex flex-row items-start justify-end gap-2 sm:flex-row sm:items-center">
         {!onSelectContaCorrente && (
           <div className='grid grid-cols-3'>
             {showcard ?
-              (<List onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer '/>) :
-              (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer '/>)
+              (<List onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer ' />) :
+              (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer ' />)
             }
             {/* <h1 className="col-span-2 text-2xl font-bold">Imoveis</h1> 
           <Button className='flex justify-center' style={{ 'backgroundColor': 'transparent'}}
@@ -162,7 +202,7 @@ export default function ListarContasCorrentes({
           user?.permissions.includes("CREATE_ALERTA")
         ) && !onSelectContaCorrente) && (
             <Button size={"sm"} onClick={handleClickCreateContaCorrente}
-            className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
+              className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
               <Plus className="mr-2 h-4 w-4" /> Criar Conta
             </Button>
           )
@@ -197,17 +237,17 @@ export default function ListarContasCorrentes({
             <Loader />
           </div>
         ) :
-        
+
           (
             showcard ?
               (
                 <>
-                  {contascorrentes?.map((conta) => (
-                    <Card key={conta.id} className="" style={{color: "#034869"}}>
+                  {sortedData?.map((conta) => (
+                    <Card key={conta.id} className="" style={{ color: "#034869" }}>
                       <CardHeader className="flex flex-row justify-between">
                         <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>{conta?.descricao}</CardTitle>
                       </CardHeader>
-                      <CardContent style={{color: "#034869"}}>
+                      <CardContent style={{ color: "#034869" }}>
                         <p className='font-[Poppins-bold]'>{conta.banco.nome}</p>
                         <p className="line-clamp-2 flex gap-1 text-sm">
                           Agencia: {conta.agencia}
@@ -216,14 +256,14 @@ export default function ListarContasCorrentes({
                           Conta: {conta.conta + '-' + conta.digito}
                         </p>
                       </CardContent>
-                      <CardFooter className="flex justify-between" style={{color: "#034869"}}>
+                      <CardFooter className="flex justify-between" style={{ color: "#034869" }}>
                         <div className='grid grid-cols-2 gap-10'>
                           <Button
                             variant="secondary"
                             size="sm"
                             onClick={() => handleClickVerDetalhes(conta.id.toString())}
                             className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
-                            style={{color: "#034869"}}
+                            style={{ color: "#034869" }}
                           >
                             Ver detalhes
                           </Button>
@@ -254,13 +294,26 @@ export default function ListarContasCorrentes({
                   <table className="w-full">
                     <thead>
                       <tr>
-                        <th className="border-b p-2 text-left">Nome</th>
-                        <th className="border-b p-2 text-left">Dados</th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("descricao")}
+                        >
+                          <div className="flex items-center">
+                            <span>Nome&nbsp;&nbsp;</span> {sortField === "descricao" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
+
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("banco.nome")}
+                        >
+                          <div className="flex items-center">
+                            <span>Dados bancários&nbsp;&nbsp;</span> {sortField === "banco.nome" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
                         <th className="border-b p-2 text-left"></th>
                       </tr>
                     </thead>
                     <tbody>
-                      {contascorrentes?.map((conta) => (
+                      {sortedData?.map((conta) => (
                         <tr key={conta.id} className="hover:bg-gray-300">
                           <td className="border-b p-2">
                             {conta.descricao}
@@ -295,13 +348,13 @@ export default function ListarContasCorrentes({
         <PaginationContent>
           {/* Previous & Next Buttons */}
           <PaginationItem>
-            <PaginationPrevious onClick={() => handlePageChange(page - 1)} 
-              className='hover:bg-gray-200 hover:cursor-pointer'/>
+            <PaginationPrevious onClick={() => handlePageChange(page - 1)}
+              className='hover:bg-gray-200 hover:cursor-pointer' />
           </PaginationItem>
           {generatePaginationLinks(page, !totalPages ? 1 : totalPages, (limit === 1 ? limit : isBigScreen ? 10 : isPortrait ? 10 : isTablet ? 5 : 1), handlePageChange)}
           <PaginationItem>
-            <PaginationNext onClick={() => handlePageChange(page + 1)} 
-              className='hover:bg-gray-200 hover:cursor-pointer'/>
+            <PaginationNext onClick={() => handlePageChange(page + 1)}
+              className='hover:bg-gray-200 hover:cursor-pointer' />
           </PaginationItem>
         </PaginationContent>
       </Pagination>

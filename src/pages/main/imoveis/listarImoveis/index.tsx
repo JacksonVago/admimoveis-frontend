@@ -29,9 +29,9 @@ import { TipoImovel } from '@/interfaces/tipoimovel'
 import { cn } from '@/lib/utils'
 import api from '@/services/axios/api'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { IdCard, MapPin, Plus, Search, Table } from 'lucide-react'
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, IdCard, MapPin, Plus, Search, Table } from 'lucide-react'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -142,6 +142,9 @@ export default function ListarImoveis({
   const search = searchParams.get('search') || ''
   const tipo = searchParams.get('tipo') || undefined
 
+  const [sortField, setSortField] = useState<string>("id");
+  const [order, setOrder] = useState<string>("");
+
   //Consulta Tipo imóvel
   const {
     data: imovelTipo
@@ -242,6 +245,43 @@ export default function ListarImoveis({
     window.open(urlGoogleMaps);
   }
 
+  const handleOrderbyChange = (column_sel: string) => {
+    console.log('column_sel:', column_sel);
+    const sortOrder = sortField === column_sel && order === "asc" ? "desc" : "asc";
+    setSortField(column_sel);
+    setOrder(sortOrder);
+  }
+
+  const getNestedValue = (obj: any, path: string) => {
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : undefined;
+    }, obj);
+  };
+
+  const sortedData = useMemo(() => {
+    if (!sortField) return imoveis;
+
+    return [...imoveis].sort((a, b) => {
+      // Resolve the nested values safely
+      const valA = getNestedValue(a, sortField);
+      const valB = getNestedValue(b, sortField);
+
+      // Handle undefined or null values gracefully
+      if (valA === undefined || valA === null) return 1;
+      if (valB === undefined || valB === null) return -1;
+      if (valA === valB) return 0;
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return order === 'asc'
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      }
+
+      if (valA < valB) return order === 'asc' ? -1 : 1;
+      return order === 'asc' ? 1 : -1;
+    });
+  }, [imoveis, sortField, order]);
+
   return (
     <div className="container mx-auto space-y-4 p-4 font-[Poppins-regular]" style={{color: "#034869"}}>
       {/* Search & Filters */}
@@ -323,7 +363,7 @@ export default function ListarImoveis({
             showcard ?
               (
                 <>
-                  {imoveis?.map((imovel) => (
+                  {sortedData?.map((imovel) => (
                     <Card key={imovel.id} className="" style={{color: "#034869"}}>
                       <CardHeader className="flex flex-row justify-between">
                         <CardTitle className="line-clamp-1" style={{ fontSize: '1rem' }}>{imovel?.description}</CardTitle>
@@ -401,15 +441,39 @@ export default function ListarImoveis({
                   <table className="w-full">
                     <thead>
                       <tr>
-                        <th className="border-b p-2 text-left">Endereço</th>
-                        <th className="border-b p-2 text-left">Período</th>
-                        <th className="border-b p-2 text-left">Valor Aluguel</th>
-                        <th className="border-b p-2 text-left">Locatário</th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("endereco.logradouro")}
+                        >
+                          <div className="flex items-center">
+                            <span>Endereço&nbsp;&nbsp;</span> {sortField === "endereco.logradouro" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("locacoes.0.dataInicio")}
+                        >
+                          <div className="flex items-center">
+                            <span>Período&nbsp;&nbsp;</span> {sortField === "locacoes.0.dataInicio" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("valorAluguel")}
+                        >
+                          <div className="flex items-center">
+                            <span>Valor Aluguel&nbsp;&nbsp;</span> {sortField === "valorAluguel" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>                        
+                        <th className="border-b p-2 text-left hover:cursor-pointer hover:bg-gray-200"
+                          onClick={() => handleOrderbyChange("locacoes.0.locatarios.0.pessoa.nome")}
+                        >
+                          <div className="flex items-center">
+                            <span>Locatário&nbsp;&nbsp;</span> {sortField === "locacoes.0.locatarios.0.pessoa.nome" ? (order === "asc" ? <ArrowDownNarrowWide size={"16"} /> : <ArrowDownWideNarrow size={"16"} />) : <></>}
+                          </div>
+                        </th>                        
                         <th className="border-b p-2 text-left"></th>
                       </tr>
                     </thead>
                     <tbody>
-                      {imoveis?.map((imovel) => (
+                      {sortedData?.map((imovel) => (
                         <tr key={imovel.id} className="hover:bg-gray-300">
                           <td className={imovel.status === ImovelStatus.INDISPONIVEL ? "border-b p-2 text-red-600" : "border-b p-2"}>
                             {imovel.description} -
