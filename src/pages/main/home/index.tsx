@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/auth/use-auth';
 import { queryClient } from '@/services/react-query/query-client';
 import { toast } from '@/hooks/use-toast';
+import { MyChatBot } from '../chatbot/chatbot';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -602,6 +603,8 @@ export const Home = () => {
           </div>
         )}
       </div>
-    </div>)
+      <MyChatBot/>
+    </div>
+    )
 }
 

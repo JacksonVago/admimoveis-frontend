@@ -146,15 +146,29 @@ export const AlertaFormContent = ({
         ]
         break;
 
+      case "Verifica boleto pago":
+        arr_campos = [
+          { check: false, campo: "id", descricao: "Número do Boleto" },
+          { check: false, campo: "dataBoleto", descricao: "Data de Emissão" },
+          { check: false, campo: "dataVencimento", descricao: "Data de Vencimento" },
+          { check: false, campo: "dataPagamento", descricao: "Data de Pagamento" },
+          { check: false, campo: "valor", descricao: "Valor Boleto" },
+          { check: false, campo: "valorPago", descricao: "Valor Pago" },
+          { check: false, campo: "email", descricao: "Email" },
+          { check: false, campo: "destinatario", descricao: "Destinatário" },
+        ]
+        break;
+
       case "Aviso boleto atrasado":
         arr_campos = [
-          { check: false, campo: "dataEmissao", descricao: "Data de Emissão" },
+          { check: false, campo: "id", descricao: "Número do Boleto" },
+          { check: false, campo: "dataBoleto", descricao: "Data de Emissão" },
           { check: false, campo: "dataVencimento", descricao: "Data de Vencimento" },
-          { check: false, campo: "valorOriginal", descricao: "Valor Original" },
-          { check: false, campo: "email", descricao: "Email" },
-          { check: false, campo: "linkDocumento", descricao: "Link do Documento" },
-          { check: false, campo: "linhaDigitavelBol", descricao: "Linha Digitável Boleto" },
-          { check: false, campo: "linhaDigitavelLan", descricao: "Linha Digitável Lançamento" },
+          { check: false, campo: "dataPagamento", descricao: "Data de Pagamento" },
+          { check: false, campo: "valor", descricao: "Valor Boleto" },
+          { check: false, campo: "observacao", descricao: "Observação" },
+          { check: false, campo: "destinatario", descricao: "Destinatário" },
+          { check: false, campo: "linhaDigitavel", descricao: "Código de Barras" },
         ]
         break;
 
