@@ -1,28 +1,32 @@
 import { ROUTE } from "@/enums/routes.enum";
 import { useAuth } from "@/hooks/auth/use-auth";
-import { useRef, useState } from "react";
-import ChatBot from "react-chatbotify";
+import { useEffect, useRef, useState } from "react";
+import ChatBot, { ChatBotProvider, useFlow } from "react-chatbotify";
 import { Params, Styles, Settings } from "react-chatbotify"
 import { useNavigate } from "react-router-dom";
 import { useGlobalParams } from "@/globals/GlobalParams";
 import { BoletoStatus } from "@/enums/locacao/enums-locacao";
 import api from "@/services/axios/api";
 import { Boleto } from "@/interfaces/boleto";
-import moment from "moment";
+import moment, { duration } from "moment";
+import { Label } from "@radix-ui/react-label";
+import { usdFormatter } from "@/utils/format-money";
 
-interface ChatFormData {
-    name?: string;
-    age?: string | number;
-    pet_ownership?: string;
-    pet_choices?: string;
-    num_work_days?: string | number;
-}
+// Componente interno que terá acesso aos Hooks do Chatbot
+const BotaoReiniciar = () => {
+    const { restartFlow } = useFlow();
+
+    return (
+        <button onClick={restartFlow} style={{ margin: "10px", padding: "5px 10px" }}>
+            Reiniciar Conversa 🔄
+        </button>
+    );
+};
 
 export const MyChatBot = () => {
     const navigate = useNavigate();
     const glb_params = useGlobalParams();
     const { firstName } = useAuth();
-    const formRef = useRef<ChatFormData>({ name: "", age: "", pet_ownership: "", pet_choices: "", num_work_days: "" });
     const [previsoes, setPrevisoes] = useState<Boleto[]>([]);
     const [filterPrevisoes, setFilterPrevisoes] = useState<Boleto[]>([]);
 
@@ -32,6 +36,9 @@ export const MyChatBot = () => {
     const filtroOptions = ["Vencimento", "Valor", "Locatário", "Proprietário", "Locação"];
 
     const snOptions = ["Sim", "Não"];
+
+    useEffect(() => {
+    }, [filterPrevisoes]);
 
     const flow = {
         //Início da conversa
@@ -110,13 +117,13 @@ export const MyChatBot = () => {
                     else {
                         await params.injectMessage(`Não foram encontradas previsões aguardando geração de boletos.`);
                         return "criar_previsao";
-                    }                    
+                    }
                 }
 
                 if (params.userInput === "Não") {
                     return "criar_previsao";
                 }
-                else{
+                else {
                     return "o_q_deseja";
                 }
             },
@@ -152,10 +159,10 @@ export const MyChatBot = () => {
             }
         },
         //Criar uma nova previsão
-        criar_previsao:{
-            message : "Gostaria de criar uma previsão ?",
-            options : snOptions,
-            path: (params:Params) =>{
+        criar_previsao: {
+            message: "Gostaria de criar uma previsão ?",
+            options: snOptions,
+            path: (params: Params) => {
                 if (params.userInput === "Sim") {
                     navigate(ROUTE.PAGAMENTOS);
                 }
@@ -163,11 +170,11 @@ export const MyChatBot = () => {
                 if (params.userInput === "Não") {
                     return "posso_algomais";
                 }
-                else{
+                else {
                     return "o_q_deseja";
                 }
             }
-        },        
+        },
         seleciona_previsao: {
             transitions: { duration: 0 },
             path: async (params: Params) => {
@@ -182,7 +189,7 @@ export const MyChatBot = () => {
             path: async (params: Params) => {
                 let str_path = "";
                 switch (params.userInput) {
-                    case "Vencimento":                        
+                    case "Vencimento":
                         str_path = "filtra_previsao_venc";
                         break;
 
@@ -205,33 +212,152 @@ export const MyChatBot = () => {
                 return str_path;
             }
         },
-        filtra_previsao_venc :{
-            message : `Informe uma data no formato dd/mm/aaaa (Ex.: ${new Date().toLocaleDateString()}).`,
-            path : (params:Params)=> {
-                    let str_data = new Date(params.userInput);
-                    if (!isNaN(str_data.getDate())){
-                        let previsoes_aux:Boleto[] = [];
-                        previsoes_aux = previsoes.filter(x => { x.dataVencimento === moment.utc(str_data).format("YYYY-MM-DD")});
-                        setFilterPrevisoes(previsoes_aux);
-                        return "mostra_previsao";
-                    }
-                    else{
-                        params.injectMessage("A data informada não válida.");
-                        return "filtra_previsao_venc";
-                    }
+        filtra_previsao_venc: {
+            message: `Informe uma data no formato dd/mm/aaaa (Ex.: ${new Date().toLocaleDateString()}).`,
+            function: (params: Params) => {
+                let str_dataAux = params.userInput;
+                str_dataAux = str_dataAux.substring(3, 6) + str_dataAux.substring(0, 3) + str_dataAux.substring(6, 10)
+                let str_data = new Date(str_dataAux);
+                if (!isNaN(str_data.getDate())) {
+                    let previsoes_aux: Boleto[] = [];
+                    previsoes_aux = previsoes.filter(x => x.dataVencimento.slice(0, 10).toString() == moment.utc(str_data).format("YYYY-MM-DD").toString());
+                    setFilterPrevisoes(previsoes_aux);
+                }
+                else {
+                    params.injectMessage("A data informada não válida.");
+                }
+            },
+            path: (params: Params) => {
+                return "aguarda_refresh";
+            },
+        },
+        aguarda_refresh: {
+            message: "Estamos aplicando o filtro, aguarde...",
+            transition: { duration: 3000 },
+            path: "mostra_previsao",
+        },
+        //Filtrar previsao por valor
+        filtra_previsao_val: {
+            message: `Informe um valor no formato 123.00.`,
+            function: (params: Params) => {
+                let str_data = params.userInput;
+                if (Number(str_data) > 0) {
+                    let previsoes_aux: Boleto[] = [];
+                    previsoes_aux = previsoes.filter(x => x.valorOriginal === Number(str_data));
+                    setFilterPrevisoes(previsoes_aux);
+                }
+                else {
+                    params.injectMessage("O Valor dever ser um número maior que ZERO.");
+                }
 
-            }
+            },
+            path: (params: Params) => {
+                return "aguarda_refresh";
+            },
         },
         //mostra as previsões filtradas
-        mostra_previsao :{
-            message : () => {
-                if (filterPrevisoes.length > 5){
-                 return `Foram encontradas ${filterPrevisoes.length} com esse vencimento`;
+        mostra_previsao: {
+            message: () => {
+                console.log(filterPrevisoes);
+                if (filterPrevisoes.length > 6) {
+                    return `Foram encontradas ${filterPrevisoes.length} com esse filtro`
+                }
+                else {
+                    if (filterPrevisoes.length === 1) {
+                        return "Apenas uma previsão foi encontrada com esse filtro.Se for essa a previsão basta confirmar que iremos emitir o boleto."
+                    }
+                    else {
+                        return "Favor verificar se é uma dessas previsão, se sim basta informar o número da lista que proseguiremos."
+                    }
+                }
+            },
+            component: () => {
+                return (
+                    <div>
+                        {(filterPrevisoes.length > 0 ?
+                            <div className='rounded-md border-2 mt-2 m-2 p-2'>
+                                <div className='grid grid-cols-12 m-2 font-[Poppins-bold]' >
+                                    <Label className='border-b pb-5 col-span-7' style={{ 'fontSize': '0.7rem' }}>Destinatário</Label>
+                                    <Label className='border-b  pb-5  col-span-3' style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
+                                    <Label className='flex justify-end border-b pb-6  col-span-2' style={{ 'fontSize': '0.7rem' }}>Valor</Label>
+                                </div>
+
+                                <div className='grid grid-cols-12 m-2' >
+                                    {filterPrevisoes.map((previsao, index) => (
+                                        <>
+                                            <Label className='flex items-center  col-span-7' style={{ 'fontSize': '0.7rem' }}>{(index + 1)} -
+                                                {previsao.locatario ? previsao.locatario.pessoa?.nome :
+                                                    previsao.imovel?.proprietarios ? previsao.imovel?.proprietarios[0].pessoa?.nome : ''}
+                                            </Label>
+                                            <Label className='flex items-center  col-span-3' style={{ 'fontSize': '0.7rem' }}>{moment.utc(previsao.dataVencimento).format("DD/MM/YYYY")}</Label>
+                                            <Label className='flex justify-end items-center  col-span-2' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(previsao.valorOriginal)}</Label>
+                                        </>
+                                    ))}
+                                </div>
+                            </div>
+                            :
+                            <></>
+                        )}
+                    </div>
+                );
+            },
+            /*options: () =>{
+                if (filterPrevisoes.length === 1) {
+                    return snOptions;
                 }
                 else{
-                    
+                    return undefined;
                 }
-            }
+            },*/
+            chatDisabled: true,
+            path: "solicita_num_previsao", /*(params:Params) =>{                
+                console.log(filterPrevisoes);
+                if (filterPrevisoes.length === 1) {
+                    if (params.userInput === "Sim") {
+                        return "confirma_previsao";
+                    }
+                    else{
+                        return "novo_filtro";
+                    }
+                }
+                else{
+                    console.log('solicita_num_previsao');
+                    return "solicita_num_previsao";
+                }
+            },*/
+        },
+        novo_filtro:{
+            message : "Deseja informar um novo fitro ?",
+            options: snOptions,
+            path: (params:Params) =>{
+                if (params.userInput === "Sim") {
+                    return "filtra_previsao";
+                }
+                else{
+                    return "start";
+                }
+            },
+        },
+        solicita_num_previsao:{
+            message : "Favor informar o número da previsão que deseja emitir o boleto. ",
+            function: (params: Params) => {
+                let str_data = params.userInput;
+                if (Number(str_data) > 0) {
+                    let previsoes_aux: Boleto[] = [];
+                    previsoes_aux.push(previsoes[Number(str_data)]);
+                    setFilterPrevisoes(previsoes_aux);
+                }
+                else {
+                    params.injectMessage("O Valor dever ser um número maior que ZERO.");
+                }
+
+            },
+            path: (params: Params) => {
+                return "aguarda_refresh";
+            },
+        },
+        confirma_previsao : {
+
         },
         //Caso não selecione um item
         o_q_deseja: {
@@ -349,8 +475,10 @@ export const MyChatBot = () => {
         }
     }
 
-
     return (
-        <ChatBot settings={settings} flow={flow} styles={styles} />
+        <ChatBotProvider>
+            <ChatBot settings={settings} flow={flow} styles={styles} />
+            <BotaoReiniciar />
+        </ChatBotProvider>
     );
 };
