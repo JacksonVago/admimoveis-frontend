@@ -5,12 +5,16 @@ import ChatBot, { ChatBotProvider, useFlow } from "react-chatbotify";
 import { Params, Styles, Settings } from "react-chatbotify"
 import { useNavigate } from "react-router-dom";
 import { useGlobalParams } from "@/globals/GlobalParams";
-import { BoletoStatus } from "@/enums/locacao/enums-locacao";
+import { BoletoStatus, LocacaoStatus } from "@/enums/locacao/enums-locacao";
 import api from "@/services/axios/api";
 import { Boleto } from "@/interfaces/boleto";
 import moment, { duration } from "moment";
 import { Label } from "@radix-ui/react-label";
 import { usdFormatter } from "@/utils/format-money";
+import { elements } from "chart.js";
+import chatIcon from "@/assets/chat2.svg";
+import { STATUS_LOCACAO_OPTIONS } from "@/constants/status-locacao";
+import { Locacao } from "@/interfaces/locacao";
 
 // Componente interno que terá acesso aos Hooks do Chatbot
 const BotaoReiniciar = () => {
@@ -28,17 +32,60 @@ export const MyChatBot = () => {
     const glb_params = useGlobalParams();
     const { firstName } = useAuth();
     const [previsoes, setPrevisoes] = useState<Boleto[]>([]);
+    const [locacoes, setLocacoes] = useState<Locacao[]>([]);
     const [filterPrevisoes, setFilterPrevisoes] = useState<Boleto[]>([]);
+    const [filtrosSel, setFiltrosSel] = useState<string[]>([]);
+    const [statusLoc, setStatusLoc] = useState<LocacaoStatus>([]);
+    const [filterLocacoes, setFilterLocacoes] = useState<Locacao[]>([]);
 
-    const initOptions = ["Emissão de boletos", "Cadastros"];
+    const initOptions = ["Emissão de boletos", "Cadastros", "Consultas"];
     const criaOptions = ["Criar", "Consultar"];
     const cadastrosOptions = ["Tipo imóvel", "Imóvel", "Locação", "Proprietário", "Locatário"];
     const filtroOptions = ["Vencimento", "Valor", "Locatário", "Proprietário", "Locação"];
+    const OptionsLocacao = ["Dia Vencimento", "Valor", "Locatário", "Proprietário", "Locação"];
 
     const snOptions = ["Sim", "Não"];
 
     useEffect(() => {
     }, [filterPrevisoes]);
+
+    const styles: Styles = {
+        headerStyle: {
+            background: '#034869',
+            color: '#ffffff',
+            padding: '10px',
+        },
+        chatWindowStyle: {
+            backgroundColor: '#f2f2f2',
+        },
+        chatButtonStyle: { background: "transparent" },
+    }
+
+    const settings: Settings = {
+        general: {
+            showFooter: false
+        },
+        chatButton: {
+            icon: chatIcon,
+        },
+        notification: {
+            disabled: true,
+        },
+        header: {
+            title: "Assis"
+        },
+        chatHistory: {
+            storageKey: "example_basic_form"
+        },
+        tooltip: {
+            mode: "NEVER",
+        },
+        // Customizing emoji button icons
+        emoji: {
+            disabled: false,
+            icon: () => <span>😊</span>,
+        }
+    }
 
     const flow = {
         //Início da conversa
@@ -74,33 +121,32 @@ export const MyChatBot = () => {
                 let link = "";
                 switch (params.userInput) {
                     case "Emissão de boletos":
-                        return "emissao_boleto"
+                        link = "emissao_boleto";
                         break;
                     case "Cadastros":
-                        return "opcao_cadastros";
+                        link = "opcao_cadastros";;
                         break;
-                    case "Examples":
-                        link = "https://react-chatbotify.com/docs/examples/basic_form";
+                    case "Consultas":
+                        link = "opcao_consultas";
                         break;
+
                     case "Github":
                         link = "https://github.com/react-chatbotify/react-chatbotify/";
                         break;
+
                     case "Discord":
                         link = "https://discord.gg/6R4DK4G5Zh";
                         break;
+
                     default:
-                        return "o_q_deseja";
+                        link = "o_q_deseja";
                 }
-                await params.injectMessage("Aguarde um instante! Vou encaminhar você para lá agora mesmo!");
-                setTimeout(() => {
-                    navigate(link);
-                }, 1000)
-                return "repeat"
+                return link
             },
         },
         //Quando Emissao de boletos
         emissao_boleto: {
-            message: "Já existem uma previsão de cobrança criada o boleto que deseja emitir ?",
+            message: "Já existem uma previsão de cobrança criada para o boleto que deseja emitir ?",
             options: snOptions,
             path: async (params: Params) => {
                 if (params.userInput === "Sim") {
@@ -158,6 +204,32 @@ export const MyChatBot = () => {
                 return "repeat"
             }
         },
+        //Opção de consultas
+        opcao_consultas: {
+            message: "Quais dessas consultas deseja efetuar ?",
+            options: ["Locações", "Imóveis", "Clientes", "Previsões", "Boletos"],
+            path: async (params: Params) => {
+                let link = "";
+                switch (params.userInput) {
+                    case "Locações":
+                        link = "consulta_locacao";
+                        break;
+                    case "Imóveis":
+                        link = "consulta_imovel";
+                        break;
+                    case "Clientes":
+                        link = "consulta_cliente";
+                        break;
+                    case "Previsões":
+                        link = "consulta_previsao";
+                        break;
+                    case "Boletos":
+                        link = "consulta_boleto";
+                        break;
+                }
+                return link
+            }
+        },
         //Criar uma nova previsão
         criar_previsao: {
             message: "Gostaria de criar uma previsão ?",
@@ -176,7 +248,7 @@ export const MyChatBot = () => {
             }
         },
         seleciona_previsao: {
-            transitions: { duration: 0 },
+            transition: { duration: 0 },
             path: async (params: Params) => {
                 return "filtra_previsao"
             }
@@ -184,8 +256,15 @@ export const MyChatBot = () => {
         //filtrar as Previsões dentre as encontradas encontradas
         filtra_previsao: {
             message: "Você teria algumas das informações abaixo, assim posso filtrar as previsões.\nClique no botão desejado para colocar a informação.",
-            transitions: { duration: 1000 },
-            options: filtroOptions,
+            transition: { duration: 1000 },
+            path: "mostra_filtros",
+        },
+        //mostra os filtros disponíveis
+        mostra_filtros: {
+            options: () => {
+                console.log(previsoes.length);
+                return (previsoes.length < 10 ? [...filtroOptions, "Listar todas"] : filtroOptions);
+            },
             path: async (params: Params) => {
                 let str_path = "";
                 switch (params.userInput) {
@@ -207,6 +286,14 @@ export const MyChatBot = () => {
 
                     case "Locação":
                         str_path = "filtra_previsao_loc";
+                        break;
+
+                    case "Listar todas":
+                        str_path = "mostra_previsao_todas";
+                        break;
+
+                    default:
+                        str_path = "o_q_deseja";
                         break;
                 }
                 return str_path;
@@ -255,6 +342,24 @@ export const MyChatBot = () => {
                 return "aguarda_refresh";
             },
         },
+        filtra_previsao_locat: {
+            message: "Qual o nome do locatário que deseja encontrar?",
+            function: (params: Params) => {
+                let str_data = params.userInput;
+                if (str_data.length > 0) {
+                    let previsoes_aux: Boleto[] = [];
+                    previsoes_aux = previsoes.filter(x => x.locatario?.pessoa?.nome.toLowerCase().includes(str_data.toLowerCase()));
+                    setFilterPrevisoes(previsoes_aux);
+                }
+                else {
+                    params.injectMessage("Favor informar ao menos uma letra.");
+                }
+
+            },
+            path: (params: Params) => {
+                return "aguarda_refresh";
+            },
+        },
         //mostra as previsões filtradas
         mostra_previsao: {
             message: () => {
@@ -282,16 +387,16 @@ export const MyChatBot = () => {
                                     <Label className='flex justify-end border-b pb-6  col-span-2' style={{ 'fontSize': '0.7rem' }}>Valor</Label>
                                 </div>
 
-                                <div className='grid grid-cols-12 m-2' >
+                                <div>
                                     {filterPrevisoes.map((previsao, index) => (
-                                        <>
+                                        <div key={index} className='grid grid-cols-12 m-2'>
                                             <Label className='flex items-center  col-span-7' style={{ 'fontSize': '0.7rem' }}>{(index + 1)} -
                                                 {previsao.locatario ? previsao.locatario.pessoa?.nome :
                                                     previsao.imovel?.proprietarios ? previsao.imovel?.proprietarios[0].pessoa?.nome : ''}
                                             </Label>
                                             <Label className='flex items-center  col-span-3' style={{ 'fontSize': '0.7rem' }}>{moment.utc(previsao.dataVencimento).format("DD/MM/YYYY")}</Label>
                                             <Label className='flex justify-end items-center  col-span-2' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(previsao.valorOriginal)}</Label>
-                                        </>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
@@ -309,55 +414,556 @@ export const MyChatBot = () => {
                     return undefined;
                 }
             },*/
-            chatDisabled: true,
-            path: "solicita_num_previsao", /*(params:Params) =>{                
+            transition: {
+                duration: 1000,
+                //interruptable: (filterPrevisoes.length === 1 ? true : false)
+            },
+            path: () => {
                 console.log(filterPrevisoes);
                 if (filterPrevisoes.length === 1) {
-                    if (params.userInput === "Sim") {
-                        return "confirma_previsao";
+                    return "solicita_previsao_emissao";
+                }
+                else {
+                    if (filterPrevisoes.length === 0) {
+                        return "previsao_nao_encontrada";
                     }
-                    else{
-                        return "novo_filtro";
+                    else {
+                        return "solicita_num_previsao";
                     }
-                }
-                else{
-                    console.log('solicita_num_previsao');
-                    return "solicita_num_previsao";
-                }
-            },*/
-        },
-        novo_filtro:{
-            message : "Deseja informar um novo fitro ?",
-            options: snOptions,
-            path: (params:Params) =>{
-                if (params.userInput === "Sim") {
-                    return "filtra_previsao";
-                }
-                else{
-                    return "start";
                 }
             },
         },
-        solicita_num_previsao:{
-            message : "Favor informar o número da previsão que deseja emitir o boleto. ",
+        //Mostrar todas as previsões
+        mostra_previsao_todas: {
+            component: () => {
+                return (
+                    <div>
+                        {(previsoes.length > 0 ?
+                            <div className='rounded-md border-2 mt-2 m-2 p-2'>
+                                <div className='grid grid-cols-12 m-2 font-[Poppins-bold]' >
+                                    <Label className='border-b pb-5 col-span-7' style={{ 'fontSize': '0.7rem' }}>Destinatário</Label>
+                                    <Label className='border-b  pb-5  col-span-3' style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
+                                    <Label className='flex justify-end border-b pb-6  col-span-2' style={{ 'fontSize': '0.7rem' }}>Valor</Label>
+                                </div>
+
+                                <div>
+                                    {previsoes.map((previsao, index) => (
+                                        <div key={index} className='grid grid-cols-12 m-2'>
+                                            <Label className='flex items-center  col-span-7' style={{ 'fontSize': '0.7rem' }}>{(index + 1)} -
+                                                {previsao.locatario ? previsao.locatario.pessoa?.nome :
+                                                    previsao.imovel?.proprietarios ? previsao.imovel?.proprietarios[0].pessoa?.nome : ''}
+                                            </Label>
+                                            <Label className='flex items-center  col-span-3' style={{ 'fontSize': '0.7rem' }}>{moment.utc(previsao.dataVencimento).format("DD/MM/YYYY")}</Label>
+                                            <Label className='flex justify-end items-center  col-span-2' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(previsao.valorOriginal)}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            :
+                            <></>
+                        )}
+                    </div>
+                );
+            },
+            transition: {
+                duration: 1000,
+            },
+            path: () => {
+                console.log(filterPrevisoes);
+                if (previsoes.length === 1) {
+                    return "solicita_previsao_emissao";
+                }
+                else {
+                    if (previsoes.length === 0) {
+                        return "previsao_nao_encontrada";
+                    }
+                    else {
+                        return "solicita_num_previsao";
+                    }
+                }
+            },
+        },
+        //Quando não econtrar nenuma previsao
+        previsao_nao_encontrada: {
+            message: "Nenhuma previsão encontrada, deseja informar outro filtro ?",
+            options: snOptions,
+            path: (params: Params) => {
+                if (params.userInput === "Sim") {
+                    return "filtra_previsao";
+                }
+                else {
+                    if (params.userInput === "Não") {
+                        return "end";
+                    }
+                    else {
+                        return "o_q_deseja";
+                    }
+                }
+            }
+        },
+        novo_filtro: {
+            message: "Deseja informar um novo fitro ?",
+            options: snOptions,
+            path: (params: Params) => {
+                if (params.userInput === "Sim") {
+                    return "filtra_previsao";
+                }
+                else {
+                    return "end";
+                }
+            },
+        },
+        solicita_previsao_emissao: {
+            message: "Confirma a emissão do boleto para essa previsão ?",
+            options: snOptions,
+
+            path: (params: Params) => {
+                if (params.userInput === "Sim") {
+                    return "confirma_previsao";
+                }
+                else {
+                    if (params.userInput === "Não") {
+                        return "novo_filtro";
+                    }
+                    else {
+                        return "o_que_deseja";
+                    }
+                }
+            },
+        },
+        solicita_num_previsao: {
+            message: "Favor informar o número da previsão que deseja emitir o boleto ou 0 - zero para retornar aos fitros.",
             function: (params: Params) => {
                 let str_data = params.userInput;
-                if (Number(str_data) > 0) {
+                if (Number(str_data) > 0 &&
+                    Number(str_data) <= filterPrevisoes.length) {
                     let previsoes_aux: Boleto[] = [];
-                    previsoes_aux.push(previsoes[Number(str_data)]);
+                    previsoes_aux.push(filterPrevisoes[Number(str_data) - 1]);
                     setFilterPrevisoes(previsoes_aux);
                 }
                 else {
-                    params.injectMessage("O Valor dever ser um número maior que ZERO.");
+                    if (params.userInput.toLowerCase().indexOf('não') > -1 ||
+                        params.userInput.toLowerCase().indexOf('nao') > -1 ||
+                        params.userInput.toLowerCase().indexOf('nenhum') > -1 ||
+                        params.userInput.toLowerCase().indexOf('emitir') > -1 ||
+                        params.userInput.toLowerCase() === "0" ||
+                        params.userInput.toLowerCase().indexOf('cancelar') > -1 ||
+                        params.userInput.toLowerCase().indexOf('geração') > -1 ||
+                        params.userInput.toLowerCase().indexOf('geraçao') > -1
+                    ) {
+                        params.injectMessage("Um momento por favor.");
+                    }
+                    else {
+                        params.injectMessage("O Valor informado dever estar entre 1 e " + (filterPrevisoes.length).toString());
+                    }
                 }
 
             },
             path: (params: Params) => {
-                return "aguarda_refresh";
+                if (params.userInput.toLowerCase() === "0") {
+                    return "novo_filtro";
+                }
+                else {
+                    return "aguarda_refresh";
+                }
             },
         },
-        confirma_previsao : {
+        confirma_previsao: {
+            message: "Gerando boleto...",
+            transition: { duration: 1000 },
+            path: "envia_boleto_banco",
+        },
 
+
+        //LOCAÇÕES
+        //Consulta Locações
+        consulta_locacao: {
+            message: "Qual situação das locações deseja consultar ?",
+            component: () => {
+                return (
+                    <div className='rounded-md border-2 mt-2 m-2 p-2'>
+                        <div className='grid grid-cols-12 m-2 font-[Poppins-bold]' >
+                            <Label className='border-b pb-5 col-span-7' style={{ 'fontSize': '0.7rem' }}>Situação</Label>
+                        </div>
+
+                        <div>
+                            {STATUS_LOCACAO_OPTIONS.map((status, index) => (
+                                <div key={index} className='grid grid-cols-12 m-2'>
+                                    <Label className='flex items-center  col-span-7' style={{ 'fontSize': '0.7rem' }}>{(index + 1)} -
+                                        {status.label}
+                                    </Label>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            },
+            path: async (params: Params) => {
+                setStatusLoc(params.userInput.toUpperCase() as LocacaoStatus);
+
+                if (Number(params.userInput) > 0 && Number(params.userInput) <= 3) {
+
+                    let str_status = (params.userInput === "1" ? LocacaoStatus.AGUARDANDO_DOCUMENTOS : (params.userInput === "2" ? LocacaoStatus.ATIVA : LocacaoStatus.ENCERRADA));
+                    //Consulta locações
+                    console.log(str_status);
+                    const data = await api.get<Locacao[]>('locacoes/empresastatus/' + (glb_params.id_empresa ? Number(glb_params.id_empresa) : 0) + '/' + str_status);
+
+                    const locacoes = data?.data;
+
+                    setFiltrosSel([]);
+                    if (locacoes && locacoes.length > 0) {
+                        await params.injectMessage(`Foram encontradas ${locacoes.length} locações ${str_status}`);
+                        setLocacoes(locacoes);
+                        setFilterLocacoes(locacoes);
+                        return "filtra_locacao"
+                    }
+                    else {
+                        await params.injectMessage(`Não foram encontradas locações ${str_status}.`);
+                        setLocacoes([]);
+                        return "criar_previsao";
+                    }
+                }
+                else {
+                    if (params.userInput.toLowerCase().indexOf('iniciar') > -1 ||
+                        params.userInput.toLowerCase().indexOf('começar') > -1) {
+                        await params.injectMessage(`Voltando ao início.`);
+                        return "start";
+                    }
+                    else {
+                        await params.injectMessage(`O valor informado não é válido. Deve ser um número entre 1 e 3.`);
+                        return "consulta_locacao";
+
+                    }
+                }
+            }
+        },
+        process_status_locacao: {
+            message: async () => {
+
+            }
+        },
+
+        mostra_locacao: {
+            message: () => {
+                console.log(locacoes);
+                if (filterLocacoes.length > 6) {
+                    return `Foram encontradas ${filterLocacoes.length} locações com esse filtro`
+                }
+                else {
+                    if (filterLocacoes.length === 1) {
+                        return "Apenas uma locação foi encontrada com esse filtro."
+                    }
+                    else {
+                        return "Favor verificar se é uma dessas locações, se sim basta informar o número da lista que proseguiremos."
+                    }
+                }
+            },
+            component: () => {
+                return (
+                    <div>
+                        {(filterLocacoes.length <= 10 ?
+                            <div className='rounded-md border-2 mt-2 m-2 p-2'>
+                                <div className='grid grid-cols-12 m-2 font-[Poppins-bold]' >
+                                    <Label className='border-b pb-5 col-span-7' style={{ 'fontSize': '0.7rem' }}>Locatário</Label>
+                                    <Label className='border-b  pb-5  col-span-3' style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
+                                    <Label className='flex justify-end border-b pb-6  col-span-2' style={{ 'fontSize': '0.7rem' }}>Aluguel</Label>
+                                </div>
+
+                                <div>
+                                    {filterLocacoes.map((locacao, index) => (
+                                        <div key={index} className='grid grid-cols-12 m-2'>
+                                            <Label className='flex items-center  col-span-7' style={{ 'fontSize': '0.7rem' }}>{(index + 1)} -
+                                                {locacao.locatarios ? locacao.locatarios[0].pessoa?.nome : ""}
+                                            </Label>
+                                            <Label className='flex items-center  col-span-3' style={{ 'fontSize': '0.7rem' }}>{locacao.diaVencimento}</Label>
+                                            <Label className='flex justify-end items-center  col-span-2' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(locacao.valorAluguel)}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            :
+                            <></>
+                        )}
+                    </div>
+                );
+            },
+            /*options: () =>{
+                if (filterPrevisoes.length === 1) {
+                    return snOptions;
+                }
+                else{
+                    return undefined;
+                }
+            },*/
+            transition: {
+                duration: 1000,
+                //interruptable: (filterPrevisoes.length === 1 ? true : false)
+            },
+            path: () => {
+                console.log(filterLocacoes);
+                if (filterLocacoes.length === 1) {
+                    return "solicita_locacao_detalhes";
+                }
+                else {
+                    if (filterLocacoes.length === 0) {
+                        return "locacao_nao_encontrada";
+                    }
+                    else {
+                        if (filterLocacoes.length > 10) {
+                            return "filtra_locacao";
+                        }
+                        else {
+                            return "solicita_num_locacao";
+                        }
+                    }
+                }
+            },
+        },
+        //Mostrar todas as previsões
+        mostra_locacao_todas: {
+            component: () => {
+                return (
+                    <div>
+                        {(filterLocacoes.length > 0 ?
+                            <div className='rounded-md border-2 mt-2 m-2 p-2'>
+                                <div className='grid grid-cols-12 m-2 font-[Poppins-bold]' >
+                                    <Label className='border-b pb-5 col-span-7' style={{ 'fontSize': '0.7rem' }}>Locatário</Label>
+                                    <Label className='border-b  pb-5  col-span-3' style={{ 'fontSize': '0.7rem' }}>Vencimento</Label>
+                                    <Label className='flex justify-end border-b pb-6  col-span-2' style={{ 'fontSize': '0.7rem' }}>Aluguel</Label>
+                                </div>
+
+                                <div>
+                                    {filterLocacoes.map((locacao, index) => (
+                                        <div key={index} className='grid grid-cols-12 m-2'>
+                                            <Label className='flex items-center  col-span-7' style={{ 'fontSize': '0.7rem' }}>{(index + 1)} -
+                                                {locacao.locatarios ? locacao.locatarios[0].pessoa?.nome : ""}
+                                            </Label>
+                                            <Label className='flex items-center  col-span-3' style={{ 'fontSize': '0.7rem' }}>{locacao.diaVencimento}</Label>
+                                            <Label className='flex justify-end items-center  col-span-2' style={{ 'fontSize': '0.7rem' }}>{usdFormatter.format(locacao.valorAluguel)}</Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            :
+                            <></>
+                        )}
+                    </div>
+                );
+            },
+            transition: {
+                duration: 1000,
+            },
+            path: () => {
+                console.log(filterLocacoes);
+                if (locacoes.length === 1) {
+                    return "solicita_locacao_detalhes";
+                }
+                else {
+                    if (locacoes.length === 0) {
+                        return "locacao_nao_encontrada";
+                    }
+                    else {
+                        return "solicita_num_locacao";
+                    }
+                }
+            },
+        },
+        //Quando não econtrar nenuma previsao
+        locacao_nao_encontrada: {
+            message: "Nenhuma locação encontrada, deseja informar outro filtro ?",
+            options: snOptions,
+            path: (params: Params) => {
+                if (params.userInput === "Sim") {
+                    return "filtra_locacao";
+                }
+                else {
+                    if (params.userInput === "Não") {
+                        return "end";
+                    }
+                    else {
+                        return "o_q_deseja";
+                    }
+                }
+            }
+        },
+        novo_filtro_locacao: {
+            message: "Deseja informar um novo fitro ?",
+            options: snOptions,
+            path: (params: Params) => {
+                if (params.userInput === "Sim") {
+                    return "filtra_locacao";
+                }
+                else {
+                    return "end";
+                }
+            },
+        },
+
+        //filtrar as locações dentre as encontradas encontradas
+        filtra_locacao: {
+            message: "Você teria algumas das informações abaixo, assim posso filtrar as locações.\nClique no botão desejado para colocar a informação.",
+            transition: { duration: 1000 },
+            path: "mostra_filtros_locacao",
+        },
+        mostra_filtros_locacao: {
+            options: () => {
+                return (filterLocacoes.length < 20 ? [...OptionsLocacao.filter(x => !filtrosSel.includes(x)), "Listar todas"] : OptionsLocacao.filter(x => !filtrosSel.includes(x)));
+            },
+            path: (params: Params) => {
+                let str_path = "";
+                switch (params.userInput) {
+                    case "Dia Vencimento":
+                        str_path = "filtra_locacao_venc";
+                        setFiltrosSel([...filtrosSel, "Dia Vencimento"]);
+                        break;
+
+                    case "Valor":
+                        str_path = "filtra_locacao_val";
+                        setFiltrosSel([...filtrosSel, "Valor"]);
+                        break;
+
+                    case "Locatário":
+                        str_path = "filtra_locacao_locat";
+                        setFiltrosSel([...filtrosSel, "Locatário"]);
+                        break;
+
+                    case "Proprietário":
+                        str_path = "filtra_locacao_prop";
+                        setFiltrosSel([...filtrosSel, "Proprietário"]);
+                        break;
+
+                    case "Locação":
+                        str_path = "filtra_locacao_loc";
+                        setFiltrosSel([...filtrosSel, "Locação"]);
+                        break;
+
+                    case "Listar todas":
+                        str_path = "mostra_locacao_todas";
+                        break;
+                    default:
+                        str_path = "consulta_locacao";
+                }
+
+                return str_path;
+            },
+        },
+
+        filtra_locacao_venc: {
+            message: `Informe um dia de vencimento entre 1 e 31 (a depender do mês).`,
+            function: async (params: Params) => {
+                let str_data = params.userInput;
+                if (Number(str_data) > 0) {
+
+                    let locacoes_aux: Locacao[] = [];
+                    locacoes_aux = filterLocacoes.filter(x => x.diaVencimento === Number(str_data));
+                    setFilterLocacoes(locacoes_aux);
+                }
+                else {
+                    params.injectMessage("O dia do vencimento deve ser um número entre 1 e 31.");
+                }
+            },
+            path: (params: Params) => {
+                return "aguarda_refresh_locacao";
+            },
+        },
+        filtra_locacao_val: {
+            message: `Informe um valor no formato 123.00.`,
+
+            function: async (params: Params) => {
+                let str_data = params.userInput;
+                if (Number(str_data) > 0) {
+
+                    let locacoes_aux: Locacao[] = [];
+                    locacoes_aux = filterLocacoes.filter(x => x.valorAluguel === Number(str_data));
+                    setFilterLocacoes(locacoes_aux);
+                }
+                else {
+                    params.injectMessage("o Valor deve ser número maior que ZERO.");
+                }
+            },
+            path: (params: Params) => {
+                return "aguarda_refresh_locacao";
+            },
+        },
+        filtra_locacao_locat: {
+            message: `Informe o nome do locatário.`,
+
+            function: async (params: Params) => {
+                let str_data = params.userInput;
+                if (str_data.length > 0) {
+
+                    let locacoes_aux: Locacao[] = [];
+                    //locacoes_aux = filterLocacoes.filter(x => x.locatarios && x.locatarios.map(l => l.pessoa ? l.pessoa.nome.toLowerCase() : '').includes(str_data.toLowerCase()));
+                    locacoes_aux = filterLocacoes.filter(x => x.locatarios && x.locatarios.some(l => l.pessoa ? l.pessoa.nome.toLowerCase().includes(str_data.toLowerCase()) : false));
+                    setFilterLocacoes(locacoes_aux);
+                }
+            },
+            path: (params: Params) => {
+                return "aguarda_refresh_locacao";
+            },
+        },
+        solicita_locacao_detalhes: {
+            options: ["Ver detalhes"],
+            path: (params: Params) => {
+                let str_path = "";
+                switch (params.userInput) {
+                    case "Ver detalhes":
+                        navigate(ROUTE.LOCACOES + "/" + filterLocacoes[0].id);
+                        str_path = "mostra_locacao_detalhes";
+                }
+                return str_path;
+            }
+        },
+        aguarda_refresh_locacao: {
+            message: "Estamos aplicando o filtro, aguarde...",
+            transition: { duration: 3000 },
+            path: "mostra_locacao",
+        },
+
+        solicita_num_locacao: {
+            message: "Favor informar o número da locacao que deseja visualizar ou 0 - zero para retornar aos fitros.",
+            function: (params: Params) => {
+                let str_data = params.userInput;
+                if (Number(str_data) > 0 &&
+                    Number(str_data) <= filterLocacoes.length) {
+                    let locacoes_aux: Locacao[] = [];
+                    locacoes_aux.push(filterLocacoes[Number(str_data) - 1]);
+                    setFilterLocacoes(locacoes_aux);
+                }
+                else {
+                    if (params.userInput.toLowerCase().indexOf('não') > -1 ||
+                        params.userInput.toLowerCase().indexOf('nao') > -1 ||
+                        params.userInput.toLowerCase().indexOf('nenhum') > -1 ||
+                        params.userInput.toLowerCase().indexOf('emitir') > -1 ||
+                        params.userInput.toLowerCase() === "0" ||
+                        params.userInput.toLowerCase().indexOf('cancelar') > -1 ||
+                        params.userInput.toLowerCase().indexOf('geração') > -1 ||
+                        params.userInput.toLowerCase().indexOf('geraçao') > -1
+                    ) {
+                        params.injectMessage("Um momento por favor.");
+                    }
+                    else {
+                        params.injectMessage("O Valor informado dever estar entre 1 e " + (filterLocacoes.length).toString());
+                    }
+                }
+
+            },
+            path: (params: Params) => {
+                if (params.userInput.toLowerCase() === "0") {
+                    return "novo_filtro_locacao";
+                }
+                else {
+                    return "aguarda_refresh_locacao";
+                }
+            },
+        },
+
+
+        //BOLETOS
+        envia_boleto_banco: {
+            message: "Registrando boleto no banco...",
+            transition: { duration: 1000 },
+            path: "end",
         },
         //Caso não selecione um item
         o_q_deseja: {
@@ -369,20 +975,30 @@ export const MyChatBot = () => {
                     str_msg.toLowerCase().indexOf('gerar')) {
 
                     //Boleto , verificar se é boleto bancário mesmo ou apenas a previsão
-                    if (str_msg.toLowerCase().indexOf('boleto')) {
-
+                    if (str_msg.toLowerCase().indexOf('boleto') > -1 || str_msg.toLowerCase().indexOf('boletos') > -1) {
+                        return "Você deseja gerar um novo boleto ou consulta um existente ?"
                     }
                     //Previsões
-                    if (str_msg.toLowerCase().indexOf('boleto')) {
+                    if (str_msg.toLowerCase().indexOf('previsão') > -1 || str_msg.toLowerCase().indexOf('previsões') > -1) {
                         return "Você deseja gerar uma nova previsão ou consultar uma existente ?"
                     }
                 }
                 //Previsões
-                if (str_msg.toLowerCase().indexOf('previsão') || str_msg.toLowerCase().indexOf('previsões')) {
+                if (str_msg.toLowerCase().indexOf('previsão') > -1 || str_msg.toLowerCase().indexOf('previsões') > -1) {
                     return "Você deseja gerar uma nova previsão ou consultar uma existente ?"
                 }
 
-                return "Favor informar algo sobre sua pretensão. Palavas relacionada ao assunto."
+                //Boletos
+                if (str_msg.toLowerCase().indexOf('boleto') > -1 || str_msg.toLowerCase().indexOf('boletos') > -1) {
+                    return "Você deseja gerar uma novo boleto ou consultar um existente ?"
+                }
+
+                //Inicio
+                if (str_msg.toLowerCase().indexOf('inicio') > -1 || str_msg.toLowerCase().indexOf('iniciar') > -1) {
+                    return "Você deseja gerar uma nova previsão ou consultar uma existente ?"
+                }
+
+                return "Favor informar algo sobre sua pretensão. Palavras relacionada à assuntos da plataforma (Cadastros, previsões boletos, etc..)."
             },
             options: criaOptions,
             path: async (params: Params) => {
@@ -390,7 +1006,12 @@ export const MyChatBot = () => {
                     return "process_cria";
                 }
                 else {
-                    return "process_consulta";
+                    if (params.userInput.toLowerCase().indexOf('inicio') || params.userInput.toLowerCase().indexOf('iniciar')) {
+                        return "start";
+                    }
+                    else {
+                        return "process_consulta";
+                    }
                 }
             }
         },
@@ -439,40 +1060,11 @@ export const MyChatBot = () => {
             path: "como_ajudar"
         },
         end: {
-            message: "Obrigado por utilizar nosso assitente.",
-            options: ["New Application"],
+            message: "Obrigado por utilizar nosso assitente.\nAté a próxima!👋",
+            options: ["Iniciar novamente"],
             chatDisabled: true,
             path: "start"
         },
-    }
-
-    const styles: Styles = {
-        headerStyle: {
-            background: '#034869',
-            color: '#ffffff',
-            padding: '10px',
-        },
-        chatWindowStyle: {
-            backgroundColor: '#f2f2f2',
-        },
-    }
-
-    const settings: Settings = {
-        general: {
-            showFooter: false
-        },
-        notification: {
-            disabled: true,
-        },
-        header: {
-            title: "Assis"
-        },
-        chatHistory: {
-            storageKey: "example_basic_form"
-        },
-        tooltip: {
-            mode: "NEVER",
-        }
     }
 
     return (

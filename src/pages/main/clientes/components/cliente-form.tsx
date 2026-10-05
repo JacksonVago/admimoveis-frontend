@@ -60,7 +60,7 @@ export const ClienteFormContent = ({
             Email
             <Input
               className="mt-1"
-              type="email"
+              type="text"
               disabled={disabled}
               placeholder="Email"
               {...createClienteMethods.register('email')}

@@ -6,13 +6,21 @@ import { z } from 'zod'
 
 export const clienteSchema = z.object({
   nome: z.string().min(1, 'Nome do cliente é obrigatório')
-  .transform((nome)=>{
-    return nome.trim().split(' ').map(word =>{
-      return (word !== 'de' && word !== 'da' ? word[0].toLocaleUpperCase().concat(word.substring(1)) : word)
-    }).join(' ')
-  }),
+    .transform((nome) => {
+      return nome.trim().split(' ').map(word => {
+        return (word !== 'de' && word !== 'da' ? word[0].toLocaleUpperCase().concat(word.substring(1)) : word)
+      }).join(' ')
+    }),
   documento: z.string().min(1, 'Documento é obrigatório'),
-  email: z.string().email('Email inválido').min(1, 'Email é obrigatório'),
+  email: z
+    .preprocess((value) => {
+      // Se já for um array, mantém. Se for string, divide por vírgula e limpa os espaços.
+      if (typeof value === 'string') {
+        return value.split(';').map((email) => email.trim()).filter(Boolean);
+      }
+      return value;
+    }, z.array(z.string().email('E-mail inválido')))
+    .refine((arr) => arr.length > 0, 'Adicione pelo menos um e-mail'),
   telefone: z.string().optional(),
   profissao: z.string().optional(),
   estadoCivil: z.enum(Object.values(EstadoCivil) as [string, ...string[]]).optional(),

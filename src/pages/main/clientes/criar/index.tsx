@@ -12,6 +12,7 @@ import { ClienteFormContent, ClienteFormRoot, ClienteFormSubmitButton } from '..
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
 import { useEffect } from 'react'
+import axios from 'axios'
 
 const createCliente = async (data: FormData): Promise<Pessoa | any> => {
   return await api.post<Pessoa>('/pessoas', data, {
@@ -77,8 +78,23 @@ export const CriarCliente = () => {
       }
 
     },
-    onError: () => {
-      toast({ title: 'Erro ao criar cliente', variant: 'destructive' })
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        // Check if there's a response and data within the error
+        if (error.response && error.response.data) {
+          console.error('Error message from server:', error.response.data);
+          toast({
+            title: 'Erro ao criar o cliente',
+            description: error.response.data.message,
+          })
+
+          // You can also set this error message to a state to display it in your UI
+        } else {
+          console.error('Axios error without response data:', error.message);
+        }
+      } else {
+        console.error('Non-Axios error:', error);
+      }
     }
   });
 
@@ -96,7 +112,7 @@ export const CriarCliente = () => {
     }
 
     if (data?.email) {
-      form.append('email', data.email)
+      form.append('email', data.email.join(';'))
     }
 
     if (data?.telefone) {
