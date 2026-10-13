@@ -85,7 +85,7 @@ export const CriarCliente = () => {
     }
 
     if (data?.email) {
-      form.append('email', data.email)
+      form.append('email', data.email.map((email) => email.toLowerCase()).join(';'))
     }
 
     if (data?.telefone) {

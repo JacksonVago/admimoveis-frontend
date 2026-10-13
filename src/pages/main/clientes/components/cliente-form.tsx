@@ -38,6 +38,15 @@ export const ClienteFormContent = ({
   createClienteMethods: UseFormReturn<ClienteSchema>
   disabled?: boolean
 }) => {
+
+  console.log('createClienteMethods', createClienteMethods.formState?.errors);
+  //console.log((createClienteMethods && createClienteMethods.formState && createClienteMethods.formState.errors && createClienteMethods.formState.errors.email && createClienteMethods.formState.errors.email.length && createClienteMethods.formState.errors.email.length > 0) ? createClienteMethods.formState?.errors?.email?.map(x => (x ? x.message : '')).join(";") : null  );
+  console.log(createClienteMethods.formState.errors.email);
+  if (createClienteMethods && createClienteMethods.formState && createClienteMethods.formState.errors && createClienteMethods.formState.errors.email && createClienteMethods.formState.errors.email.length && createClienteMethods.formState.errors.email.length > 0) {
+    let arr = createClienteMethods.formState.errors.email as String[] | any;
+    console.log('createClienteMethods.formState.errors.email', arr.map((x:any) => (x ? x.message : '')).join(";"));
+  }
+  
   return (
     <>
       <FormProvider {...createClienteMethods}>

@@ -45,7 +45,7 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { PessoaStatus } from '@/enums/pessoal/status-pesoa'
 import { Pessoa } from '@/interfaces/pessoa'
-import { ClienteSchema } from '@/schemas/cliente.schema'
+import { clienteSchema, ClienteSchema } from '@/schemas/cliente.schema'
 import { PropImovelSchema, propImoveSchema, proprietarioSchema } from '@/schemas/proprietario.schema'
 import { ClienteFormContent, ClienteFormRoot } from '../components/cliente-form'
 import { ImovelStatus } from '@/enums/imovel/enums-imovel'
@@ -178,7 +178,7 @@ export const DetalhesClienteForm = ({
       }
 
       if (data?.email) {
-        form.append('email', data.email)
+        form.append('email', data.email.join(';'))
       }
 
       if (data?.telefone) {
@@ -279,7 +279,7 @@ export const DetalhesClienteForm = ({
   //react hook form
 
   const clienteMethods = useForm<ClienteSchema>({
-    resolver: zodResolver(proprietarioSchema),
+    resolver: zodResolver(clienteSchema),
     defaultValues,
     mode: 'onBlur'
   })

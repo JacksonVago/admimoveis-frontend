@@ -2,7 +2,8 @@ export enum ImovelStatus {
   DISPONIVEL = 'DISPONIVEL',
   ALUGADO = 'ALUGADO',
   VENDIDO = 'VENDIDO',
-  INDISPONIVEL = 'INDISPONIVEL'
+  INDISPONIVEL = 'INDISPONIVEL',
+  INATIVO = 'INATIVO'
 }
 
 export enum ImovelTipo {

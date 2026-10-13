@@ -15,6 +15,10 @@ export const clienteSchema = z.object({
   email: z
     .preprocess((value) => {
       // Se já for um array, mantém. Se for string, divide por vírgula e limpa os espaços.
+      console.log('Preprocess email value:', value);
+      if (Array.isArray(value)) {
+        return value;
+      }
       if (typeof value === 'string') {
         return value.split(';').map((email) => email.trim()).filter(Boolean);
       }
