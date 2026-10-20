@@ -492,6 +492,7 @@ export default function ListarTiposLancamento() {
                     id="name"
                     type="number"
                     placeholder="Valor Fixo"
+                    step={'any'}
                     {...tipoMethods.register('valorFixo')}
                   />
                   {tipoMethods.formState.errors.valorFixo?.message &&

@@ -16,6 +16,7 @@ import { Controller, FormProvider, UseFormReturn } from 'react-hook-form'
 import { DocumentUpload } from '../../imoveis/criarImovel/components/document-upload'
 import { ClienteSchema } from '@/schemas/cliente.schema'
 import { formatCpfCnpj, formatPhone } from '@/utils/format-cpfcnpj'
+import { Textarea } from '@/components/ui/textarea'
 
 export const ClienteFormRoot = ({
   children,
@@ -44,9 +45,9 @@ export const ClienteFormContent = ({
   console.log(createClienteMethods.formState.errors.email);
   if (createClienteMethods && createClienteMethods.formState && createClienteMethods.formState.errors && createClienteMethods.formState.errors.email && createClienteMethods.formState.errors.email.length && createClienteMethods.formState.errors.email.length > 0) {
     let arr = createClienteMethods.formState.errors.email as String[] | any;
-    console.log('createClienteMethods.formState.errors.email', arr.map((x:any) => (x ? x.message : '')).join(";"));
+    console.log('createClienteMethods.formState.errors.email', arr.map((x: any) => (x ? x.message : '')).join(";"));
   }
-  
+
   return (
     <>
       <FormProvider {...createClienteMethods}>
@@ -306,6 +307,17 @@ export const ClienteFormContent = ({
               )}
             </div>
           </Label>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4">
+          <Label className="text-base">
+            Observação
+            <Textarea placeholder="Observação "
+              {...createClienteMethods.register('observacao')}
+              disabled={disabled}
+            />
+          </Label>
+
         </div>
       </div>
       {/* <h2 className="mb-4 text-xl font-semibold">informações de locação</h2> */}

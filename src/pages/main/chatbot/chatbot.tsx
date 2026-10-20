@@ -1,6 +1,6 @@
 import { ROUTE } from "@/enums/routes.enum";
 import { useAuth } from "@/hooks/auth/use-auth";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ChatBot, { ChatBotProvider, useFlow } from "react-chatbotify";
 import { Params, Styles, Settings } from "react-chatbotify"
 import { useNavigate } from "react-router-dom";
@@ -14,7 +14,6 @@ import chatIcon from "@/assets/chat2.svg";
 import { STATUS_LOCACAO_OPTIONS } from "@/constants/status-locacao";
 import { Locacao } from "@/interfaces/locacao";
 import moment from "moment";
-import { set } from "react-hook-form";
 import { Imovel } from "@/interfaces/imovel";
 import { STATUS_IMOVEL_OPTIONS } from "@/constants/status-imovel";
 import { ImovelStatus } from "@/enums/imovel/enums-imovel";

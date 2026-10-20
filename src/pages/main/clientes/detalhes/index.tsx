@@ -39,7 +39,7 @@ import { queryClient } from '@/services/react-query/query-client'
 import { transformNullToUndefined } from '@/utils/transform-null-to-undefined'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import {  Edit, Link2Off, Plus, Search, Trash2, X } from 'lucide-react'
+import { Edit, Link2Off, Plus, Search, Trash2, X } from 'lucide-react'
 import * as React from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -228,6 +228,10 @@ export const DetalhesClienteForm = ({
         form.append('status', PessoaStatus.ATIVA)
       }
 
+      if (data?.observacao) {
+        form.append('observacao', data.observacao)
+      }
+
       const newDocuments = data?.documentos?.filter((doc) => !doc.id)
       newDocuments?.forEach((doc) => {
         form.append('documentos', doc.file)
@@ -297,7 +301,7 @@ export const DetalhesClienteForm = ({
   const hasLocatario = !!cliente?.locatarios?.length;
 
   return (
-    <Card style={{color: "#034869"}}>
+    <Card style={{ color: "#034869" }}>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <h2 className="mb-4 mt-8 text-xl font-bold">Dados Pessoais</h2>
@@ -512,7 +516,7 @@ export default function DetalhesCliente() {
   });
 
   React.useEffect(() => {
-    if (glb_params.pastaOrig === ""){
+    if (glb_params.pastaOrig === "") {
       glb_params.updPastaOrig('personal-info');
     }
     if (cliente) {
@@ -638,103 +642,103 @@ export default function DetalhesCliente() {
     console.log((id! ? id : 0));
   }*/
 
-    /*
-  const handlerEditLocacao = (locacao: Locacao) => {
-    if (locacao) {
-      setPropImovelIdAlt(0);
-      imovelLocAlt.reset();
-      imovelLocAlt.setValue('dataInicio', moment((locacao.dataInicio ? locacao.dataInicio : '')).format("YYYY-MM-DD"));
-      imovelLocAlt.setValue('dataFim', moment((locacao.dataFim ? locacao.dataFim : '')).format("YYYY-MM-DD"));
-      imovelLocAlt.setValue('valorAluguel', locacao.valorAluguel);
-      imovelLocAlt.setValue('status', locacao.status);
-      imovelLocAlt.setValue('garantiaLocacaoTipo', locacao.garantiaLocacaoTipo);
-      imovelLocAlt.setValue('imovelId', locacao.imovelId);
-      imovelLocAlt.setValue('fiadores', (locacao.fiadores ? locacao.fiadores.map(x => { return { id: x.id, nome: (x.pessoa ? x.pessoa?.nome : '') } }) : []));
-    }
+  /*
+const handlerEditLocacao = (locacao: Locacao) => {
+  if (locacao) {
+    setPropImovelIdAlt(0);
+    imovelLocAlt.reset();
+    imovelLocAlt.setValue('dataInicio', moment((locacao.dataInicio ? locacao.dataInicio : '')).format("YYYY-MM-DD"));
+    imovelLocAlt.setValue('dataFim', moment((locacao.dataFim ? locacao.dataFim : '')).format("YYYY-MM-DD"));
+    imovelLocAlt.setValue('valorAluguel', locacao.valorAluguel);
+    imovelLocAlt.setValue('status', locacao.status);
+    imovelLocAlt.setValue('garantiaLocacaoTipo', locacao.garantiaLocacaoTipo);
+    imovelLocAlt.setValue('imovelId', locacao.imovelId);
+    imovelLocAlt.setValue('fiadores', (locacao.fiadores ? locacao.fiadores.map(x => { return { id: x.id, nome: (x.pessoa ? x.pessoa?.nome : '') } }) : []));
+  }
+}
+
+const handleSelectFiador = (fiador: Pessoa | undefined) => {
+  console.log(selGarantia);
+  setSelFiador(false);
+  if (fiador) {
+    locacaoFiadores.append({
+      nome: fiador.nome,
+      id: fiador.id
+    });
+  }
+  console.log(locacaoFiadores);
+}
+
+const handlerChangeGarantia = (e: GarantiaLocacao) => {
+  let bol_limpa = {
+    fiador: true,
+    calcao: true,
+    seguro: true,
+    titulo: true,
+  };
+
+  setSelGarantia(e);
+  console.log(e);
+
+  locacaoMethods.setValue('garantiaLocacaoTipo', e);
+
+  switch (e) {
+    case GarantiaLocacao.DEPOSITO_CALCAO:
+      bol_limpa.calcao = false;
+      bol_limpa.fiador = true;
+      bol_limpa.seguro = true;
+      bol_limpa.titulo = true;
+      break;
+
+    case GarantiaLocacao.FIADOR:
+      bol_limpa.calcao = true;
+      bol_limpa.fiador = false;
+      bol_limpa.seguro = true;
+      bol_limpa.titulo = true;
+      break;
+
+    case GarantiaLocacao.SEGURO_FIANCA:
+      bol_limpa.calcao = true;
+      bol_limpa.fiador = true;
+      bol_limpa.seguro = false;
+      bol_limpa.titulo = true;
+      break;
+
+    case GarantiaLocacao.TITULO_CAPITALIZACAO:
+      bol_limpa.calcao = true;
+      bol_limpa.fiador = true;
+      bol_limpa.seguro = true;
+      bol_limpa.titulo = false;
+      break;
   }
 
-  const handleSelectFiador = (fiador: Pessoa | undefined) => {
-    console.log(selGarantia);
-    setSelFiador(false);
-    if (fiador) {
-      locacaoFiadores.append({
-        nome: fiador.nome,
-        id: fiador.id
-      });
-    }
-    console.log(locacaoFiadores);
-  }
-
-  const handlerChangeGarantia = (e: GarantiaLocacao) => {
-    let bol_limpa = {
-      fiador: true,
-      calcao: true,
-      seguro: true,
-      titulo: true,
-    };
-
-    setSelGarantia(e);
-    console.log(e);
-
-    locacaoMethods.setValue('garantiaLocacaoTipo', e);
-
-    switch (e) {
-      case GarantiaLocacao.DEPOSITO_CALCAO:
-        bol_limpa.calcao = false;
-        bol_limpa.fiador = true;
-        bol_limpa.seguro = true;
-        bol_limpa.titulo = true;
-        break;
-
-      case GarantiaLocacao.FIADOR:
-        bol_limpa.calcao = true;
-        bol_limpa.fiador = false;
-        bol_limpa.seguro = true;
-        bol_limpa.titulo = true;
-        break;
-
-      case GarantiaLocacao.SEGURO_FIANCA:
-        bol_limpa.calcao = true;
-        bol_limpa.fiador = true;
-        bol_limpa.seguro = false;
-        bol_limpa.titulo = true;
-        break;
-
-      case GarantiaLocacao.TITULO_CAPITALIZACAO:
-        bol_limpa.calcao = true;
-        bol_limpa.fiador = true;
-        bol_limpa.seguro = true;
-        bol_limpa.titulo = false;
-        break;
-    }
-
-    //limpa fiador
-    if (bol_limpa.fiador) {
-      if (locacaoFiadores.fields.length > 0) {
-        for (let i = 0; i < locacaoFiadores.fields.length; i++) {
-          locacaoFiadores.remove(i);
-        }
+  //limpa fiador
+  if (bol_limpa.fiador) {
+    if (locacaoFiadores.fields.length > 0) {
+      for (let i = 0; i < locacaoFiadores.fields.length; i++) {
+        locacaoFiadores.remove(i);
       }
-      setSelFiador(false);
     }
-    else {
-      setSelFiador(true);
-    }
+    setSelFiador(false);
+  }
+  else {
+    setSelFiador(true);
+  }
 
-    if (bol_limpa.calcao) {
-      locacaoMethods.setValue('depCalcao.valorDeposito', 0);
-      locacaoMethods.setValue('depCalcao.quantidadeMeses', 0);
-    }
+  if (bol_limpa.calcao) {
+    locacaoMethods.setValue('depCalcao.valorDeposito', 0);
+    locacaoMethods.setValue('depCalcao.quantidadeMeses', 0);
+  }
 
-    if (bol_limpa.seguro) {
-      locacaoMethods.setValue('seguroFianca.numeroSeguro', '0');
-    }
+  if (bol_limpa.seguro) {
+    locacaoMethods.setValue('seguroFianca.numeroSeguro', '0');
+  }
 
-    if (bol_limpa.titulo) {
-      locacaoMethods.setValue('tituloCap.numeroTitulo', '0');
-    }
+  if (bol_limpa.titulo) {
+    locacaoMethods.setValue('tituloCap.numeroTitulo', '0');
+  }
 
-  }*/
+}*/
 
   const handlerSelImovel = (origin: string) => {
 
@@ -791,7 +795,7 @@ export default function DetalhesCliente() {
   }
 
   return (
-    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]"  style={{color: "#034869"}}>
+    <div className="container mx-auto space-y-6 p-4 font-[Poppins-regular]" style={{ color: "#034869" }}>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{cliente?.nome}</h1>
         <AlertDialog>
@@ -826,10 +830,10 @@ export default function DetalhesCliente() {
       </div>
       <Tabs value={activeTab} onValueChange={(value) => { handlerChangeFolder(value) }}>
         <TabsList >
-          <TabsTrigger value="personal-info" className='text-[0.7rem] hover:cursor-pointer hover:bg-[#a7d9f2]'  style={{color: "#034869"}}>Dados Pessoais</TabsTrigger>
-          <TabsTrigger value="propriedades" className='text-[0.7rem] hover:cursor-pointer hover:bg-[#a7d9f2]' style={{color: "#034869"}}>Propriedades</TabsTrigger>
-          <TabsTrigger value="locacoes" className='text-[0.7rem] hover:cursor-pointer hover:bg-[#a7d9f2]' style={{color: "#034869"}}>Locações</TabsTrigger>
-          <TabsTrigger value="finance" className='text-[0.7rem] hover:cursor-pointer hover:bg-[#a7d9f2]' style={{color: "#034869"}}>Fianças</TabsTrigger>
+          <TabsTrigger value="personal-info" className='text-[0.7rem] hover:cursor-pointer hover:bg-[#a7d9f2]' style={{ color: "#034869" }}>Dados Pessoais</TabsTrigger>
+          <TabsTrigger value="propriedades" className='text-[0.7rem] hover:cursor-pointer hover:bg-[#a7d9f2]' style={{ color: "#034869" }}>Propriedades</TabsTrigger>
+          <TabsTrigger value="locacoes" className='text-[0.7rem] hover:cursor-pointer hover:bg-[#a7d9f2]' style={{ color: "#034869" }}>Locações</TabsTrigger>
+          <TabsTrigger value="finance" className='text-[0.7rem] hover:cursor-pointer hover:bg-[#a7d9f2]' style={{ color: "#034869" }}>Fianças</TabsTrigger>
         </TabsList>
 
         <TabsContent value="personal-info" className="space-y-4">
@@ -1371,7 +1375,7 @@ export default function DetalhesCliente() {
           </div>
 
           {cliente?.fiador?.locacoes?.map((locacao) => (
-            <Card key={locacao.id}  style={{ color: "#034869" }}>
+            <Card key={locacao.id} style={{ color: "#034869" }}>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>{locacao.id}</span>

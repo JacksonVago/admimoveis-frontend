@@ -139,7 +139,7 @@ export default function ListarBoletosBancarios({
   });
 
 
-  const { data, isLoading } = useQuery(
+  const { data, isLoading, refetch } = useQuery(
     useGetBoletosQueryOptions(glb_params.id_empresa ? Number(glb_params.id_empresa) : 0, {
       page,
       limit,
@@ -363,9 +363,30 @@ export default function ListarBoletosBancarios({
     try {
       console.log(boletoBancarioId);
       if (boletoBancarioId) {
-        let resp = DownloadPdf(boletoBancarioId, true);
-        if (resp) {
-          console.log('DownloadPdf response:', resp);
+        try {
+          console.log('Antes de ir')
+          const resp = await DownloadPdf(boletoBancarioId, true);
+          if (resp) {
+            console.log('DownloadPdf response:', resp);
+          }
+        }
+        catch (error) {
+          if (axios.isAxiosError(error)) {
+            // Check if there's a response and data within the error
+            if (error.response && error.response.data) {
+              console.error('Error message from server:', error.response.data);
+              toast({
+                title: 'Erro ao atualizar locacao',
+                description: error.response.data.message,
+              })
+
+              // You can also set this error message to a state to display it in your UI
+            } else {
+              console.error('Axios error without response data:', error.message);
+            }
+          } else {
+            console.error('Non-Axios error:', error);
+          }
         }
         /*
         api.get('/boleto-bancario/download/' + boletoBancarioId)
@@ -590,12 +611,45 @@ export default function ListarBoletosBancarios({
               window.URL.revokeObjectURL(downloadUrl);
             }
             return blob;
+          })
+          .catch(error => {
+            if (axios.isAxiosError(error)) {
+              // Check if there's a response and data within the error
+              if (error.response && error.response.data) {
+                console.error('Error message from server:', error.response.data);
+                toast({
+                  title: 'Erro Download',
+                  description: error.response.data.message,
+                })
+
+                // You can also set this error message to a state to display it in your UI
+              } else {
+                console.error('Axios error without response data:', error.message);
+              }
+            } else {
+              console.error('Non-Axios error:', error);
+            }
           });
       }
 
     } catch (error) {
-      console.error('Download failed:', error);
-      throw 'Error : ' + error;
+      console.log('Error down');
+      if (axios.isAxiosError(error)) {
+        // Check if there's a response and data within the error
+        if (error.response && error.response.data) {
+          console.error('Error message from server:', error.response.data);
+          toast({
+            title: 'Erro ao atualizar locacao',
+            description: error.response.data.message,
+          })
+
+          // You can also set this error message to a state to display it in your UI
+        } else {
+          console.error('Axios error without response data:', error.message);
+        }
+      } else {
+        console.error('Non-Axios error:', error);
+      }
     }
 
   }
@@ -606,9 +660,34 @@ export default function ListarBoletosBancarios({
       if (boletoBancarioId) {
         api.get('/boleto-bancario/nossonumero/' + boletoBancarioId)
           .then(result => {
-            console.log(result.data);
-            console.log(result.data.data);
 
+            if (result.status === 200){
+              console.log(result.status);
+            }
+
+            toast({
+              title: 'Atualização',
+              description: "Atualização efetuada com sucesso!",
+            });
+            refetch();
+
+          }).catch(error => {
+            if (axios.isAxiosError(error)) {
+              // Check if there's a response and data within the error
+              if (error.response && error.response.data) {
+                console.error('Error message from server:', error.response.data);
+                toast({
+                  title: 'Erro Atualização',
+                  description: error.response.data.message,
+                });
+
+                // You can also set this error message to a state to display it in your UI
+              } else {
+                console.error('Axios error without response data:', error.message);
+              }
+            } else {
+              console.error('Non-Axios error:', error);
+            }
           });
 
       }

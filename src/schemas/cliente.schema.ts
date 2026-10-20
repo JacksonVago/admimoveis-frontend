@@ -30,6 +30,7 @@ export const clienteSchema = z.object({
   estadoCivil: z.enum(Object.values(EstadoCivil) as [string, ...string[]]).optional(),
   logradouro: z.string(),
   status: z.enum(Object.values(PessoaStatus) as [string, ...string[]]).optional(),
+  observacao: z.string().optional(),
   numero: z
     .union([
       z.number().min(1, 'Número é obrigatório'),

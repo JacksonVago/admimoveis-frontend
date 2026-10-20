@@ -351,6 +351,9 @@ export const DetalhesLancamento = () => {
     let tipo = tipolancamento?.data.find(tipo => tipo.id === Number(value));
     if (lancamentoMethods.getValues('linhaDigitavel')?.length === 0) {
       lancamentoMethods.setValue('valorLancamento', Number(tipo?.valorFixo));
+      if (tipo?.geraObservacao){
+        lancamentoMethods.setValue('observacao', 'Parcela 1/' + tipo?.parcelas);
+      }
     }
   }
 

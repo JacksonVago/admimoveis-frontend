@@ -155,6 +155,10 @@ export const CriarCliente = () => {
       form.append('estado', data.estado)
     }
 
+    if (data?.observacao) {
+      form.append('observacao', data.observacao)
+    }
+
     form.append('status', PessoaStatus.ATIVA);
     form.append('empresaId', glb_params.id_empresa ? glb_params.id_empresa : "0");
 
