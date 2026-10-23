@@ -113,6 +113,11 @@ export enum ROUTE {
   GRUPO_FLUXO_CAIXA_CRIAR = '/grupo-fluxo-caixa/criar',
   GRUPO_FLUXO_CAIXA_DETALHES = '/grupo-fluxo-caixa/:id',
 
+  //Acordo
+  ACORDOS = '/acordos',
+  ACORDO_CRIAR = '/acordo/criar',
+  ACORDO_DETALHES = '/acordo/:id',
+
   // Error routes
   NOT_FOUND = '*',
   UNAUTHORIZED = '/unauthorized'

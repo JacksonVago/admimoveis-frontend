@@ -214,6 +214,12 @@ export const permissions: { value: Permission; label: string }[] = [
   { value: 'DELETE_CLIENTE', label: 'Excluir Cliente' },
   { value: 'VIEW_CLIENTES', label: 'Ver Clientes' },
 
+  /* Acordos */
+  { value: 'CREATE_ACORDO', label: 'Criar Acordo' },
+  { value: 'UPDATE_ACORDO', label: 'Atualizar Acordo' },
+  { value: 'DELETE_ACORDO', label: 'Excluir Acordo' },
+  { value: 'VIEW_ACORDOS', label: 'Ver Acordos' },
+
 ]
 
 const GrupoFluxoCaixaPermissions: { value: Permission; label: string }[] = [
@@ -350,6 +356,14 @@ const boletobancarioPermissions: { value: Permission; label: string }[] = [
   { value: 'UPDATE_BOLETO_BANCARIO', label: 'Atualizar Boleto bancário' },
   { value: 'DELETE_BOLETO_BANCARIO', label: 'Excluir Boleto bancário' },
   { value: 'VIEW_BOLETO_BANCARIO', label: 'Ver Boleto bancário' },
+]
+
+//Acordo
+const acordoPermissions: { value: Permission; label: string }[] = [
+  { value: 'CREATE_ACORDO', label: 'Criar Acordo' },
+  { value: 'UPDATE_ACORDO', label: 'Atualizar Acordo' },
+  { value: 'DELETE_ACORDO', label: 'Excluir Acordo' },
+  { value: 'VIEW_ACORDOS', label: 'Ver Acordo' },
 ]
 
 
@@ -961,6 +975,26 @@ export const ListarColaboradores = () => {
             return [...(prevPermissions || []), permission]
           } else {
             return prevPermissions.filter((p) => !p.includes('BOLETO_BANCARIO'))
+          }
+        })
+      }
+    }
+
+    if (permission?.includes('ACORDO')) {
+      if (permission !== 'VIEW_ACORDOS') {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission, 'VIEW_ACORDOS']
+          } else {
+            return prevPermissions.filter((p) => p !== permission)
+          }
+        })
+      } else {
+        setUserPermissions((prevPermissions) => {
+          if (checked) {
+            return [...(prevPermissions || []), permission]
+          } else {
+            return prevPermissions.filter((p) => !p.includes('ACORDO'))
           }
         })
       }

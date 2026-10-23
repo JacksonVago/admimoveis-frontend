@@ -165,6 +165,12 @@ export type Permission =
   | 'DELETE_GRUPO_FLUXO_CAIXA'
   | 'VIEW_GRUPO_FLUXO_CAIXA'
 
+  //Acordo
+  | 'CREATE_ACORDO'
+  | 'UPDATE_ACORDO'
+  | 'DELETE_ACORDO'
+  | 'VIEW_ACORDOS'
+
 export const userPermissions: {
   [key in Permission]: string
 } = {
@@ -241,63 +247,63 @@ export const userPermissions: {
   DELETE_CONTA_CORRENTE: 'Deletar Conta corrente',
   VIEW_CONTAS_CORRENTE: 'Visualizar Contas corrente',
 
-  CREATE_INSTRUCAO_COBRANCA: 'Visualizar Instrucao de Cobranca',
-  UPDATE_INSTRUCAO_COBRANCA: 'Visualizar Instrucao de Cobranca',
-  DELETE_INSTRUCAO_COBRANCA: 'Visualizar Instrucao de Cobranca',
+  CREATE_INSTRUCAO_COBRANCA: 'Criar Instrucao de Cobranca',
+  UPDATE_INSTRUCAO_COBRANCA: 'Atualizar Instrucao de Cobranca',
+  DELETE_INSTRUCAO_COBRANCA: 'Deletar Instrucao de Cobranca',
   VIEW_INSTRUCOES_COBRANCA: 'Visualizar Instrucao de Cobranca',
 
   //Instrução de recebimento
-  CREATE_INSTRUCAO_RECEBIMENTO: 'Visualizar Instrucao de Recebimento',
-  UPDATE_INSTRUCAO_RECEBIMENTO: 'Visualizar Instrucao de Recebimento',
-  DELETE_INSTRUCAO_RECEBIMENTO: 'Visualizar Instrucao de Recebimento',
+  CREATE_INSTRUCAO_RECEBIMENTO: 'Criar Instrucao de Recebimento',
+  UPDATE_INSTRUCAO_RECEBIMENTO: 'Atualizar Instrucao de Recebimento',
+  DELETE_INSTRUCAO_RECEBIMENTO: 'Deletar Instrucao de Recebimento',
   VIEW_INSTRUCOES_RECEBIMENTO: 'Visualizar Instrucao de Recebimento',
 
   //Carteira de cobrança
-  CREATE_CARTEIRA_COBRANCA: 'Visualizar Carteira de Cobranca',
-  UPDATE_CARTEIRA_COBRANCA: 'Visualizar Carteira de Cobranca',
-  DELETE_CARTEIRA_COBRANCA: 'Visualizar Carteira de Cobranca',
+  CREATE_CARTEIRA_COBRANCA: 'Criar Carteira de Cobranca',
+  UPDATE_CARTEIRA_COBRANCA: 'Atualizar Carteira de Cobranca',
+  DELETE_CARTEIRA_COBRANCA: 'Deletar Carteira de Cobranca',
   VIEW_CARTEIRAS_COBRANCA: 'Visualizar Carteira de Cobranca',
 
   //Espécie de cobrança
-  CREATE_ESPECIE_COBRANCA: 'Visualizar Espécie de Cobranca',
-  UPDATE_ESPECIE_COBRANCA: 'Visualizar Espécie de Cobranca',
-  DELETE_ESPECIE_COBRANCA: 'Visualizar Espécie de Cobranca',
+  CREATE_ESPECIE_COBRANCA: 'Criar Espécie de Cobranca',
+  UPDATE_ESPECIE_COBRANCA: 'Atualizar Espécie de Cobranca',
+  DELETE_ESPECIE_COBRANCA: 'Deletar Espécie de Cobranca',
   VIEW_ESPECIES_COBRANCA: 'Visualizar Espécie de Cobranca',
 
   //Banco
-  CREATE_BANCO: 'Visualizar Banco',
-  UPDATE_BANCO: 'Visualizar Banco',
-  DELETE_BANCO: 'Visualizar Banco',
+  CREATE_BANCO: 'Criar Banco',
+  UPDATE_BANCO: 'Atualizar Banco',
+  DELETE_BANCO: 'Deletar Banco',
   VIEW_BANCOS: 'Visualizar Banco',
 
   //Tipo de juros
-  CREATE_TIPO_JUROS: 'Visualizar Tipo de Juros',
-  UPDATE_TIPO_JUROS: 'Visualizar Tipo de Juros',
-  DELETE_TIPO_JUROS: 'Visualizar Tipo de Juros',
+  CREATE_TIPO_JUROS: 'Criar Tipo de Juros',
+  UPDATE_TIPO_JUROS: 'Atualizar Tipo de Juros',
+  DELETE_TIPO_JUROS: 'Deletar Tipo de Juros',
   VIEW_TIPOS_JUROS: 'Visualizar Tipo de Juros',
 
   //Tipo de multa
-  CREATE_TIPO_MULTA: 'Visualizar Tipo de Multa',
-  UPDATE_TIPO_MULTA: 'Visualizar Tipo de Multa',
-  DELETE_TIPO_MULTA: 'Visualizar Tipo de Multa',
+  CREATE_TIPO_MULTA: 'Criar Tipo de Multa',
+  UPDATE_TIPO_MULTA: 'Atualizar Tipo de Multa',
+  DELETE_TIPO_MULTA: 'Deletar Tipo de Multa',
   VIEW_TIPOS_MULTA: 'Visualizar Tipo de Multa',
 
   //Tipo de desconto
-  CREATE_TIPO_DESCONTOS: 'Visualizar Tipo de Desconto',
-  UPDATE_TIPO_DESCONTOS: 'Visualizar Tipo de Desconto',
-  DELETE_TIPO_DESCONTOS: 'Visualizar Tipo de Desconto',
+  CREATE_TIPO_DESCONTOS: 'Criar Tipo de Desconto',
+  UPDATE_TIPO_DESCONTOS: 'Atualizar Tipo de Desconto',
+  DELETE_TIPO_DESCONTOS: 'Deletar Tipo de Desconto',
   VIEW_TIPOS_DESCONTOS: 'Visualizar Tipo de Desconto',
 
   //Tipo de AUTORIZACAO
-  CREATE_TIPO_AUTORIZACAO: 'Visualizar Tipo de Autorização',
-  UPDATE_TIPO_AUTORIZACAO: 'Visualizar Tipo de Autorização',
-  DELETE_TIPO_AUTORIZACAO: 'Visualizar Tipo de Autorização',
+  CREATE_TIPO_AUTORIZACAO: 'Criar Tipo de Autorização',
+  UPDATE_TIPO_AUTORIZACAO: 'Atualizar Tipo de Autorização',
+  DELETE_TIPO_AUTORIZACAO: 'Deletar Tipo de Autorização',
   VIEW_TIPO_AUTORIZACAO: 'Visualizar Tipo de Autorização',
 
   //Boleto bancario
-  CREATE_BOLETO_BANCARIO: 'Visualizar Boleto bancário',
-  UPDATE_BOLETO_BANCARIO: 'Visualizar Boleto bancário',
-  DELETE_BOLETO_BANCARIO: 'Visualizar Boleto bancário',
+  CREATE_BOLETO_BANCARIO: 'Criar Boleto bancário',
+  UPDATE_BOLETO_BANCARIO: 'Atualizar Boleto bancário',
+  DELETE_BOLETO_BANCARIO: 'Deletar Boleto bancário',
   VIEW_BOLETO_BANCARIO: 'Visualizar Boleto bancário',
 
   CREATE_CLIENTE: 'Criar clientes',
@@ -306,11 +312,16 @@ export const userPermissions: {
   VIEW_CLIENTES: 'Visualizar clientes',
 
   //Grupo fluxo de caixa
-  CREATE_GRUPO_FLUXO_CAIXA: 'Visualizar Grupo de Fluxo de Caixa',
-  UPDATE_GRUPO_FLUXO_CAIXA: 'Visualizar Grupo de Fluxo de Caixa',
-  DELETE_GRUPO_FLUXO_CAIXA: 'Visualizar Grupo de Fluxo de Caixa',
-  VIEW_GRUPO_FLUXO_CAIXA: 'Visualizar Grupo de Fluxo de Caixa'
+  CREATE_GRUPO_FLUXO_CAIXA: 'Criar Grupo de Fluxo de Caixa',
+  UPDATE_GRUPO_FLUXO_CAIXA: 'Altualizar Grupo de Fluxo de Caixa',
+  DELETE_GRUPO_FLUXO_CAIXA: 'Deletar Grupo de Fluxo de Caixa',
+  VIEW_GRUPO_FLUXO_CAIXA: 'Visualizar Grupo de Fluxo de Caixa',
 
+  //Acordo
+  CREATE_ACORDO: 'Criar Acordor',
+  UPDATE_ACORDO: 'Atualizar Acordor',
+  DELETE_ACORDO: 'Deletar Acordor',
+  VIEW_ACORDOS: 'Visualizar Acordor'
 }
 
 export enum UserRole {

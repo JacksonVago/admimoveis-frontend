@@ -61,6 +61,9 @@ import ListarBoletosBancarios from '@/pages/main/boletosbancarios'
 import { DetalhesBoletoBancario } from '@/pages/main/boletosbancarios/detalhes'
 import ListarPagamentos from '@/pages/main/pagamentos'
 import ListarGruposFluxoCaixa from '@/pages/main/grupofluxocaixa'
+import ListarAcordos from '@/pages/main/acordo'
+import { DetalhesAcordo } from '@/pages/main/acordo/detalhes'
+import { CriarAcordo } from '@/pages/main/acordo/criar'
 
 export interface ProtectedRouteProps {
   permission: Permission
@@ -453,6 +456,32 @@ export const RoutesComponent = () => {
             element={
               <ProtectedRoute permission="VIEW_PAGAMENTOS">
                 <ListarRepasses exclude='' limitView={3} />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Acordo */}
+          <Route
+            path={ROUTE.ACORDOS}
+            element={
+              <ProtectedRoute permission="VIEW_ACORDOS">
+                <ListarAcordos exclude='' limitView={3} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.ACORDO_DETALHES}
+            element={
+              <ProtectedRoute permission="CREATE_ACORDO">
+                <DetalhesAcordo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTE.ACORDO_CRIAR}
+            element={
+              <ProtectedRoute permission="CREATE_LOCACAO">
+                <CriarAcordo />
               </ProtectedRoute>
             }
           />

@@ -310,6 +310,7 @@ export const LocacaoFormContent = ({
           <DocumentUpload disabled={disabled} downloadDocuments={disabled} />
         </FormProvider>
       </div>
+      
       <div className="space-y-4 font-[Poppins-Regular]">
         <div style={{ display: (!selFiador ? 'block' : 'none') }}>
           <div>

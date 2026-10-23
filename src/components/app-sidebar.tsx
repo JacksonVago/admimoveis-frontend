@@ -1,6 +1,6 @@
 'use client'
 
-import { Boxes, Building, Building2, CircleDollarSign, Cog, HandCoins, House, KeyRound, Landmark, Lock, LogOut, Notebook, NotebookPen, OctagonAlert, ReceiptText, Shapes, Users, Wallet } from 'lucide-react'
+import { Boxes, Building, Building2, CircleDollarSign, Cog, HandCoins, Handshake, House, KeyRound, Landmark, Lock, LogOut, Notebook, NotebookPen, OctagonAlert, ReceiptText, Shapes, Users, Wallet } from 'lucide-react'
 import * as React from 'react'
 //import logo  from '../assets/logo-molina.png';
 
@@ -121,6 +121,11 @@ const data = {
           title: 'Boletos Bancários',
           url: ROUTE.BOLETO_BANCARIO,
           icon: CircleDollarSign
+        },
+        {
+          title: 'Acordos',
+          url: ROUTE.ACORDOS,
+          icon: Handshake
         },
       ]
     },

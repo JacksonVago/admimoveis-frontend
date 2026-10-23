@@ -661,6 +661,7 @@ export default function ListarBoletosBancarios({
         api.get('/boleto-bancario/nossonumero/' + boletoBancarioId)
           .then(result => {
 
+            console.log(result);
             if (result.status === 200){
               console.log(result.status);
             }
@@ -672,6 +673,7 @@ export default function ListarBoletosBancarios({
             refetch();
 
           }).catch(error => {
+            console.log(error);
             if (axios.isAxiosError(error)) {
               // Check if there's a response and data within the error
               if (error.response && error.response.data) {
