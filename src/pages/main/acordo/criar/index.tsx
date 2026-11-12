@@ -1,14 +1,12 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { ROUTE } from '@/enums/routes.enum'
 import { toast } from '@/hooks/use-toast'
-import { Pessoa } from '@/interfaces/pessoa'
-import { clienteSchema, ClienteSchema } from '@/schemas/cliente.schema'
 import api from '@/services/axios/api'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
-import { useGlobalParams, usePessoa } from '@/globals/GlobalParams'
+import { useGlobalParams } from '@/globals/GlobalParams'
 import { useEffect } from 'react'
 import axios from 'axios'
 import { Acordo } from '@/interfaces/acordo'
@@ -18,6 +16,9 @@ import { BoletoStatus } from '@/enums/locacao/enums-locacao'
 import { AcordoFormContent, AcordoFormRoot, AcordoFormSubmitButton } from './components/acordo-form'
 
 const createAcordo = async (data: FormData): Promise<Acordo | any> => {
+    const dataObject = Object.fromEntries(data.entries());
+    const jsonData = JSON.stringify(dataObject);
+    console.log(jsonData);
     return await api.post<Acordo>('/acordos', data, {
         headers: { 'Content-Type': 'multipart/form-data' }
     })
@@ -35,6 +36,8 @@ export const CriarAcordo = () => {
         resolver: zodResolver(acordoSchema),
         defaultValues: {
             empresaId: glb_params.id_empresa ? Number(glb_params.id_empresa) : 0,
+            tipoGeracaoBoleto: 'T',
+            status: BoletoStatus.PENDENTE,
         },
         mode: 'all'
     })
@@ -54,7 +57,8 @@ export const CriarAcordo = () => {
 
     const createAcordoMutation = useMutation({
         mutationFn: ({ data }: { data: FormData }) => createAcordo(data),
-        onSuccess: ({ data: clienteData }) => {
+        onSuccess: () => {
+
             toast({ title: 'Acordo criado com sucesso' });
 
             navigate(ROUTE.ACORDOS);
@@ -85,6 +89,7 @@ export const CriarAcordo = () => {
         //try {
         const form = new FormData()
 
+        console.log(data);
         if (data?.observacao) {
             form.append('observacao', data.observacao);
         }
@@ -113,6 +118,10 @@ export const CriarAcordo = () => {
             form.append('qtdParcelas', data.qtdParcelas.toString());
         }
 
+        if (data?.valorParcela) {
+            form.append('valorParcela', data.valorParcela.toString());
+        }
+
         if (data?.tipoGeracaoBoleto) {
             form.append('tipoGeracaoBoleto', data.tipoGeracaoBoleto);
         }
@@ -123,10 +132,6 @@ export const CriarAcordo = () => {
 
         if (data?.dataVencimento) {
             form.append('dataVencimento', moment(data.dataVencimento).format('YYYY-MM-DD'));
-        }
-
-        if (data?.status) {
-            form.append('status', data.status);
         }
 
 
@@ -142,6 +147,12 @@ export const CriarAcordo = () => {
         form.append('pessoaId', data.pessoaId.toString());
         form.append('empresaId', glb_params.id_empresa ? glb_params.id_empresa : "0");
 
+        if (data?.lancamentos && data?.lancamentos.length > 0) {
+            form.append('lancamentos', JSON.stringify(data?.lancamentos))
+            /*data.lancamentos.forEach((lancamento)=>{
+                form.append('lancamentos', JSON.stringify(lancamento))
+            });*/
+        }
         const newDocuments = data?.documentos?.filter((doc) => !doc.id)
         newDocuments?.forEach((doc) => {
             form.append('documentos', doc.file)
@@ -152,6 +163,8 @@ export const CriarAcordo = () => {
                 form.append('documentosToDeleteIds[]', docId.toString())
             })
         }
+
+        console.log('Antes de enviar');
 
         createAcordoMutation.mutate({ data: form });
 
@@ -166,11 +179,13 @@ export const CriarAcordo = () => {
             <Card className='py-10' style={{ color: "#034869" }}>
                 <CardContent>
                     <h2 className="mb-4 mt-8 text-xl font-bold">Criar um novo Acordo</h2>
-                    <AcordoFormRoot
+                    <AcordoFormRoot                        
                         createAcordoMethods={acordoMethods}
                         onSubmitAcordoData={onSubmitAcordoData}
                     >
-                        <AcordoFormContent createAcordoMethods={acordoMethods} />
+                        <AcordoFormContent 
+                        action='create'
+                        createAcordoMethods={acordoMethods} />
                         <AcordoFormSubmitButton createAcordoMethods={acordoMethods} />
                     </AcordoFormRoot>
                 </CardContent>

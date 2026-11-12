@@ -4,15 +4,45 @@ import { ACCEPTED_DOCUMENT_TYPES } from "@/pages/main/proprietarios/constants/ac
 import moment from "moment";
 import { z } from "zod";
 
+export const lancamentoAcordoSchema = z.object({
+  id: z.coerce.number().optional(),
+  descricao: z.string(),  
+  valorOriginal: z.coerce.number().min(1, 'Valor do lançamento é obrigatório'),
+  juros: z.coerce.number().optional(),
+  multa: z.coerce.number().optional(),
+  desconto: z.coerce.number().optional(),
+  valorLancamento: z.coerce.number().optional(),
+
+  dataLancamento: z.string().transform((val) => {
+    const data: string = val;
+    return moment(data.substring(0, 10)).format("YYYY-MM-DD");
+  }),
+  dataVencimento: z.string().transform((val) => {
+    const data: string = val;
+    return moment(data.substring(0, 10)).format("YYYY-MM-DD");
+  }).optional(),
+  boleto: z.array(
+    z.object(
+      {
+        nome: z.string(),
+        id: z.number(),
+      }
+    )
+  ).optional(),    
+  boletoBancarioId: z.coerce.number().optional(),
+});
+
+
 export const acordoSchema = z.object({
   id: z.number().optional(),
   observacao: z.string().optional(),
-  valorOriginal: z.coerce.number().min(1, 'Valor do Original é obrigatório'),
+  valorOriginal: z.coerce.number({message:'Valor do Original é obrigatório'}),
   juros: z.coerce.number().optional(),
   multa: z.coerce.number().optional(),
   desconto: z.coerce.number().optional(),
   valorLiquido: z.coerce.number().optional(),
-  qtdParcelas: z.coerce.number(),
+  qtdParcelas: z.coerce.number({message:'Quantidade de parcelas é obrigatório'}).min(1, 'Quantidade de parcelas dever ser maior que 0 - zero.'),
+  valorParcela: z.coerce.number({message:'Valor das parcelas é obrigatório'}).min(1, 'Valor da parcela dever ser maior que 0 - zero.'),
   tipoGeracaoBoleto: z.string(),
 
 
@@ -80,7 +110,11 @@ export const acordoSchema = z.object({
       }
     )
   ).optional(),  
+  lancamentos: z.array(lancamentoAcordoSchema),
+  lancamentostoDeleteIds: z.array(z.number()).optional(),  
+  lancamentostoUpdate: z.array(lancamentoAcordoSchema).optional(),
   empresaId: z.coerce.number().min(1, 'Empresa é obrigatória'),
 });
 
 export type AcordoSchema = z.infer<typeof acordoSchema>
+export type LancamentoAcordoSchema = z.infer<typeof lancamentoAcordoSchema>

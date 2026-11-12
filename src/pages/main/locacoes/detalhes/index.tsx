@@ -218,7 +218,7 @@ export const DetalhesLocacaoForm = ({
 
     formData.append('pessoaId', (data.locatarios ? data.locatarios.map(x => { return x.id; }).toString() : ''));
 
-    console.log(new Date());
+    console.log('chama alteração de dados');
 
     await updatelocacao.mutateAsync(formData)
   }

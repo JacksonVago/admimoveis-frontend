@@ -115,8 +115,8 @@ export enum ROUTE {
 
   //Acordo
   ACORDOS = '/acordos',
-  ACORDO_CRIAR = '/acordo/criar',
-  ACORDO_DETALHES = '/acordo/:id',
+  ACORDO_CRIAR = '/acordos/criar',
+  ACORDO_DETALHES = '/acordos/:id',
 
   // Error routes
   NOT_FOUND = '*',

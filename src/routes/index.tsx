@@ -62,8 +62,8 @@ import { DetalhesBoletoBancario } from '@/pages/main/boletosbancarios/detalhes'
 import ListarPagamentos from '@/pages/main/pagamentos'
 import ListarGruposFluxoCaixa from '@/pages/main/grupofluxocaixa'
 import ListarAcordos from '@/pages/main/acordo'
-import { DetalhesAcordo } from '@/pages/main/acordo/detalhes'
 import { CriarAcordo } from '@/pages/main/acordo/criar'
+import DetalhesAcordo from '@/pages/main/acordo/detalhes'
 
 export interface ProtectedRouteProps {
   permission: Permission
@@ -437,7 +437,7 @@ export const RoutesComponent = () => {
             path={ROUTE.BOLETO_BANCARIO}
             element={
               <ProtectedRoute permission="VIEW_BOLETO_BANCARIO">
-                <ListarBoletosBancarios exclude='' limitView={3} />
+                <ListarBoletosBancarios exclude='' limitView={3} txtVinc='' onSelectBoleto={undefined}/>
               </ProtectedRoute>
             }
           />

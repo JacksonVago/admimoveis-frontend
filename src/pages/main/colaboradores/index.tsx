@@ -1577,6 +1577,28 @@ export const ListarColaboradores = () => {
                     ))}
                   </div>
 
+                  <div className='grid grid-cols-1 gap-1  mt-2'>
+                    <h3 className="text-lg font-semibold">Boleto bancário</h3>
+                    {acordoPermissions.map((permission) => (
+                      <div key={permission.value} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={permission.value}
+                          checked={userPermissions.includes(permission.value)}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(checked as boolean, permission.value)
+                          }
+                          style={{ 'border': '1px solid black' }}
+                        />
+                        <label
+                          htmlFor={permission.value}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {permission.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+
                 </div>
               </ScrollArea>
               <Button size={"sm"} onClick={handleSavePermissions}>Salvar permissões</Button>

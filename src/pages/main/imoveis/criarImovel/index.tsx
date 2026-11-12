@@ -456,7 +456,7 @@ export const CriarImovel = () => {
   })
 
   console.log('imovel dados', createImovelMethods.formState.errors);
-
+''
   return (
     <div className="scale mx-auto flex max-w-screen-xl transform flex-col items-center px-4 transition-transform">
       <div className="mb-8 flex w-full items-center justify-between">

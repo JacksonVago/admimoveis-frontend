@@ -92,13 +92,15 @@ export const useGetBoletosQueryOptions = (empresaId: number, {
 
 //Lista de boletos
 export default function ListarBoletosBancarios({
+  txtVinc,
   limitView,
   exclude,
-  //onSelectBoleto
+  onSelectBoleto
 }: {
+  txtVinc: string
   limitView: number
   exclude: string
-  //onSelectBoleto: ((pagamento: Boleto) => void) | undefined
+  onSelectBoleto: ((boleto: BoletoBancario) => void) | undefined
 }) {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
@@ -107,7 +109,7 @@ export default function ListarBoletosBancarios({
   const isTablet = useMediaQuery({ query: '(min-width: 746px)' })
   const isMobile = useMediaQuery({ query: '(max-width: 420px)' })
   //const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
-  const [showcard, setShowCard] = useState((isMobile ? false : true));
+  const [showcard, setShowCard] = useState((txtVinc != '' ? false : true) || (isMobile ? false : true));
   const [selBoleto, setSelBoleto] = useState<BoletoBancario>();
   //const [selAlerta, setSelAlerta] = useState<ConfiguracaoAlerta>();
 
@@ -179,7 +181,10 @@ export default function ListarBoletosBancarios({
   //always that we go to out of the total pages, we will go to the first page
 
   useEffect(() => {
-    glb_params.updTitle_form('Boletos Bancário');
+    if (!onSelectBoleto) {
+      glb_params.updTitle_form('Boletos Bancário');
+    }
+
     if (totalPages && page > totalPages) {
       navigate({
         search: `?page=1&limit=${limit}&search=${search}&status=${(status !== null ? status : '')}`
@@ -662,7 +667,7 @@ export default function ListarBoletosBancarios({
           .then(result => {
 
             console.log(result);
-            if (result.status === 200){
+            if (result.status === 200) {
               console.log(result.status);
             }
 
@@ -744,16 +749,17 @@ export default function ListarBoletosBancarios({
           <h1 className="text-2xl font-bold">Boletos bancário</h1>
         )}
         <div className='flex justify-end'>
-          {
-            showcard ?
+          {(txtVinc === '' ?
+            (showcard ?
               (<List onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />) :
               (<IdCard onClick={() => { setShowCard(!showcard) }} color='#034869' className='hover:cursor-pointer hover:bg-gray-300' />)
+            ) : (<></>))
           }
         </div>
       </div>
 
       <div className=
-        {(isPortrait || isTablet || isBigScreen)
+        {((isPortrait || isTablet || isBigScreen) && txtVinc === '')
           ? "grid grid-cols-2 gap-4 sm:flex-row sm:items-center sm:justify-between border-b"
           : "grid grid-cols-1 gap-4 sm:flex-row sm:items-center sm:justify-between border-b"}
       >
@@ -767,32 +773,37 @@ export default function ListarBoletosBancarios({
           />
         </div>
         <div className=
-          {(isPortrait || isTablet || isBigScreen)
+          {((isPortrait || isTablet || isBigScreen) && txtVinc === '')
             ? "grid grid-cols-3 gap-4 mb-2"
             : "grid grid-cols-1 gap-4 mb-2"}>
           <h1 className='flex items-center'>Período</h1>
-          <div className="flex justify-between gap-2">
-            <Label className="text-base flex items-center">
-              De</Label>
-            <Input
-              type='date'
-              className="mt-2"
-              placeholder="Data de vencimento"
-              value={dataInicial}
-              onChange={(e) => setdataInicial(e.target.value)}
-            />
-          </div>
-          <div className="flex justify-between gap-2">
-            <Label className="text-base flex items-center">
-              Até
-            </Label>
-            <Input
-              type='date'
-              className="mt-2"
-              placeholder="Data de vencimento"
-              value={dataFinal}
-              onChange={(e) => setdataFinal(e.target.value)}
-            />
+          <div className=
+          {((isPortrait || isTablet || isBigScreen) && txtVinc === '')
+            ? "grid grid-cols-1"
+            : "grid grid-cols-2 gap-2"}>
+            <div className="flex justify-between gap-2">
+              <Label className="text-base flex items-center">
+                De</Label>
+              <Input
+                type='date'
+                className="mt-2"
+                placeholder="Data de vencimento"
+                value={dataInicial}
+                onChange={(e) => setdataInicial(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-between gap-2">
+              <Label className="text-base flex items-center">
+                Até
+              </Label>
+              <Input
+                type='date'
+                className="mt-2"
+                placeholder="Data de vencimento"
+                value={dataFinal}
+                onChange={(e) => setdataFinal(e.target.value)}
+              />
+            </div>
           </div>
         </div>
         <div className="flex gap-2">
@@ -905,10 +916,26 @@ export default function ListarBoletosBancarios({
                           'grid-cols-2': boleto.boleto?.status === BoletoStatus.ATRASADO || boleto.boleto?.status === BoletoStatus.PAGO,
                         })}
                       >
-                        {(isAdmin ||
+                        {(txtVinc !== '' && onSelectBoleto) && (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => {
+                              onSelectBoleto(boleto);
+                            }}
+                            style={{
+                              fontSize: (isBigScreen ? '1.2rem' : isPortrait ? '1rem' : isTablet ? '0.8rem' : isMobile ? '0.8rem' : '0.3rem'),
+                              textWrap: 'inherit'
+                            }}
+                            className='hover:cursor-pointer hover:bg-gray-200'
+                          >
+                            {txtVinc}
+                          </Button>
+                        )}
+                        {((isAdmin ||
                           user?.permissions.includes("ALL") ||
                           user?.permissions.includes("UPDATE_PAGAMENTO")
-                        ) && (
+                        ) && (txtVinc === '')) && (
 
                             <Button variant="secondary"
                               className='hover:bg-[#daeffa] hover:cursor-pointer bg-[#a7d9f2]'
@@ -921,7 +948,7 @@ export default function ListarBoletosBancarios({
                         {((isAdmin ||
                           user?.permissions.includes("ALL") ||
                           user?.permissions.includes("DELETE_PAGAMENTO")
-                        ) && (boleto.status === 'REGISTRADO')) && (
+                        ) && (boleto.status === 'REGISTRADO') && (txtVinc === '')) && (
                             <>
                               <Button variant="secondary"
                                 onClick={() => handlerBaixarBoleto(boleto.id)}
@@ -936,7 +963,7 @@ export default function ListarBoletosBancarios({
                         {((isAdmin ||
                           user?.permissions.includes("ALL") ||
                           user?.permissions.includes("DELETE_PAGAMENTO")
-                        ) && (boleto.status === "REGISTRADO")) && (
+                        ) && (boleto.status === "REGISTRADO") && (txtVinc === '')) && (
                             <>
                               <Button variant="secondary"
                                 onClick={() => handlerValidarBoleto(boleto.id)}
@@ -952,8 +979,7 @@ export default function ListarBoletosBancarios({
                           user?.permissions.includes("ALL") ||
                           user?.permissions.includes("VIEW_BOLETO_BANCARIO")
                         ) && (boleto.boleto?.status === BoletoStatus.CONFIRMADO ||
-                          boleto.status === "REGISTRADO"
-                          )) && (
+                          boleto.status === "REGISTRADO") && (txtVinc === '')) && (
                             <>
                               <Button variant="secondary"
                                 onClick={() => handlerDownloadBoleto(boleto.id)}
@@ -966,7 +992,7 @@ export default function ListarBoletosBancarios({
                               </Button>
                             </>
                           )}
-                        {(boleto.boleto?.status === BoletoStatus.CONFIRMADO || boleto.status === "REGISTRADO") && (
+                        {((boleto.boleto?.status === BoletoStatus.CONFIRMADO || boleto.status === "REGISTRADO") && (txtVinc === '')) && (
                           <Button variant="secondary"
                             className='hover:cursor-pointer hover:bg-gray-200'
                             onClick={() => handlerEnviaEmail(boleto)}

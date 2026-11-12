@@ -1,6 +1,5 @@
 import { Boleto } from "./boleto";
 import { BoletoBancario } from "./boletobancario";
-import { Empresa } from "./empresa";
 import { GenericAnexo } from "./generic-anexo";
 import { Imovel } from "./imovel";
 import { Locacao } from "./locacao";
@@ -16,6 +15,7 @@ export interface Acordo {
     desconto: number;
     valorLiquido: number;
     qtdParcelas: number;
+    valorParcela: number;
     tipoGeracaoBoleto: string;
     dataEmissao: string;
     dataVencimento: string;
@@ -46,7 +46,9 @@ export interface LancamentoAcordo {
     juros: number;
     multa: number;
     desconto: number;
-    dataLancamento: string
+    valorLancamento: number;
+    dataLancamento: string;
+    dataVencimento: string;
     acordo:Acordo;
     boletoBancario?:BoletoBancario;
 }

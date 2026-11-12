@@ -40,6 +40,7 @@ export const ClienteFormContent = ({
   disabled?: boolean
 }) => {
 
+  
   console.log('createClienteMethods', createClienteMethods.formState?.errors);
   //console.log((createClienteMethods && createClienteMethods.formState && createClienteMethods.formState.errors && createClienteMethods.formState.errors.email && createClienteMethods.formState.errors.email.length && createClienteMethods.formState.errors.email.length > 0) ? createClienteMethods.formState?.errors?.email?.map(x => (x ? x.message : '')).join(";") : null  );
   console.log(createClienteMethods.formState.errors.email);

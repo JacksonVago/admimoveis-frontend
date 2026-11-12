@@ -171,6 +171,13 @@ export type Permission =
   | 'DELETE_ACORDO'
   | 'VIEW_ACORDOS'
 
+  //Lançamentos acordo
+    //Lanmçamentos acordos
+  | 'CREATE_LANCAMENTO_ACORDO'
+  | 'UPDATE_LANCAMENTO_ACORDO'
+  | 'DELETE_LANCAMENTO_ACORDO'
+  | 'VIEW_LANCAMENTOS_ACORDOS'
+
 export const userPermissions: {
   [key in Permission]: string
 } = {
@@ -321,7 +328,15 @@ export const userPermissions: {
   CREATE_ACORDO: 'Criar Acordor',
   UPDATE_ACORDO: 'Atualizar Acordor',
   DELETE_ACORDO: 'Deletar Acordor',
-  VIEW_ACORDOS: 'Visualizar Acordor'
+  VIEW_ACORDOS: 'Visualizar Acordor',
+
+  //Lançamentos aordos
+    //Lanmçamentos acordos
+  CREATE_LANCAMENTO_ACORDO: 'Criar Lançamento acordo',
+  UPDATE_LANCAMENTO_ACORDO: 'Atualziar Lançamento acordo',
+  DELETE_LANCAMENTO_ACORDO: 'Deletar Lançamento acordo',
+  VIEW_LANCAMENTOS_ACORDOS: 'Visualizar Lançamento acordo',
+
 }
 
 export enum UserRole {
