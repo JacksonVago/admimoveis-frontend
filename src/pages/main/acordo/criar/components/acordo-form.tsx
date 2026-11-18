@@ -159,8 +159,13 @@ export const AcordoFormContent = ({
   //Lista de lançamentos
   const lancamentoAcordo = useFieldArray({
     control: createAcordoMethods.control,
-    name: 'lancamentos'
+    name: 'lancamentos',
+    keyName: 'fieldId'
   });
+
+  console.log(lancamentoAcordo);
+  console.log(createAcordoMethods.getValues());
+  
 
   //boleto do lancamento
   const boletoLancamento = useFieldArray({
@@ -172,9 +177,9 @@ export const AcordoFormContent = ({
     lancamentoMethods.reset(defaultValuesLancto);
   }, [])
 
-  /*useEffect(() => {
+  useEffect(() => {
     handlerSomaLancamentos();
-  }, [lancamentoAcordo])*/
+  }, [lancamentoAcordo])
 
   const handlerSelImovel = () => {
 
@@ -539,6 +544,7 @@ export const AcordoFormContent = ({
   }
 
   const handleEditLancamento = (lancamento: LancamentoAcordoSchema) => {
+    console.log(lancamento);
     if (createAcordoMethods.getValues("status") === BoletoStatus.PENDENTE) {
       setTitulo("Visualizar lançamento");
     }
@@ -655,11 +661,6 @@ export const AcordoFormContent = ({
       createAcordoMethods.setValue("valorParcela", Number(valParcela.toFixed(2)));
     }
   }
-
-  console.log(createAcordoMethods.formState.errors);
-  console.log(createAcordoMethods.getValues());
-  console.log(acordoLocacao);
-  console.log(acordoPessoa);
 
   return (
     <>
@@ -887,7 +888,7 @@ export const AcordoFormContent = ({
                   <DialogTrigger asChild>
                     {(isAdmin ||
                       user?.permissions.includes("ALL") ||
-                      user?.permissions.includes("CREATE_LOCACAO_LANCAMENTO")
+                      user?.permissions.includes("CREATE_LANCAMENTO_ACORDO")
                     ) && (
                         <div className='grid grid-cols-4'>
                           <Button size={'sm'}

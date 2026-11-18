@@ -5,7 +5,7 @@ import moment from "moment";
 import { z } from "zod";
 
 export const lancamentoAcordoSchema = z.object({
-  id: z.coerce.number().optional(),
+  id: z.number().optional(),
   descricao: z.string(),  
   valorOriginal: z.coerce.number().min(1, 'Valor do lançamento é obrigatório'),
   juros: z.coerce.number().optional(),
@@ -30,6 +30,7 @@ export const lancamentoAcordoSchema = z.object({
     )
   ).optional(),    
   boletoBancarioId: z.coerce.number().optional(),
+  acordoId: z.coerce.number().optional(),
 });
 
 
@@ -112,7 +113,6 @@ export const acordoSchema = z.object({
   ).optional(),  
   lancamentos: z.array(lancamentoAcordoSchema),
   lancamentostoDeleteIds: z.array(z.number()).optional(),  
-  lancamentostoUpdate: z.array(lancamentoAcordoSchema).optional(),
   empresaId: z.coerce.number().min(1, 'Empresa é obrigatória'),
 });
 

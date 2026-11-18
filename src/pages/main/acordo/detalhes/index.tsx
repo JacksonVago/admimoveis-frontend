@@ -228,7 +228,7 @@ export default function DetalhesAcordo() {
     }),
     [acordo, documentFiles]
   );
-  console.log(defaultValues);
+
   //default values
   const defaultValuesLan = React.useMemo(
     () => ({
@@ -245,26 +245,26 @@ export default function DetalhesAcordo() {
   //react hook form
   const acordoMethods = useForm<AcordoSchema>({
     resolver: zodResolver(acordoSchema),
-    defaultValues: defaultValues,
+    //defaultValues: defaultValues,
     mode: 'all'
   })
-  console.log(acordoMethods.getValues("valorLiquido"));
-  console.log(acordoMethods.getValues("valorOriginal"));
-  console.log(acordoMethods.getValues("juros"));
-  console.log(acordoMethods.getValues("multa"));
 
   //react hook form
   const lancamentoMethods = useForm<LancamentoAcordoSchema>({
     resolver: zodResolver(lancamentoAcordoSchema),
-    defaultValues: defaultValuesLan,
-    mode: 'all'
+    mode: 'all',
+    //    defaultValues: defaultValuesLan,
   });
 
   //Lista de lançamentos para alteração
-  const lancamentoAcordo = useFieldArray({
+  const lancamentoAcordoAlt = useFieldArray({
     control: acordoMethods.control,
-    name: 'lancamentostoUpdate'
+    name: 'lancamentos',
+    keyName: 'fieldId',
   });
+
+  console.log(acordoMethods);
+  console.log(lancamentoAcordoAlt);
 
   const deleteAcordoMutation = useMutation({
     mutationFn: async () => {
@@ -305,7 +305,7 @@ export default function DetalhesAcordo() {
   const updateacordo = useMutation({
     mutationFn: async (data: FormData) => updateAcordo(id ? id.toString() : '0', data),
     onSuccess: () => {
-      ;['acordo', 'documentFiles', id].forEach((key) => {
+      ;['acordo', 'documentFiles', 'lancamentos', id].forEach((key) => {
         queryClient.invalidateQueries({ queryKey: [key] })
       })
       toast({ title: 'Acordo alterado com sucesso' });
@@ -331,7 +331,7 @@ export default function DetalhesAcordo() {
   });
 
   const onSubmitAcordoData = async (data: AcordoSchema) => {
-    console.log('Validar Data');
+    console.log('Validar Data', data);
     const form = new FormData()
 
     if (data?.observacao) {
@@ -389,10 +389,6 @@ export default function DetalhesAcordo() {
     form.append('pessoaId', data.pessoaId.toString());
     form.append('empresaId', glb_params.id_empresa ? glb_params.id_empresa : "0");
 
-    if (data?.lancamentostoUpdate && data?.lancamentostoUpdate.length > 0) {
-      form.append('lancamentostoUpdate', JSON.stringify(data?.lancamentostoUpdate))
-    }
-
     if (data?.documentosToDeleteIds?.length) {
       data.documentosToDeleteIds.forEach((docId) => {
         form.append('documentosToDeleteIds[]', docId.toString())
@@ -407,59 +403,93 @@ export default function DetalhesAcordo() {
   const onSubmitLancamentoData = async (data: LancamentoAcordoSchema) => {
     try {
       const form = new FormData()
-      let lan_aux: LancamentoAcordoSchema = {
-        id: 0,
-        descricao: '',
-        valorOriginal: 0,
-        juros: 0,
-        multa: 0,
-        desconto: 0,
-        valorLancamento: 0,
-        dataLancamento: moment.utc(new Date()).format("YYYY-MM-DD"),
-        dataVencimento: moment.utc(new Date()).format("YYYY-MM-DD"),
-        boletoBancarioId: 0
-      };
+
+      console.log(data);
+      if (data?.id) {
+        form.append("id", data.id.toString());
+      }
 
       if (data?.descricao) {
-        lan_aux.descricao = data.descricao;
+        form.append("descricao", data.descricao);
       }
 
 
       if (data?.valorOriginal) {
-        lan_aux.valorOriginal = data.valorOriginal;
+        form.append("valorOriginal", data.valorOriginal.toString());
       }
 
       if (data?.valorLancamento) {
-        lan_aux.valorLancamento = data.valorLancamento;
+        form.append("valorLancamento", data.valorLancamento.toString());
       }
 
       if (data?.juros) {
-        lan_aux.juros = data.juros;
+        form.append("juros", data.juros.toString());
+      }
+      else {
+        form.append("juros", "0");
       }
 
       if (data?.multa) {
-        lan_aux.multa = data.multa;
+        form.append("multa", data.multa.toString());
+      }
+      else {
+        form.append("multa", "0");
       }
 
       if (data?.desconto) {
-        lan_aux.desconto = data.desconto;
+        form.append("desconto", data.desconto.toString());
+      }
+      else {
+        form.append("desconto", "0");
       }
 
 
       if (data?.dataLancamento) {
-        lan_aux.dataLancamento = data.dataLancamento;
+        form.append("dataLancamento", data.dataLancamento);
       }
 
       if (data?.dataVencimento) {
-        lan_aux.dataVencimento = data.dataVencimento;
+        form.append("dataVencimento", data.dataVencimento);
+      }
+      else {
+        form.append("dataVencimento", data.dataLancamento);
       }
 
 
       if (data?.boletoBancarioId) {
-        lan_aux.boletoBancarioId = data.boletoBancarioId;
+        form.append("boletoBancarioId", data.boletoBancarioId.toString());
       }
 
-      lancamentoAcordo.append(lan_aux);
+      if (data?.acordoId) {
+        form.append("acordoId", data.acordoId.toString());
+      }
+      /*if (data) {
+        form.append('lancamentos', JSON.stringify(data))
+      }*/
+
+      /*if (lancamentoAcordoAlt.fields.length > 0) {
+        if (data?.id) {
+          lancamentoAcordoAlt.fields.forEach((lancamento, index) => {
+            if (lancamento.id === data.id) {
+              lancamentoAcordoAlt.remove(index);
+              lancamentoAcordoAlt.append(data);
+            }
+          });
+        }
+        else {
+          lancamentoAcordoAlt.append(data);
+        }
+      }
+      else {
+        lancamentoAcordoAlt.append(data);
+      }*/
+
+      if (titulo === "Criar novo Lançamento") {
+        createLancamento.mutateAsync(form);
+      }
+      else {
+        updateLancamento.mutateAsync(form);
+      }
 
       console.log('Lançamento adicionado');
       setIsLanctoDialogOpen(false);
@@ -490,7 +520,15 @@ export default function DetalhesAcordo() {
     }
   }
 
+  const handlerNewLancamento = () => {
+    lancamentoMethods.reset();
+    lancamentoMethods.setValue("acordoId", id);
+    setTitulo("Criar novo Lançamento");
+    setIsLanctoDialogOpen(true);
+  }
+
   const handleEditLancamento = (lancamento: LancamentoAcordo) => {
+    console.log(lancamento);
     if (acordo?.status !== BoletoStatus.PENDENTE) {
       setTitulo("Visualizar lançamento");
     }
@@ -509,6 +547,7 @@ export default function DetalhesAcordo() {
     lancamentoMethods.setValue("valorLancamento", lancamento.valorLancamento);
     lancamentoMethods.setValue("descricao", lancamento.descricao);
     lancamentoMethods.setValue("boletoBancarioId", lancamento.boletoBancario ? lancamento.boletoBancario.id : 0);
+    lancamentoMethods.setValue("acordoId", id);
     console.log(lancamentoMethods.getValues());
   }
 
@@ -531,7 +570,7 @@ export default function DetalhesAcordo() {
       })
     },
     onSuccess: () => {
-      ['acordo', id].forEach((key) => {
+      ['acordo', 'lancamentos', id].forEach((key) => {
         queryClient.invalidateQueries({ queryKey: [key] })
       })
     }
@@ -539,14 +578,23 @@ export default function DetalhesAcordo() {
 
   const updateLancamento = useMutation({
     mutationFn: async (data: FormData) => {
-      return await api.put<LancamentoLocacao>(`/lancamentos/${data.get('id')}`, data, {
+      const dataObject = Object.fromEntries(data.entries());
+      const jsonData = JSON.stringify(dataObject);
+      console.log(jsonData);
+
+      return await api.put<LancamentoLocacao>(`/acordo/lancamentos/${data.get('id')}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     },
     onSuccess: () => {
-      ['locacao', id].forEach((key) => {
-        queryClient.invalidateQueries({ queryKey: [key] })
-      })
+      ;['acordo', id].forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: [key] });
+        toast({
+          title: 'Atualizar os lançamentos',
+          description: 'Lançamento atualizado com sucesso.',
+        })
+        handlerSomaLancamentos();
+      });
     }
   })
 
@@ -716,8 +764,69 @@ export default function DetalhesAcordo() {
   }
 
 
-  console.log(acordoMethods.formState.errors);
-  console.log(acordoMethods.formState.isValid);
+  const handlerSomaLancamentos = () => {
+    console.log('handlerSomaLancamentos');
+    if (lancamentoAcordoAlt.fields.length > 0) {
+
+      const totals = lancamentoAcordoAlt.fields.reduce((acc, current) => {
+        acc.valorOriginal += current.valorOriginal;
+        acc.juros += current.juros ? current.juros : 0;
+        acc.multa += current.multa ? current.multa : 0;
+        acc.desconto += current.desconto ? current.desconto : 0;
+        acc.valorLancamento += current.valorLancamento ? current.valorLancamento : 0;
+        return acc;
+      }, { valorOriginal: 0, juros: 0, multa: 0, desconto: 0, valorLancamento: 0 }); // Initial values set to 0
+
+      console.log(totals);
+
+      acordoMethods.setValue("valorOriginal", totals.valorOriginal);
+      acordoMethods.setValue("juros", totals.juros);
+      acordoMethods.setValue("multa", totals.multa);
+      if (totals.desconto > 0) {
+        acordoMethods.setValue("desconto", totals.desconto);
+      }
+      if (totals.valorLancamento > 0) {
+        acordoMethods.setValue("valorLiquido", totals.valorLancamento);
+      }
+      handlerCalculaTotais();
+    }
+    else {
+      acordoMethods.setValue("valorOriginal", 0);
+      acordoMethods.setValue("juros", 0);
+      acordoMethods.setValue("multa", 0);
+      acordoMethods.setValue("desconto", 0);
+      acordoMethods.setValue("valorLiquido", 0);
+      console.log('sem valores');
+    }
+  }
+
+  const handlerCalculaTotais = () => {
+    console.log('handlerCalculaTotais');
+    let valor = Number(acordoMethods.getValues("valorOriginal"));
+    let juros = Number(acordoMethods.getValues("juros") !== undefined ? acordoMethods.getValues("juros") : 0);
+    let multa = Number(acordoMethods.getValues("multa") !== undefined ? acordoMethods.getValues("multa") : 0);
+    let desconto = Number(acordoMethods.getValues("desconto") !== undefined ? acordoMethods.getValues("desconto") : 0);
+    let total = valor + (juros ? juros : 0) + (multa ? multa : 0) - (desconto ? desconto : 0)
+    console.log(total);
+    acordoMethods.setValue("valorLiquido", total);
+    handlerCalculaParcelas();
+  }
+
+  const handlerCalculaParcelas = () => {
+    console.log('handlerCalculaParcelas');
+    let valorLiquido = (acordoMethods.getValues("valorLiquido") !== undefined ? acordoMethods.getValues("valorLiquido") : 0);
+    console.log(valorLiquido);
+    if (valorLiquido && valorLiquido > 0) {
+      let valParcela = valorLiquido / acordoMethods.getValues("qtdParcelas");
+      acordoMethods.setValue("valorParcela", Number(valParcela.toFixed(2)), {
+        shouldDirty: true,
+        shouldValidate: true
+      });
+    }
+    console.log(acordoMethods.getValues("valorLiquido"));
+    console.log(acordoMethods.getValues("valorParcela"));
+    //onSubmitAcordoData(acordoMethods.getValues);
+  }
 
   if (isLoading) return <PageLoader />
 
@@ -798,18 +907,21 @@ export default function DetalhesAcordo() {
                 onSubmitAcordoData={onSubmitAcordoData}
               >
                 <AcordoFormContent action='update' createAcordoMethods={acordoMethods} disabled={!isEditing} />
-                <div className="mt-4">
-                  {!isEditing && (
-                    <Button
-                      className={(isPortrait ? "hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white" : "w-full hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white")}
-                      disabled={
-                        !acordoMethods.formState.isDirty
-                        //|| !acordoMethods.formState.isValid
-                      }
+                <div className="mt-4 grid grid-cols-6">
+                  {isEditing && (
+                    <>
+                      <div className='col-span-5'></div>
+                      <Button
+                        className={(isPortrait ? "hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white" : "w-full hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white")}
+                        disabled={
+                          !acordoMethods.formState.isDirty
+                          //|| !acordoMethods.formState.isValid
+                        }
 
-                    >
-                      Salvar Alterações
-                    </Button>
+                      >
+                        Salvar Alterações
+                      </Button>
+                    </>
                   )}
                 </div>
               </AcordoFormRoot>
@@ -819,7 +931,22 @@ export default function DetalhesAcordo() {
 
         {/*Lançamento */}
         <TabsContent value="lancamentos" className="space-y-4">
+          {((isAdmin ||
+            user?.permissions.includes("ALL") ||
+            user?.permissions.includes("CREATE_LANCAMENTO_ACORDO")
+          ) && isEditing) && (
+              <div className='grid grid-cols-6'>
+                <Button size={'sm'}
+                  type='button'
+                  className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white mb-3 col-start-6 col-end-6"
+                  onClick={handlerNewLancamento}
+                >
+                  <Plus className="mr-2 h-4 w-4" /> Lançamento
+                </Button>
+              </div>
+            )}
           {(acordo?.lancamentos && acordo?.lancamentos.length > 0) ? (
+            //(lancamentoAcordoAlt && lancamentoAcordoAlt.fields.length > 0) ? (
             <div className=''>
 
               <div className='rounded-md border'>
@@ -836,93 +963,116 @@ export default function DetalhesAcordo() {
                 </div>
 
                 <div className='grid grid-cols-9 m-2' >
-                  {acordo?.lancamentos.map((lancamento) => (
-                    <>
-                      <Label className={!isMobile ? 'flex items-center' : 'flex items-center col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.descricao}</Label>
-                      {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>) : (<></>)}
-                      {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataVencimento).format("DD/MM/YYYY")}</Label>) : (<></>)}
-                      <Label className='flex items-center justify-end' style={{ 'fontSize': '0.7rem' }}>{lancamento.valorOriginal.toLocaleString('pt-BR')}</Label>
-                      <Label className='flex items-center justify-end' style={{ 'fontSize': '0.7rem' }}>{lancamento.juros ? lancamento.juros.toLocaleString('pt-BR') : 0}</Label>
-                      <Label className='flex items-center justify-end' style={{ 'fontSize': '0.7rem' }}>{lancamento.multa ? lancamento.multa.toLocaleString('pt-BR') : 0}</Label>
-                      <Label className='flex items-center justify-end' style={{ 'fontSize': '0.7rem' }}>{lancamento.desconto ? lancamento.desconto.toLocaleString('pt-BR') : 0}</Label>
-                      <Label className='flex justify-end items-center' style={{ 'fontSize': '0.7rem' }}>{
-                        (lancamento.valorOriginal +
-                          (lancamento.juros ? lancamento.juros : 0) +
-                          (lancamento.multa ? lancamento.multa : 0) -
-                          (lancamento.desconto ? lancamento.desconto : 0)
-                        ).toLocaleString('pt-BR')
-                      }</Label>
-                      <div className='flex justify-center'>
-                        {((isAdmin ||
-                          user?.permissions.includes("ALL") ||
-                          user?.permissions.includes("UPDATE_LOCACAO_LANCAMENTO")
-                        ) && (acordo?.status === BoletoStatus.PENDENTE)) && (
+                  {//lancamentoAcordoAlt.fields.map((lancamento) => (
+                    acordo.lancamentos.map((lancamento) => (
+
+                      <>
+                        <Label className={!isMobile ? 'flex items-center' : 'flex items-center col-span-2'} style={{ 'fontSize': '0.7rem' }}>{lancamento.descricao}</Label>
+                        {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataLancamento).format("DD/MM/YYYY")}</Label>) : (<></>)}
+                        {!isMobile ? (<Label className='flex items-center' style={{ 'fontSize': '0.7rem' }}>{moment.utc(lancamento.dataVencimento).format("DD/MM/YYYY")}</Label>) : (<></>)}
+                        <Label className='flex items-center justify-end' style={{ 'fontSize': '0.7rem' }}>{lancamento.valorOriginal.toLocaleString('pt-BR')}</Label>
+                        <Label className='flex items-center justify-end' style={{ 'fontSize': '0.7rem' }}>{lancamento.juros ? lancamento.juros.toLocaleString('pt-BR') : 0}</Label>
+                        <Label className='flex items-center justify-end' style={{ 'fontSize': '0.7rem' }}>{lancamento.multa ? lancamento.multa.toLocaleString('pt-BR') : 0}</Label>
+                        <Label className='flex items-center justify-end' style={{ 'fontSize': '0.7rem' }}>{lancamento.desconto ? lancamento.desconto.toLocaleString('pt-BR') : 0}</Label>
+                        <Label className='flex justify-end items-center' style={{ 'fontSize': '0.7rem' }}>{
+                          (lancamento.valorOriginal +
+                            (lancamento.juros ? lancamento.juros : 0) +
+                            (lancamento.multa ? lancamento.multa : 0) -
+                            (lancamento.desconto ? lancamento.desconto : 0)
+                          ).toLocaleString('pt-BR')
+                        }</Label>
+                        <div className='flex justify-center'>
+                          {((isAdmin ||
+                            user?.permissions.includes("ALL") ||
+                            user?.permissions.includes("UPDATE_LOCACAO_LANCAMENTO")
+                          ) && (acordo?.status === BoletoStatus.PENDENTE) && isEditing) && (
+                              <>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEditLancamento(lancamento);
+                                    /*handleEditLancamento({
+                                      id: lancamento.id,
+                                      descricao: lancamento.descricao,
+                                      valorOriginal: lancamento.valorOriginal,
+                                      juros: lancamento.juros,
+                                      multa: lancamento.multa,
+                                      desconto: lancamento.desconto,
+                                      valorLancamento: lancamento.valorLancamento ? lancamento.valorLancamento : 0,
+                                      dataLancamento: lancamento.dataLancamento,
+                                      dataVencimento: lancamento.dataVencimento ? lancamento.dataVencimento : lancamento.dataLancamento,
+
+                                    });*/
+                                  }}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+
+                                <Dialog
+                                  open={isExcDialogOpen}
+                                  onOpenChange={(value) => {
+                                    setIsExcDialogOpen(value)
+                                  }}>
+                                  <DialogTrigger asChild>
+                                    <Button variant="ghost" size="icon" onClick={(e) => {
+                                      e.stopPropagation()
+                                      //setSelectedTipo(tipo)
+                                    }
+                                    } title='Excluir Lançamento'>
+                                      <Trash2 className="h-4 w-4" />
+
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle>Você tem certeza?</DialogTitle>
+                                      <DialogDescription>
+                                        Isso excluir o lançamento da locação
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <DialogFooter>
+                                      <Button onClick={() => { setIsExcDialogOpen(false) }}>Cancelar</Button>
+                                      <Button onClick={() => { handleDeleteLancamento(lancamento.id ? lancamento.id : 0) }}>
+                                        Sim, excluir o lançamento.
+                                      </Button>
+                                    </DialogFooter>
+                                  </DialogContent>
+                                </Dialog>
+                              </>
+                            )}
+                          {(acordo?.status === BoletoStatus.CONFIRMADO) && (
                             <>
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  handleEditLancamento(lancamento);
+                                  handleEditLancamento({
+                                    id: lancamento.id,
+                                    descricao: lancamento.descricao,
+                                    valorOriginal: lancamento.valorOriginal,
+                                    juros: lancamento.juros,
+                                    multa: lancamento.multa,
+                                    desconto: lancamento.desconto,
+                                    valorLancamento: lancamento.valorLancamento ? lancamento.valorLancamento : 0,
+                                    dataLancamento: lancamento.dataLancamento,
+                                    dataVencimento: lancamento.dataVencimento ? lancamento.dataVencimento : lancamento.dataLancamento,
+
+                                  });
                                   //setSelectedTipo(tipo)
                                   //setIsEditDialogOpen(true)
                                 }}
                               >
-                                <Pencil className="h-4 w-4" />
+                                <Info className="h-4 w-4" />
                               </Button>
 
-                              <Dialog
-                                open={isExcDialogOpen}
-                                onOpenChange={(value) => {
-                                  setIsExcDialogOpen(value)
-                                }}>
-                                <DialogTrigger asChild>
-                                  <Button variant="ghost" size="icon" onClick={(e) => {
-                                    e.stopPropagation()
-                                    //setSelectedTipo(tipo)
-                                  }
-                                  } title='Excluir Lançamento'>
-                                    <Trash2 className="h-4 w-4" />
-
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                  <DialogHeader>
-                                    <DialogTitle>Você tem certeza?</DialogTitle>
-                                    <DialogDescription>
-                                      Isso excluir o lançamento da locação
-                                    </DialogDescription>
-                                  </DialogHeader>
-                                  <DialogFooter>
-                                    <Button onClick={() => { setIsExcDialogOpen(false) }}>Cancelar</Button>
-                                    <Button onClick={() => { handleDeleteLancamento(lancamento.id) }}>
-                                      Sim, excluir o lançamento.
-                                    </Button>
-                                  </DialogFooter>
-                                </DialogContent>
-                              </Dialog>
                             </>
                           )}
-                        {(acordo?.status === BoletoStatus.CONFIRMADO) && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleEditLancamento(lancamento);
-                                //setSelectedTipo(tipo)
-                                //setIsEditDialogOpen(true)
-                              }}
-                            >
-                              <Info className="h-4 w-4" />
-                            </Button>
-
-                          </>
-                        )}
-                      </div>
-                    </>
-                  ))}
+                        </div>
+                      </>
+                    ))}
                 </div>
               </div>
 
@@ -1099,8 +1249,10 @@ export default function DetalhesAcordo() {
                         <DialogFooter className='mt-2'>
                           {(isEditing || titulo.includes('novo')) && (
                             <Button size={"sm"} type='submit'
-                              disabled={!lancamentoMethods.formState.isDirty ||
-                                !lancamentoMethods.formState.isValid}
+                              disabled={!lancamentoMethods.formState.isDirty
+                                //||
+                                //!lancamentoMethods.formState.isValid
+                              }
                               className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white">
                               {titulo.includes('novo') ? 'Criar lançamento' : 'Confirmar Alteração'}</Button>
                           )}
@@ -1122,7 +1274,70 @@ export default function DetalhesAcordo() {
 
         {/* Boletos */}
         <TabsContent value="boletos" className="space-y-4">
-          {(acordo?.lancamentos && acordo?.lancamentos.length > 0) ? (
+
+          {!selBoleto && (
+            <div className='mt-3'>
+              {(boletoLancamento.fields.length > 0) ? (
+                <>
+                  <Label className='text-base' >Boleto</Label>
+                  <div className="flex items-center">
+                    {boletoLancamento.fields.map((field, index) => (
+                      <div className='flex justify-between items-center gap-2 mt-2 border-solid border-2 border-gray-250 rounded p-1'>
+                        <Label >{field.nome}</Label>
+                        <button disabled={!isEditing}
+                          className='border bg-zinc-200 hover:bg-zinc-400'
+                          type="button"
+                          onClick={() => {
+                            lancamentoMethods.setValue('boletoBancarioId', 0, { shouldDirty: false, shouldValidate: false });
+                            boletoLancamento.remove(index);
+                          }}
+                        >
+
+                          <X className='px-1'></X>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+
+                ((isAdmin ||
+                  user?.permissions.includes("ALL") ||
+                  user?.permissions.includes("CREATE_LANCAMENTO_ACORDO")
+                ) && isEditing) && (
+                  < div className="flex items-center">
+                    <Button type='button'
+                      className="hover:bg-[#a9d9ef] hover:cursor-pointer bg-[#034869] hover:text-[#034869] text-white h-5"
+                      onClick={() => {
+                        handlerSelBoleto()
+                      }}
+                    >Selecionar boletos</Button>
+                  </div>
+                )
+              )}
+            </div>
+          )}
+          {(!selBoleto && !!acordoMethods?.formState?.errors?.imovelId?.message) && (
+            acordoMethods.formState?.errors?.imovelId?.message && <p style={{ color: '#ed535d', fontSize: '0.8rem' }}>* {acordoMethods.formState?.errors?.imovelId?.message}</p>
+          )}
+          {/*Seleção de boletos */}
+          {selBoleto && (
+            <div className='h-full border' style={{ color: "#034869" }}>
+              <div className="flex  justify-end">
+                <Button onClick={() => { handleSelectedBoleto(undefined) }}
+                  className='w-4 h-8 -top-5 -right-5 relative rounded-full bg-transparent text-black bg-zinc-200 hover:bg-zinc-400'>X</Button>
+              </div>
+              <div>
+                <h1 className='flex items-center justify-center font-bold'>Selecionar Boleto</h1>
+              </div>
+              <div className='mt-2 h-120'>
+                <ListarBoletosBancarios limitView={1} exclude='' txtVinc='Selecionar' onSelectBoleto={handleSelectedBoleto} />
+              </div>
+            </div>
+          )}
+
+          {(!selBoleto && (
+          (acordo?.lancamentos && acordo?.lancamentos.length > 0) ? (
             <div className=''>
               <div className='rounded-md border'>
                 <div className='grid grid-cols-9 m-2 font-[Poppins-bold]' >
@@ -1197,7 +1412,7 @@ export default function DetalhesAcordo() {
                                   </DialogHeader>
                                   <DialogFooter>
                                     <Button onClick={() => { setIsExcDialogOpen(false) }}>Cancelar</Button>
-                                    <Button onClick={() => { handleDeleteLancamento(lancamento.id) }}>
+                                    <Button onClick={() => { handleDeleteLancamento(lancamento.id ? lancamento.id : 0) }}>
                                       Sim, excluir o lançamento.
                                     </Button>
                                   </DialogFooter>
@@ -1233,13 +1448,10 @@ export default function DetalhesAcordo() {
             <p className="text-center text-muted-foreground">
               Nenhum lançamento para essa locação nesse período.
             </p>
-          )}
+          )))}
         </TabsContent>
       </Tabs>
-    </div>
+    </div >
   )
-}
-function watch(arg0: string) {
-  throw new Error('Function not implemented.')
 }
 

@@ -40,15 +40,15 @@ export interface Acordo {
 }
 
 export interface LancamentoAcordo {
-    id: number
+    id?: number
     descricao: string
     valorOriginal: number
-    juros: number;
-    multa: number;
-    desconto: number;
+    juros?: number;
+    multa?: number;
+    desconto?: number;
     valorLancamento: number;
     dataLancamento: string;
     dataVencimento: string;
-    acordo:Acordo;
+    acordo?:Acordo;
     boletoBancario?:BoletoBancario;
 }
